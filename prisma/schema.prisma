@@ -1,0 +1,307 @@
+// ==========================================================================
+// DigiClass Library — Prisma Schema (PostgreSQL)
+// ==========================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------------------------------------------------------
+// Enums are declared as string unions in TypeScript (types/index.ts) rather
+// than Prisma `enum` blocks — carried over from the original SQLite schema,
+// where native enums weren't supported. Kept as-is since nothing depends on
+// Postgres enum types.
+// --------------------------------------------------------------------------
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  emailVerified DateTime? // set by Auth.js on OAuth sign-in; required by @auth/prisma-adapter
+  image         String?
+  googleId      String?  @unique
+
+  role          String   @default("USER") // USER | ADMIN | SUPER_ADMIN
+
+  // Registration / approval workflow
+  approvalStatus String  @default("INCOMPLETE") // INCOMPLETE | PENDING | APPROVED | REJECTED | SUSPENDED
+  mobileNumber   String?
+  institutionId  String?
+  institution    Institution? @relation(fields: [institutionId], references: [id])
+  city           String?
+  state          String?
+
+  // One-time, permanent category choice
+  categoryId     String?
+  category       Category? @relation(fields: [categoryId], references: [id])
+  categoryLocked Boolean  @default(false)
+
+  boardId        String?
+  board          Board?   @relation(fields: [boardId], references: [id])
+
+  lastLoginAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  bookmarks       Bookmark[]
+  favorites       Favorite[]
+  readingProgress ReadingProgress[]
+  notifications   NotificationRecipient[]
+  approvals       Approval[] @relation("ApprovalTarget")
+  approvedByMe    Approval[] @relation("ApprovalActor")
+  activityLogs    ActivityLog[]
+  settings        Setting?
+  bookAccess      BookAccess[]
+  accounts        Account[]
+  sessions        Session[]
+
+  @@index([approvalStatus])
+  @@index([role])
+  @@index([categoryId])
+  @@index([boardId])
+}
+
+// Required by @auth/prisma-adapter (Auth.js) for Google OAuth account linking.
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// Unused while session strategy is "jwt" (see lib/auth.ts), but required by
+// the Auth.js Prisma adapter contract.
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Unused (no email/magic-link provider), but required by the Auth.js Prisma adapter contract.
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Institution {
+  id        String   @id @default(cuid())
+  name      String
+  city      String?
+  state     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+
+  @@index([name])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique // Secondary | Senior Secondary | University
+  slug      String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+  books Book[]
+}
+
+model Board {
+  id        String   @id @default(cuid())
+  name      String   @unique // CBSE, ICSE, Haryana Board, University, Others...
+  slug      String   @unique
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+  books Book[]
+}
+
+model Book {
+  id          String   @id @default(cuid())
+  title       String
+  subject     String
+  className   String?  // e.g. "Class 10", "Semester 3"
+  description String?
+  version     String   @default("1.0")
+  author      String?
+  keywords    String?  // comma-separated, indexed for search
+
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  boardId     String
+  board       Board    @relation(fields: [boardId], references: [id])
+
+  // Google Drive source (Phase-1 storage strategy)
+  driveFileId    String
+  driveShareUrl  String
+  drivePreviewUrl String
+  driveDownloadUrl String
+
+  coverImageUrl   String?
+  thumbnailUrl    String?
+
+  fileType     String  @default("PDF") // PDF | ZIP | HTML | FLIPBOOK | SCORM
+  pageCount    Int?
+  readingTimeMinutes Int?
+
+  status       String  @default("PUBLISHED") // DRAFT | PUBLISHED | ARCHIVED | HIDDEN
+
+  viewCount     Int @default(0)
+  downloadCount Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookAccess      BookAccess[]
+  bookmarks       Bookmark[]
+  favorites       Favorite[]
+  readingProgress ReadingProgress[]
+
+  @@index([categoryId])
+  @@index([boardId])
+  @@index([status])
+  @@index([subject])
+  @@index([title])
+}
+
+// One row per (user, book) — tracks that a user has opened a book at all,
+// separate from fine-grained ReadingProgress (page position).
+model BookAccess {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  firstOpenedAt DateTime @default(now())
+  lastOpenedAt  DateTime @default(now())
+
+  @@unique([userId, bookId])
+  @@index([bookId])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  pageNumber Int
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([bookId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  bookId    String
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, bookId])
+  @@index([userId])
+}
+
+model ReadingProgress {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  bookId        String
+  book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  currentPage   Int      @default(1)
+  totalPages    Int?
+  percentComplete Float  @default(0)
+  lastReadAt    DateTime @default(now())
+
+  @@unique([userId, bookId])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  type      String   @default("ANNOUNCEMENT") // ANNOUNCEMENT | NEW_BOOK | MAINTENANCE
+  createdAt DateTime @default(now())
+
+  recipients NotificationRecipient[]
+}
+
+model NotificationRecipient {
+  id             String   @id @default(cuid())
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id])
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  readAt         DateTime?
+  createdAt      DateTime @default(now())
+
+  @@unique([notificationId, userId])
+  @@index([userId])
+}
+
+model Approval {
+  id         String   @id @default(cuid())
+  targetUserId String
+  targetUser   User   @relation("ApprovalTarget", fields: [targetUserId], references: [id])
+  actorUserId  String
+  actorUser    User   @relation("ApprovalActor", fields: [actorUserId], references: [id])
+  action     String   // APPROVE | REJECT | SUSPEND | REACTIVATE | DELETE
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  @@index([targetUserId])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String   // LOGIN, BOOK_VIEW, BOOK_DOWNLOAD, REGISTER, etc.
+  metadata  String?  // JSON string
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  theme     String   @default("light") // light | dark | system
+  language  String   @default("en")
+  emailNotifications Boolean @default(true)
+  pushNotifications  Boolean @default(true)
+  updatedAt DateTime @updatedAt
+}

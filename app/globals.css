@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-navy: #182956;
+    --color-brandred: #E23744;
+    --color-accentblue: #4A90D6;
+    --color-success: #22C55E;
+    --color-warning: #F59E0B;
+    --color-background: #F7F9FC;
+    --color-card: #FFFFFF;
+    --color-border: #E5E7EB;
+    --color-text-primary: #111827;
+    --color-text-secondary: #6B7280;
+  }
+
+  .dark {
+    /* navy is used both as heading text and as solid button/badge
+       backgrounds — a mid-tone keeps both legible against the dark surface
+       without needing to split it into separate tokens. */
+    --color-navy: #7C9BE8;
+    --color-brandred: #FF6B76;
+    --color-accentblue: #6FA8E0;
+    --color-success: #34D399;
+    --color-warning: #FBBF24;
+    --color-background: #0B1220;
+    --color-card: #131B2E;
+    --color-border: #232D45;
+    --color-text-primary: #E5E7EB;
+    --color-text-secondary: #9CA3AF;
+  }
+
+  body {
+    @apply bg-background text-text-primary font-body antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display text-navy;
+  }
+  ::selection {
+    background-color: rgba(74, 144, 214, 0.25);
+  }
+}
+
+@layer utilities {
+  .data-text {
+    @apply font-mono tracking-tight;
+  }
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .animate-marquee {
+    animation: marquee 22s linear infinite;
+  }
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee {
+      animation: none;
+    }
+  }
+}
