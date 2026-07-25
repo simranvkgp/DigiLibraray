@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import { UserNavLinks } from "@/components/layout/UserNavLinks";
 import { translate, type Lang } from "@/lib/i18n/translate";
 
 export function UserTopNav({
@@ -21,11 +22,7 @@ export function UserTopNav({
         <Link href="/dashboard" className="font-display text-lg font-semibold text-navy">
           VK Digital Library
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-text-secondary sm:flex">
-          <Link href="/dashboard" className="hover:text-navy">{t("nav.dashboard")}</Link>
-          <Link href="/library" className="hover:text-navy">{t("nav.library")}</Link>
-          <Link href="/settings" className="hover:text-navy">{t("nav.settings")}</Link>
-        </nav>
+        <UserNavLinks lang={lang} />
         <div className="flex items-center gap-3">
           {image ? (
             <Image src={image} alt={name} width={32} height={32} className="rounded-full" />

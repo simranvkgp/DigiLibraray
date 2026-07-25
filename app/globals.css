@@ -4,32 +4,46 @@
 
 @layer base {
   :root {
-    --color-navy: #182956;
-    --color-brandred: #E23744;
-    --color-accentblue: #4A90D6;
-    --color-success: #22C55E;
+    /* Clean & minimal — true navy blue, one accent family on a
+       near-white ground. navy (deep navy) carries headings/primary
+       buttons/nav; accentblue (mid navy) is the one interactive accent
+       for links/focus/CTAs. No second hue, no gradients. */
+    --color-navy: #0F2B5B;
+    --color-cream: #FBF3E7;
+    --color-brandred: #DC2626;
+    --color-accentblue: #1E3A8A;
+    --color-success: #16A34A;
     --color-warning: #F59E0B;
-    --color-background: #F7F9FC;
+    --color-background: #F8FAFC;
     --color-card: #FFFFFF;
-    --color-border: #E5E7EB;
-    --color-text-primary: #111827;
-    --color-text-secondary: #6B7280;
+    --color-border: #E2E8F0;
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #64748B;
+
+    /* Dashboard-only brand palette (matches the Login page identity) — a
+       fixed premium palette, not a light/dark semantic token set, so no
+       .dark override (same approach the Login page already takes). */
+    --color-dash-navy: #142554;
+    --color-dash-blue: #1B2F6B;
+    --color-dash-cream: #FCFAF5;
+    --color-dash-gold: #C89B3C;
   }
 
   .dark {
     /* navy is used both as heading text and as solid button/badge
        backgrounds — a mid-tone keeps both legible against the dark surface
        without needing to split it into separate tokens. */
-    --color-navy: #7C9BE8;
-    --color-brandred: #FF6B76;
-    --color-accentblue: #6FA8E0;
-    --color-success: #34D399;
+    --color-navy: #93B4E8;
+    --color-cream: #15203A;
+    --color-brandred: #F87171;
+    --color-accentblue: #6C93DE;
+    --color-success: #4ADE80;
     --color-warning: #FBBF24;
     --color-background: #0B1220;
     --color-card: #131B2E;
     --color-border: #232D45;
-    --color-text-primary: #E5E7EB;
-    --color-text-secondary: #9CA3AF;
+    --color-text-primary: #E2E8F0;
+    --color-text-secondary: #94A3B8;
   }
 
   body {
@@ -47,12 +61,22 @@
   .data-text {
     @apply font-mono tracking-tight;
   }
+  /* Catalog-style section header: small-caps label with a rule trailing
+     off to the right, like a card-catalog divider. */
+  .section-label {
+    @apply flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-wider text-accentblue;
+  }
+  .section-label::after {
+    content: "";
+    flex: 1 1 auto;
+    height: 1px;
+    background-color: var(--color-border);
+  }
   .glass {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
-
   @keyframes marquee {
     from {
       transform: translateX(0);

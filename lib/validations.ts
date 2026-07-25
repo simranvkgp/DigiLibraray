@@ -48,3 +48,28 @@ export const bookFormSchema = z.object({
   readingTimeMinutes: z.coerce.number().int().positive().optional(),
 });
 export type BookFormInput = z.infer<typeof bookFormSchema>;
+
+export const bookRequestSchema = z.object({
+  bookId: z.string().min(1),
+  note: z.string().trim().max(500).optional().or(z.literal("")),
+});
+export type BookRequestInput = z.infer<typeof bookRequestSchema>;
+
+export const bookRequestRejectSchema = z.object({
+  adminNote: z.string().trim().max(500).optional().or(z.literal("")),
+});
+export type BookRequestRejectInput = z.infer<typeof bookRequestRejectSchema>;
+
+export const bookSuggestionSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(200),
+  author: z.string().trim().max(200).optional().or(z.literal("")),
+  subject: z.string().trim().max(100).optional().or(z.literal("")),
+  className: z.string().trim().max(100).optional().or(z.literal("")),
+  note: z.string().trim().max(500).optional().or(z.literal("")),
+});
+export type BookSuggestionInput = z.infer<typeof bookSuggestionSchema>;
+
+export const bookSuggestionRejectSchema = z.object({
+  adminNote: z.string().trim().max(500).optional().or(z.literal("")),
+});
+export type BookSuggestionRejectInput = z.infer<typeof bookSuggestionRejectSchema>;

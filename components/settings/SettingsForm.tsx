@@ -59,19 +59,19 @@ export function SettingsForm({
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader><CardTitle>{t("settings.profile")}</CardTitle></CardHeader>
+      <Card className="rounded-2xl">
+        <CardHeader><CardTitle className="text-dash-navy">{t("settings.profile")}</CardTitle></CardHeader>
         <CardContent className="flex items-center gap-4">
           {image && <img src={image} alt={name} className="h-12 w-12 rounded-full" />}
           <div>
-            <p className="font-medium">{name}</p>
+            <p className="font-medium text-dash-navy">{name}</p>
             <p className="text-sm text-text-secondary">{email}</p>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader><CardTitle>{t("settings.theme")}</CardTitle></CardHeader>
+      <Card className="rounded-2xl">
+        <CardHeader><CardTitle className="text-dash-navy">{t("settings.theme")}</CardTitle></CardHeader>
         <CardContent className="flex gap-2">
           {[
             { value: "light", label: t("settings.theme.light") },
@@ -81,8 +81,8 @@ export function SettingsForm({
             <button
               key={value}
               onClick={() => handleThemeChange(value)}
-              className={`rounded-lg border px-4 py-2 text-sm ${
-                settings.theme === value ? "border-navy bg-navy text-white" : "border-border text-text-secondary"
+              className={`rounded-xl border px-4 py-2 text-sm transition-colors ${
+                settings.theme === value ? "border-dash-navy bg-dash-navy text-white" : "border-border text-text-secondary hover:bg-background"
               }`}
             >
               {label}
@@ -91,13 +91,13 @@ export function SettingsForm({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader><CardTitle>{t("settings.language")}</CardTitle></CardHeader>
+      <Card className="rounded-2xl">
+        <CardHeader><CardTitle className="text-dash-navy">{t("settings.language")}</CardTitle></CardHeader>
         <CardContent>
           <select
             value={settings.language}
             onChange={(e) => handleLanguageChange(e.target.value)}
-            className="h-10 rounded-lg border border-border bg-card px-3 text-sm"
+            className="h-11 rounded-xl border border-border bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dash-gold"
           >
             <option value="en">English</option>
             <option value="hi">हिन्दी</option>
@@ -105,8 +105,8 @@ export function SettingsForm({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader><CardTitle>{t("settings.notifications")}</CardTitle></CardHeader>
+      <Card className="rounded-2xl">
+        <CardHeader><CardTitle className="text-dash-navy">{t("settings.notifications")}</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <label className="flex items-center justify-between">
             <span className="text-sm">{t("settings.emailNotifications")}</span>
@@ -114,7 +114,7 @@ export function SettingsForm({
               type="checkbox"
               checked={settings.emailNotifications}
               onChange={(e) => update({ emailNotifications: e.target.checked })}
-              className="h-4 w-4"
+              className="h-4 w-4 accent-dash-gold"
             />
           </label>
           <label className="flex items-center justify-between">
@@ -123,7 +123,7 @@ export function SettingsForm({
               type="checkbox"
               checked={settings.pushNotifications}
               onChange={(e) => update({ pushNotifications: e.target.checked })}
-              className="h-4 w-4"
+              className="h-4 w-4 accent-dash-gold"
             />
           </label>
         </CardContent>

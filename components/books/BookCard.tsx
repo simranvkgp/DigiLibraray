@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bookmark, Heart, Share2 } from "lucide-react";
+import { Bookmark, Heart, Share2, Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatReadingTime } from "@/lib/utils";
+import { cn, formatReadingTime } from "@/lib/utils";
 import { translate, type Lang } from "@/lib/i18n/translate";
-import type { BookCardData } from "@/types";
+import { RequestAccessDialog } from "@/components/books/RequestAccessDialog";
+import type { BookCardData, BookRequestStatus } from "@/types";
 
 export function BookCard({
   book,
@@ -21,6 +22,7 @@ export function BookCard({
   const isList = view === "list";
   const [isFavorite, setIsFavorite] = useState(!!book.isFavorite);
   const [copied, setCopied] = useState(false);
+  const [requestStatus, setRequestStatus] = useState<BookRequestStatus>(book.requestStatus);
   const t = (key: string) => translate(lang, key);
 
   async function toggleFavorite(e: React.MouseEvent) {
@@ -50,12 +52,17 @@ export function BookCard({
   }
 
   return (
-    <Card className={isList ? "flex gap-4 p-4" : "flex flex-col p-4"}>
+    <Card
+      className={cn(
+        "rounded-2xl transition-all duration-200 hover:-translate-y-1",
+        isList ? "flex gap-4 p-4" : "flex flex-col p-4"
+      )}
+    >
       <div
         className={
           isList
-            ? "h-28 w-20 flex-shrink-0 overflow-hidden rounded-md bg-background"
-            : "aspect-[3/4] w-full overflow-hidden rounded-md bg-background"
+            ? "h-28 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-background"
+            : "aspect-[3/4] w-full overflow-hidden rounded-lg bg-background"
         }
       >
         {book.coverImageUrl && (
@@ -67,20 +74,20 @@ export function BookCard({
       <div className="flex flex-1 flex-col">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="font-display text-base font-medium leading-tight text-navy">{book.title}</p>
+            <p className="font-display text-base font-medium leading-tight text-dash-navy">{book.title}</p>
             <p className="mt-0.5 text-xs text-text-secondary">{book.subject}{book.className ? ` · ${book.className}` : ""}</p>
           </div>
           <div className="flex gap-1 text-text-secondary">
-            <Link href={`/library/${book.id}`} aria-label={t("bookCard.openToBookmark")} className="rounded p-1 hover:bg-background hover:text-navy">
+            <Link href={`/library/${book.id}`} aria-label={t("bookCard.openToBookmark")} className="rounded p-1 hover:bg-background hover:text-dash-navy">
               <Bookmark size={16} />
             </Link>
             <button aria-label={t("bookCard.favorite")} onClick={toggleFavorite} className={`rounded p-1 hover:bg-background ${isFavorite ? "text-brandred" : "hover:text-brandred"}`}>
               <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
             </button>
-            <button aria-label={t("bookCard.share")} onClick={share} className="relative rounded p-1 hover:bg-background hover:text-accentblue">
+            <button aria-label={t("bookCard.share")} onClick={share} className="relative rounded p-1 hover:bg-background hover:text-dash-blue">
               <Share2 size={16} />
               {copied && (
-                <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-navy px-2 py-0.5 text-[10px] text-white">
+                <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-dash-navy px-2 py-0.5 text-[10px] text-white">
                   {t("bookCard.linkCopied")}
                 </span>
               )}
@@ -98,14 +105,29 @@ export function BookCard({
           <Badge variant="accent">v{book.version}</Badge>
           {book.pageCount && <Badge variant="outline">{book.pageCount}p</Badge>}
           {book.readingTimeMinutes && <Badge variant="outline">{formatReadingTime(book.readingTimeMinutes)}</Badge>}
+          {!book.hasAccess && (
+            <Badge variant="warning" className="gap-1">
+              <Lock size={10} />
+              {t("library.locked")}
+            </Badge>
+          )}
         </div>
 
-        <Link
-          href={`/library/${book.id}`}
-          className="mt-3 inline-flex w-fit items-center justify-center rounded-lg bg-navy px-4 py-2 text-sm font-medium text-white hover:bg-navy/90"
-        >
-          {t("bookCard.open")}
-        </Link>
+        {book.hasAccess ? (
+          <Link
+            href={`/library/${book.id}`}
+            className="mt-3 inline-flex w-fit items-center justify-center rounded-xl bg-dash-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-dash-navy/90"
+          >
+            {t("bookCard.open")}
+          </Link>
+        ) : (
+          <RequestAccessDialog
+            book={{ id: book.id, title: book.title }}
+            lang={lang}
+            requestStatus={requestStatus}
+            onChange={setRequestStatus}
+          />
+        )}
       </div>
     </Card>
   );

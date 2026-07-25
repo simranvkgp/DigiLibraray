@@ -33,6 +33,9 @@ export interface SessionUserShape {
   boardId?: string | null;
 }
 
+export type BookRequestStatus = "NONE" | "PENDING" | "APPROVED" | "REJECTED";
+export type BookSuggestionStatus = "PENDING" | "ADDED" | "REJECTED";
+
 export interface BookCardData {
   id: string;
   title: string;
@@ -49,4 +52,6 @@ export interface BookCardData {
   readingTimeMinutes: number | null;
   isBookmarked?: boolean;
   isFavorite?: boolean;
+  hasAccess: boolean;
+  requestStatus: BookRequestStatus;
 }

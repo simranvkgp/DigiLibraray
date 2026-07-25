@@ -2,18 +2,42 @@ import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getUserLanguage } from "@/lib/i18n/get-user-language";
+import { getBookForViewer } from "@/lib/book-access";
 import { BookReader } from "@/components/reader/BookReader";
+import { AccessRequiredNotice } from "@/components/books/AccessRequiredNotice";
 
-export default async function ReaderPage({ params }: { params: { id: string } }) {
+export default async function ReaderPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { page?: string };
+}) {
   const session = await auth();
-  const userId = (session!.user as any).id as string;
+  const user = session!.user as any;
+  const userId = user.id as string;
+  const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
   const lang = await getUserLanguage(userId);
 
-  const book = await prisma.book.findUnique({
-    where: { id: params.id },
-    include: { category: true, board: true },
-  });
-  if (!book || book.status === "HIDDEN" || book.status === "DRAFT") notFound();
+  const result = await getBookForViewer(params.id, userId, isAdmin);
+  if (result.status === "NOT_FOUND") notFound();
+
+  const { book } = result;
+
+  if (result.status === "FORBIDDEN") {
+    const latestRequest = await prisma.bookRequest.findFirst({
+      where: { userId, bookId: book.id },
+      orderBy: { createdAt: "desc" },
+      select: { status: true },
+    });
+    return (
+      <AccessRequiredNotice
+        book={{ id: book.id, title: book.title, coverImageUrl: book.coverImageUrl }}
+        lang={lang}
+        requestStatus={(latestRequest?.status as any) ?? "NONE"}
+      />
+    );
+  }
 
   const [progress, bookmarks] = await Promise.all([
     prisma.readingProgress.findUnique({ where: { userId_bookId: { userId, bookId: book.id } } }),
@@ -30,10 +54,12 @@ export default async function ReaderPage({ params }: { params: { id: string } })
         categoryName: book.category.name,
         fileType: book.fileType,
         pageCount: book.pageCount,
-        drivePreviewUrl: book.drivePreviewUrl,
-        driveDownloadUrl: book.driveDownloadUrl,
+        // Never sent to the client for PDFs — the viewer fetches bytes
+        // itself through the authenticated /api/books/[id]/file route.
+        drivePreviewUrl: book.fileType === "PDF" ? null : book.drivePreviewUrl,
+        driveDownloadUrl: book.fileType === "PDF" ? "" : book.driveDownloadUrl,
       }}
-      initialPage={progress?.currentPage ?? 1}
+      initialPage={Number(searchParams.page) || progress?.currentPage || 1}
       initialBookmarks={bookmarks}
       lang={lang}
     />

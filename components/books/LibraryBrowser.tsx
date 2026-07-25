@@ -30,11 +30,11 @@ export function LibraryBrowser({ lang = "en" }: { lang?: Lang }) {
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[240px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" size={16} />
+        <div className="relative min-w-[240px] flex-1">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary" size={16} />
           <Input
             placeholder={t("library.searchPlaceholder")}
-            className="pl-9"
+            className="h-11 rounded-xl pl-10 focus-visible:ring-dash-gold"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -42,23 +42,23 @@ export function LibraryBrowser({ lang = "en" }: { lang?: Lang }) {
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="h-10 rounded-lg border border-border bg-card px-3 text-sm"
+          className="h-11 rounded-xl border border-border bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dash-gold"
         >
           <option value="recent">{t("library.sortRecent")}</option>
           <option value="title">{t("library.sortTitle")}</option>
           <option value="popular">{t("library.sortPopular")}</option>
         </select>
-        <div className="flex rounded-lg border border-border">
+        <div className="flex rounded-xl border border-border bg-white">
           <button
             onClick={() => setView("grid")}
-            className={`p-2 ${view === "grid" ? "bg-navy text-white" : "text-text-secondary"} rounded-l-lg`}
+            className={`p-2.5 ${view === "grid" ? "bg-dash-navy text-white" : "text-text-secondary"} rounded-l-xl transition-colors`}
             aria-label={t("library.gridView")}
           >
             <LayoutGrid size={16} />
           </button>
           <button
             onClick={() => setView("list")}
-            className={`p-2 ${view === "list" ? "bg-navy text-white" : "text-text-secondary"} rounded-r-lg`}
+            className={`p-2.5 ${view === "list" ? "bg-dash-navy text-white" : "text-text-secondary"} rounded-r-xl transition-colors`}
             aria-label={t("library.listView")}
           >
             <List size={16} />

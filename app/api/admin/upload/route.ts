@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
+import { mkdir, writeFile } from "fs/promises";
+import path from "path";
 
 const ALLOWED_TYPES: Record<string, string> = {
   "image/png": "png",
@@ -31,6 +33,15 @@ export async function POST(req: Request) {
   }
 
   const filename = `covers/${crypto.randomUUID()}.${extension}`;
+
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    const uploadsDir = path.join(process.cwd(), "public", "uploads");
+    await mkdir(path.join(uploadsDir, "covers"), { recursive: true });
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await writeFile(path.join(uploadsDir, filename), buffer);
+    return NextResponse.json({ url: `/uploads/${filename}` });
+  }
+
   const blob = await put(filename, file, {
     access: "public",
     contentType: file.type,

@@ -9,10 +9,11 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url);
   const bookId = searchParams.get("bookId");
-  if (!bookId) return NextResponse.json({ error: "bookId is required" }, { status: 400 });
 
+  // Omitting bookId returns every bookmark the user has, across all books
+  // (used by the sidebar to know whether the Bookmarks link should activate).
   const bookmarks = await prisma.bookmark.findMany({
-    where: { userId, bookId },
+    where: bookId ? { userId, bookId } : { userId },
     orderBy: { pageNumber: "asc" },
   });
   return NextResponse.json({ bookmarks });

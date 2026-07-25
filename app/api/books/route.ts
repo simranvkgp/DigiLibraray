@@ -9,15 +9,25 @@ export async function GET(req: Request) {
   if (!session?.user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   const user = session.user as any;
+  const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q")?.trim();
   const sort = searchParams.get("sort") ?? "recent";
 
   const where: any = {
     status: "PUBLISHED",
-    categoryId: user.categoryId ?? undefined,
-    boardId: user.boardId ?? undefined,
   };
+
+  // Category is a one-time, locked choice per user (see User.categoryLocked) —
+  // a university student/teacher should only ever see university books in
+  // their library. On top of that, the Library page is a "my books" view:
+  // non-admins only see books they've actually been granted access to —
+  // everything else (including same-category books awaiting approval)
+  // doesn't show up here at all. Admins manage/see the full catalog.
+  if (!isAdmin) {
+    where.categoryId = user.categoryId ?? "__none__";
+    where.bookAccessGrants = { some: { userId: user.id } };
+  }
 
   if (q) {
     where.OR = [
@@ -42,12 +52,15 @@ export async function GET(req: Request) {
     take: 60,
   });
 
+  const bookIds = books.map((b) => b.id);
+
   const favoriteBookIds = new Set(
-    (await prisma.favorite.findMany({ where: { userId: user.id, bookId: { in: books.map((b) => b.id) } } })).map(
-      (f) => f.bookId
-    )
+    (await prisma.favorite.findMany({ where: { userId: user.id, bookId: { in: bookIds } } })).map((f) => f.bookId)
   );
 
+  // Every book returned here is already access-checked in the `where` clause
+  // above (admins see everything; non-admins only see their own grants), so
+  // there's nothing left to lock/request on this page.
   return NextResponse.json({
     books: books.map((b) => ({
       id: b.id,
@@ -64,6 +77,8 @@ export async function GET(req: Request) {
       pageCount: b.pageCount,
       readingTimeMinutes: b.readingTimeMinutes,
       isFavorite: favoriteBookIds.has(b.id),
+      hasAccess: true,
+      requestStatus: "NONE",
     })),
   });
 }

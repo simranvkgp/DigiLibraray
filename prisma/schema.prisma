@@ -19,17 +19,17 @@ datasource db {
 // --------------------------------------------------------------------------
 
 model User {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String
-  email         String   @unique
+  email         String    @unique
   emailVerified DateTime? // set by Auth.js on OAuth sign-in; required by @auth/prisma-adapter
   image         String?
-  googleId      String?  @unique
+  googleId      String?   @unique
 
-  role          String   @default("USER") // USER | ADMIN | SUPER_ADMIN
+  role String @default("USER") // USER | ADMIN | SUPER_ADMIN
 
   // Registration / approval workflow
-  approvalStatus String  @default("INCOMPLETE") // INCOMPLETE | PENDING | APPROVED | REJECTED | SUSPENDED
+  approvalStatus String       @default("INCOMPLETE") // INCOMPLETE | PENDING | APPROVED | REJECTED | SUSPENDED
   mobileNumber   String?
   institutionId  String?
   institution    Institution? @relation(fields: [institutionId], references: [id])
@@ -39,26 +39,33 @@ model User {
   // One-time, permanent category choice
   categoryId     String?
   category       Category? @relation(fields: [categoryId], references: [id])
-  categoryLocked Boolean  @default(false)
+  categoryLocked Boolean   @default(false)
 
-  boardId        String?
-  board          Board?   @relation(fields: [boardId], references: [id])
+  boardId String?
+  board   Board?  @relation(fields: [boardId], references: [id])
 
-  lastLoginAt    DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  bookmarks       Bookmark[]
-  favorites       Favorite[]
-  readingProgress ReadingProgress[]
-  notifications   NotificationRecipient[]
-  approvals       Approval[] @relation("ApprovalTarget")
-  approvedByMe    Approval[] @relation("ApprovalActor")
-  activityLogs    ActivityLog[]
-  settings        Setting?
-  bookAccess      BookAccess[]
-  accounts        Account[]
-  sessions        Session[]
+  bookmarks               Bookmark[]
+  favorites               Favorite[]
+  readingProgress         ReadingProgress[]
+  notifications           NotificationRecipient[]
+  approvals               Approval[]              @relation("ApprovalTarget")
+  approvedByMe            Approval[]              @relation("ApprovalActor")
+  activityLogs            ActivityLog[]
+  settings                Setting?
+  bookAccess              BookAccess[]
+  bookAccessGrants        BookAccessGrant[]       @relation("BookAccessGrantUser")
+  bookAccessGrantsGiven   BookAccessGrant[]       @relation("BookAccessGrantedBy")
+  bookRequests            BookRequest[]           @relation("BookRequestUser")
+  bookRequestsResolved    BookRequest[]           @relation("BookRequestResolvedBy")
+  bookSuggestions         BookSuggestion[]        @relation("BookSuggestionUser")
+  bookSuggestionsResolved BookSuggestion[]        @relation("BookSuggestionResolvedBy")
+  pushSubscriptions       PushSubscription[]
+  accounts                Account[]
+  sessions                Session[]
 
   @@index([approvalStatus])
   @@index([role])
@@ -113,7 +120,8 @@ model Institution {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users User[]
+  users                User[]
+  requestableBookNames RequestableBookName[]
 
   @@index([name])
 }
@@ -126,8 +134,9 @@ model Category {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users User[]
-  books Book[]
+  users                User[]
+  books                Book[]
+  requestableBookNames RequestableBookName[]
 }
 
 model Board {
@@ -143,34 +152,34 @@ model Board {
 }
 
 model Book {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   title       String
   subject     String
-  className   String?  // e.g. "Class 10", "Semester 3"
+  className   String? // e.g. "Class 10", "Semester 3"
   description String?
-  version     String   @default("1.0")
+  version     String  @default("1.0")
   author      String?
-  keywords    String?  // comma-separated, indexed for search
+  keywords    String? // comma-separated, indexed for search
 
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  boardId     String
-  board       Board    @relation(fields: [boardId], references: [id])
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  boardId    String
+  board      Board    @relation(fields: [boardId], references: [id])
 
   // Google Drive source (Phase-1 storage strategy)
-  driveFileId    String
-  driveShareUrl  String
-  drivePreviewUrl String
+  driveFileId      String
+  driveShareUrl    String
+  drivePreviewUrl  String
   driveDownloadUrl String
 
-  coverImageUrl   String?
-  thumbnailUrl    String?
+  coverImageUrl String?
+  thumbnailUrl  String?
 
-  fileType     String  @default("PDF") // PDF | ZIP | HTML | FLIPBOOK | SCORM
-  pageCount    Int?
+  fileType           String @default("PDF") // PDF | ZIP | HTML | FLIPBOOK | SCORM
+  pageCount          Int?
   readingTimeMinutes Int?
 
-  status       String  @default("PUBLISHED") // DRAFT | PUBLISHED | ARCHIVED | HIDDEN
+  status String @default("PUBLISHED") // DRAFT | PUBLISHED | ARCHIVED | HIDDEN
 
   viewCount     Int @default(0)
   downloadCount Int @default(0)
@@ -178,10 +187,13 @@ model Book {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  bookAccess      BookAccess[]
-  bookmarks       Bookmark[]
-  favorites       Favorite[]
-  readingProgress ReadingProgress[]
+  bookAccess        BookAccess[]
+  bookmarks         Bookmark[]
+  favorites         Favorite[]
+  readingProgress   ReadingProgress[]
+  bookAccessGrants  BookAccessGrant[]
+  bookRequests      BookRequest[]
+  linkedSuggestions BookSuggestion[]
 
   @@index([categoryId])
   @@index([boardId])
@@ -193,11 +205,11 @@ model Book {
 // One row per (user, book) — tracks that a user has opened a book at all,
 // separate from fine-grained ReadingProgress (page position).
 model BookAccess {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  bookId    String
-  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  bookId        String
+  book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
   firstOpenedAt DateTime @default(now())
   lastOpenedAt  DateTime @default(now())
 
@@ -205,12 +217,91 @@ model BookAccess {
   @@index([bookId])
 }
 
+// Explicit per-user permission to open a book. All book access is gated on
+// this existing (not auto-granted by category/board match) — see BookRequest.
+model BookAccessGrant {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation("BookAccessGrantUser", fields: [userId], references: [id])
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  grantedById String?
+  grantedBy   User?    @relation("BookAccessGrantedBy", fields: [grantedById], references: [id])
+  grantedAt   DateTime @default(now())
+
+  @@unique([userId, bookId])
+  @@index([bookId])
+}
+
+model BookRequest {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation("BookRequestUser", fields: [userId], references: [id])
+  bookId       String
+  book         Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  status       String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  note         String?
+  createdAt    DateTime  @default(now())
+  resolvedAt   DateTime?
+  resolvedById String?
+  resolvedBy   User?     @relation("BookRequestResolvedBy", fields: [resolvedById], references: [id])
+  adminNote    String?
+
+  @@index([userId])
+  @@index([bookId])
+  @@index([status])
+}
+
+// A user asking for a book that isn't in the catalog at all (as opposed to
+// BookRequest, which asks for access to a book that already exists). Admins
+// review these to decide what to add to the library next.
+model BookSuggestion {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation("BookSuggestionUser", fields: [userId], references: [id])
+  title        String
+  author       String?
+  subject      String?
+  className    String?
+  note         String?
+  status       String    @default("PENDING") // PENDING | ADDED | REJECTED
+  createdAt    DateTime  @default(now())
+  resolvedAt   DateTime?
+  resolvedById String?
+  resolvedBy   User?     @relation("BookSuggestionResolvedBy", fields: [resolvedById], references: [id])
+  adminNote    String?
+  linkedBookId String?
+  linkedBook   Book?     @relation(fields: [linkedBookId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+}
+
+// Admin-maintained catalog of book titles users can pick from when filing a
+// BookSuggestion, instead of typing a free-text title.
+model RequestableBookName {
+  id            String       @id @default(cuid())
+  name          String
+  className     String?
+  medium        String?
+  author        String?
+  categoryId    String
+  category      Category     @relation(fields: [categoryId], references: [id])
+  institutionId String?
+  institution   Institution? @relation(fields: [institutionId], references: [id])
+  createdAt     DateTime     @default(now())
+
+  @@unique([name, categoryId, className, medium, institutionId])
+  @@index([categoryId])
+  @@index([institutionId])
+}
+
 model Bookmark {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  bookId    String
-  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  bookId     String
+  book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
   pageNumber Int
   note       String?
   createdAt  DateTime @default(now())
@@ -232,15 +323,15 @@ model Favorite {
 }
 
 model ReadingProgress {
-  id            String   @id @default(cuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id])
-  bookId        String
-  book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  currentPage   Int      @default(1)
-  totalPages    Int?
-  percentComplete Float  @default(0)
-  lastReadAt    DateTime @default(now())
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  bookId          String
+  book            Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  currentPage     Int      @default(1)
+  totalPages      Int?
+  percentComplete Float    @default(0)
+  lastReadAt      DateTime @default(now())
 
   @@unique([userId, bookId])
   @@index([userId])
@@ -257,27 +348,42 @@ model Notification {
 }
 
 model NotificationRecipient {
-  id             String   @id @default(cuid())
+  id             String       @id @default(cuid())
   notificationId String
-  notification   Notification @relation(fields: [notificationId], references: [id])
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
   userId         String
-  user           User     @relation(fields: [userId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
   readAt         DateTime?
-  createdAt      DateTime @default(now())
+  createdAt      DateTime     @default(now())
 
   @@unique([notificationId, userId])
   @@index([userId])
 }
 
+// Browser Push API subscription — lets an admin get an OS-level notification
+// (Windows/Mac/Android/iOS) for new activity even while away from the tab.
+// One row per browser/device the admin has enabled notifications on.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
 model Approval {
-  id         String   @id @default(cuid())
+  id           String   @id @default(cuid())
   targetUserId String
-  targetUser   User   @relation("ApprovalTarget", fields: [targetUserId], references: [id])
+  targetUser   User     @relation("ApprovalTarget", fields: [targetUserId], references: [id])
   actorUserId  String
-  actorUser    User   @relation("ApprovalActor", fields: [actorUserId], references: [id])
-  action     String   // APPROVE | REJECT | SUSPEND | REACTIVATE | DELETE
-  reason     String?
-  createdAt  DateTime @default(now())
+  actorUser    User     @relation("ApprovalActor", fields: [actorUserId], references: [id])
+  action       String // APPROVE | REJECT | SUSPEND | REACTIVATE | DELETE
+  reason       String?
+  createdAt    DateTime @default(now())
 
   @@index([targetUserId])
 }
@@ -286,8 +392,8 @@ model ActivityLog {
   id        String   @id @default(cuid())
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
-  action    String   // LOGIN, BOOK_VIEW, BOOK_DOWNLOAD, REGISTER, etc.
-  metadata  String?  // JSON string
+  action    String // LOGIN, BOOK_VIEW, BOOK_DOWNLOAD, REGISTER, etc.
+  metadata  String? // JSON string
   createdAt DateTime @default(now())
 
   @@index([userId])
@@ -296,12 +402,12 @@ model ActivityLog {
 }
 
 model Setting {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id])
-  theme     String   @default("light") // light | dark | system
-  language  String   @default("en")
-  emailNotifications Boolean @default(true)
-  pushNotifications  Boolean @default(true)
-  updatedAt DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id])
+  theme              String   @default("light") // light | dark | system
+  language           String   @default("en")
+  emailNotifications Boolean  @default(true)
+  pushNotifications  Boolean  @default(true)
+  updatedAt          DateTime @updatedAt
 }

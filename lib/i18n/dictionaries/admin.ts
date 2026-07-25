@@ -4,6 +4,8 @@ export const admin = {
     // Sidebar nav
     "admin.nav.brand": "VK Digital Library Admin",
     "admin.nav.books": "Books",
+    "admin.nav.requests": "Requests",
+    "admin.nav.bookNames": "Book Names",
     "admin.nav.users": "Users",
     "admin.nav.boards": "Boards",
     "admin.nav.categories": "Categories",
@@ -11,8 +13,18 @@ export const admin = {
     "admin.nav.analytics": "Analytics",
     "admin.nav.notifications": "Notifications",
     "admin.nav.logs": "Logs",
+    "admin.nav.group.overview": "Overview",
+    "admin.nav.group.content": "Content",
+    "admin.nav.group.people": "People",
+    "admin.nav.group.system": "System",
+
+    // Push notification toggle (sidebar)
+    "admin.push.enable": "Enable alerts",
+    "admin.push.enabled": "Alerts on",
+    "admin.push.disabled": "Alerts off",
 
     // Dashboard
+    "admin.dashboard.subtitle": "Here's what's happening across the library today.",
     "admin.dashboard.totalUsers": "Total users",
     "admin.dashboard.pendingApprovals": "Pending approvals",
     "admin.dashboard.totalBooks": "Books in library",
@@ -32,6 +44,8 @@ export const admin = {
     "admin.field.description": "Description",
     "admin.field.type": "Type",
     "admin.field.institution": "Institution",
+    "admin.field.class": "Class",
+    "admin.field.medium": "Medium",
     "admin.field.user": "User",
 
     // Generic table column headers
@@ -88,6 +102,54 @@ export const admin = {
     "admin.books.form.error": "Couldn't add that book. Check the fields and try again.",
     "admin.books.form.adding": "Adding book...",
 
+    // Book requests page / table
+    "admin.requests.subtitle": "Review new book requests from users and grant access once the book is in the library.",
+    "admin.requests.col.user": "User",
+    "admin.requests.col.book": "Book",
+    "admin.requests.col.note": "Note",
+    "admin.requests.col.requested": "Requested",
+    "admin.requests.approve": "Approve",
+    "admin.requests.reject": "Reject",
+    "admin.requests.rejectReason": "Reason (optional)",
+    "admin.requests.rejectSubmit": "Confirm reject",
+    "admin.requests.empty": "No requests in this view.",
+
+    // New book suggestions (books not yet in the library)
+    "admin.status.added": "Added",
+    "admin.suggestions.subtitle": "Books users have asked for that aren't in the library yet.",
+    "admin.suggestions.col.book": "Requested book",
+    "admin.suggestions.access": "Access",
+    "admin.suggestions.giveAccess": "Give access",
+    "admin.suggestions.addBookFirst": "Please add the book in the library first, then come back here to give access.",
+    "admin.suggestions.searchBookPlaceholder": "Search books in the library...",
+    "admin.suggestions.noBooksFound": "No matching book found in the library. Please add it in Books first.",
+    "admin.suggestions.reject": "Reject",
+    "admin.suggestions.empty": "No new book requests in this view.",
+
+    // Book names catalog page (dropdown source for user book requests)
+    "admin.bookNames.subtitle": "Maintain the list of book names users can pick from when requesting a new book.",
+    "admin.bookNames.placeholder": "New book name",
+    "admin.bookNames.empty": "No book names yet — add one above.",
+    "admin.bookNames.uploadButton": "Upload catalog file",
+    "admin.bookNames.uploading": "Uploading...",
+    "admin.bookNames.uploadHint": "Pick a category, then upload a .xlsx, .xls or .ods catalog — Title, Class, Medium, Author and Institution are read automatically from every sheet.",
+    "admin.bookNames.uploadCategoryPlaceholder": "Category for this import...",
+    "admin.bookNames.selectCategoryFirst": "Pick a category before uploading",
+    "admin.bookNames.uploadError": "Couldn't process that file.",
+    "admin.bookNames.uploadSummary": "Added {created} book name(s). Skipped {skipped} already in the list.",
+    "admin.bookNames.sheetsSkipped": "Sheets skipped (no recognizable Title/Class header): {sheets}",
+    "admin.bookNames.uploadRowError": "Row {row}: {reason}",
+    "admin.bookNames.totalCount": "Total book names: {count}",
+    "admin.bookNames.editTitle": "Edit book name",
+    "admin.bookNames.editSaving": "Saving...",
+    "admin.bookNames.editError": "Couldn't save those changes.",
+    "admin.bookNames.removeAll": "Remove all",
+    "admin.bookNames.removingAll": "Removing...",
+    "admin.bookNames.removeAllConfirmTitle": "Delete all book names?",
+    "admin.bookNames.removeAllConfirmBody": "Are you sure you want to delete all {count} book name(s)? This data cannot be recovered again.",
+    "admin.bookNames.removeAllConfirmButton": "Yes, delete all",
+    "admin.bookNames.removeAllError": "Couldn't remove all book names.",
+
     // Categories page
     "admin.categories.subtitle": "Secondary, Senior Secondary, University, etc. Users choose one permanently at onboarding.",
 
@@ -125,6 +187,7 @@ export const admin = {
     "admin.notifications.recent": "Recent broadcasts",
     "admin.notifications.empty": "No broadcasts sent yet.",
     "admin.notifications.recipientsLabel": "{count} recipients",
+    "admin.notifications.confirmDelete": "Delete this notification? This can't be undone.",
 
     // Analytics page / dashboard
     "admin.analytics.subtitle": "Usage trends across users and books.",
@@ -154,6 +217,8 @@ export const admin = {
     // Sidebar nav
     "admin.nav.brand": "VK डिजिटल लाइब्रेरी एडमिन",
     "admin.nav.books": "पुस्तकें",
+    "admin.nav.requests": "अनुरोध",
+    "admin.nav.bookNames": "पुस्तक नाम",
     "admin.nav.users": "उपयोगकर्ता",
     "admin.nav.boards": "बोर्ड",
     "admin.nav.categories": "श्रेणियाँ",
@@ -161,8 +226,18 @@ export const admin = {
     "admin.nav.analytics": "विश्लेषण",
     "admin.nav.notifications": "सूचनाएं",
     "admin.nav.logs": "लॉग",
+    "admin.nav.group.overview": "अवलोकन",
+    "admin.nav.group.content": "सामग्री",
+    "admin.nav.group.people": "लोग",
+    "admin.nav.group.system": "सिस्टम",
+
+    // Push notification toggle (sidebar)
+    "admin.push.enable": "अलर्ट चालू करें",
+    "admin.push.enabled": "अलर्ट चालू",
+    "admin.push.disabled": "अलर्ट बंद",
 
     // Dashboard
+    "admin.dashboard.subtitle": "आज लाइब्रेरी में यह सब हो रहा है।",
     "admin.dashboard.totalUsers": "कुल उपयोगकर्ता",
     "admin.dashboard.pendingApprovals": "लंबित अनुमोदन",
     "admin.dashboard.totalBooks": "लाइब्रेरी में पुस्तकें",
@@ -183,6 +258,8 @@ export const admin = {
     "admin.field.type": "प्रकार",
     "admin.field.institution": "संस्थान",
     "admin.field.user": "उपयोगकर्ता",
+    "admin.field.class": "कक्षा",
+    "admin.field.medium": "माध्यम",
 
     // Generic table column headers
     "admin.table.categoryBoard": "श्रेणी / बोर्ड",
@@ -238,6 +315,54 @@ export const admin = {
     "admin.books.form.error": "वह पुस्तक नहीं जोड़ी जा सकी। फ़ील्ड जांचें और फिर से प्रयास करें।",
     "admin.books.form.adding": "पुस्तक जोड़ी जा रही है...",
 
+    // Book requests page / table
+    "admin.requests.subtitle": "उपयोगकर्ताओं के नई पुस्तक अनुरोधों की समीक्षा करें और पुस्तक लाइब्रेरी में आने पर एक्सेस दें।",
+    "admin.requests.col.user": "उपयोगकर्ता",
+    "admin.requests.col.book": "पुस्तक",
+    "admin.requests.col.note": "नोट",
+    "admin.requests.col.requested": "अनुरोधित",
+    "admin.requests.approve": "स्वीकृत करें",
+    "admin.requests.reject": "अस्वीकृत करें",
+    "admin.requests.rejectReason": "कारण (वैकल्पिक)",
+    "admin.requests.rejectSubmit": "अस्वीकृति की पुष्टि करें",
+    "admin.requests.empty": "इस दृश्य में कोई अनुरोध नहीं है।",
+
+    // New book suggestions (books not yet in the library)
+    "admin.status.added": "जोड़ी गई",
+    "admin.suggestions.subtitle": "उपयोगकर्ताओं द्वारा मांगी गई पुस्तकें जो अभी लाइब्रेरी में नहीं हैं।",
+    "admin.suggestions.col.book": "मांगी गई पुस्तक",
+    "admin.suggestions.access": "एक्सेस",
+    "admin.suggestions.giveAccess": "एक्सेस दें",
+    "admin.suggestions.addBookFirst": "कृपया पहले पुस्तक को लाइब्रेरी में जोड़ें, फिर एक्सेस देने के लिए यहां वापस आएं।",
+    "admin.suggestions.searchBookPlaceholder": "लाइब्रेरी में पुस्तकें खोजें...",
+    "admin.suggestions.noBooksFound": "लाइब्रेरी में कोई मेल खाती पुस्तक नहीं मिली। कृपया पहले इसे Books में जोड़ें।",
+    "admin.suggestions.reject": "अस्वीकृत करें",
+    "admin.suggestions.empty": "इस दृश्य में कोई नई पुस्तक अनुरोध नहीं है।",
+
+    // Book names catalog page (dropdown source for user book requests)
+    "admin.bookNames.subtitle": "उन पुस्तक नामों की सूची बनाए रखें जिनमें से उपयोगकर्ता नई पुस्तक मांगते समय चुन सकते हैं।",
+    "admin.bookNames.placeholder": "नया पुस्तक नाम",
+    "admin.bookNames.empty": "अभी तक कोई पुस्तक नाम नहीं है — ऊपर एक जोड़ें।",
+    "admin.bookNames.uploadButton": "कैटलॉग फ़ाइल अपलोड करें",
+    "admin.bookNames.uploading": "अपलोड हो रहा है...",
+    "admin.bookNames.uploadHint": "एक श्रेणी चुनें, फिर .xlsx, .xls या .ods कैटलॉग अपलोड करें — शीर्षक, कक्षा, माध्यम, लेखक और संस्थान हर शीट से अपने आप पढ़े जाते हैं।",
+    "admin.bookNames.uploadCategoryPlaceholder": "इस इम्पोर्ट के लिए श्रेणी...",
+    "admin.bookNames.selectCategoryFirst": "अपलोड करने से पहले एक श्रेणी चुनें",
+    "admin.bookNames.uploadError": "वह फ़ाइल संसाधित नहीं की जा सकी।",
+    "admin.bookNames.uploadSummary": "{created} पुस्तक नाम जोड़े गए। {skipped} पहले से सूची में होने के कारण छोड़े गए।",
+    "admin.bookNames.sheetsSkipped": "शीट्स छोड़ी गईं (कोई पहचान योग्य Title/Class हेडर नहीं मिला): {sheets}",
+    "admin.bookNames.uploadRowError": "पंक्ति {row}: {reason}",
+    "admin.bookNames.totalCount": "कुल पुस्तक नाम: {count}",
+    "admin.bookNames.editTitle": "पुस्तक नाम संपादित करें",
+    "admin.bookNames.editSaving": "सहेजा जा रहा है...",
+    "admin.bookNames.editError": "वे बदलाव सहेजे नहीं जा सके।",
+    "admin.bookNames.removeAll": "सभी हटाएं",
+    "admin.bookNames.removingAll": "हटाया जा रहा है...",
+    "admin.bookNames.removeAllConfirmTitle": "सभी पुस्तक नाम हटाएं?",
+    "admin.bookNames.removeAllConfirmBody": "क्या आप वाकई सभी {count} पुस्तक नाम हटाना चाहते हैं? यह डेटा दोबारा वापस नहीं लाया जा सकता।",
+    "admin.bookNames.removeAllConfirmButton": "हां, सभी हटाएं",
+    "admin.bookNames.removeAllError": "सभी पुस्तक नाम हटाए नहीं जा सके।",
+
     // Categories page
     "admin.categories.subtitle": "माध्यमिक, वरिष्ठ माध्यमिक, विश्वविद्यालय, आदि। उपयोगकर्ता ऑनबोर्डिंग के दौरान स्थायी रूप से एक श्रेणी चुनते हैं।",
 
@@ -275,6 +400,7 @@ export const admin = {
     "admin.notifications.recent": "हाल के प्रसारण",
     "admin.notifications.empty": "अभी तक कोई प्रसारण नहीं भेजा गया।",
     "admin.notifications.recipientsLabel": "{count} प्राप्तकर्ता",
+    "admin.notifications.confirmDelete": "यह सूचना हटाएं? इसे वापस नहीं किया जा सकता।",
 
     // Analytics page / dashboard
     "admin.analytics.subtitle": "उपयोगकर्ताओं और पुस्तकों में उपयोग के रुझान।",

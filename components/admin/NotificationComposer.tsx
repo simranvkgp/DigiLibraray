@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +35,7 @@ export function NotificationComposer({ lang = "en" }: { lang?: Lang }) {
   const [boardId, setBoardId] = useState("");
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
   const t = (key: string) => translate(lang, key);
 
   const loadHistory = useCallback(() => {
@@ -65,6 +67,14 @@ export function NotificationComposer({ lang = "en" }: { lang?: Lang }) {
       setResult(t("admin.notifications.sendError"));
     }
     setSending(false);
+  }
+
+  async function remove(id: string) {
+    if (!confirm(t("admin.notifications.confirmDelete"))) return;
+    setBusyId(id);
+    await fetch(`/api/admin/notifications/${id}`, { method: "DELETE" });
+    loadHistory();
+    setBusyId(null);
   }
 
   return (
@@ -125,7 +135,20 @@ export function NotificationComposer({ lang = "en" }: { lang?: Lang }) {
             <div key={n.id} className="rounded-xl border border-border bg-card p-4">
               <div className="flex items-center justify-between">
                 <Badge variant={n.type === "MAINTENANCE" ? "warning" : "accent"}>{typeKey[n.type] ? t(typeKey[n.type]) : n.type.replace("_", " ")}</Badge>
-                <span className="data-text text-xs text-text-secondary">{t("admin.notifications.recipientsLabel").replace("{count}", String(n._count.recipients))}</span>
+                <div className="flex items-center gap-2">
+                  <span className="data-text text-xs text-text-secondary">{t("admin.notifications.recipientsLabel").replace("{count}", String(n._count.recipients))}</span>
+                  <Button
+                    size="icon"
+                    variant="destructive"
+                    className="h-7 w-7"
+                    disabled={busyId === n.id}
+                    onClick={() => remove(n.id)}
+                    aria-label={t("action.delete")}
+                    title={t("action.delete")}
+                  >
+                    <Trash2 size={14} />
+                  </Button>
+                </div>
               </div>
               <p className="mt-2 text-sm font-medium">{n.title}</p>
               <p className="mt-1 text-sm text-text-secondary">{n.body}</p>

@@ -19,6 +19,9 @@ export const user = {
     "settings.category.change": "Change category",
     "settings.category.currentPrefix": "You're currently in",
 
+    // Footer
+    "footer.contactUs": "Contact us",
+
     // Dashboard
     "dashboard.welcomeBack": "Welcome back",
     "dashboard.heroSubtitle": "Pick up where you left off, or explore the library.",
@@ -33,6 +36,57 @@ export const user = {
     "dashboard.notifications": "Notifications",
     "dashboard.noNotifications": "Nothing new right now.",
     "dashboard.newUpdates": "New updates",
+    "dashboard.newUser.message": "You haven't started reading or favourited any books yet. Request a book you need, or explore the library to get started.",
+
+    // Dashboard redesign (sidebar, top bar, stat cards, extra sections)
+    "dashboard.sidebar.dashboard": "Dashboard",
+    "dashboard.sidebar.myLibrary": "My Library",
+    "dashboard.sidebar.newArrivals": "New Arrivals",
+    "dashboard.sidebar.bookmarks": "Bookmarks",
+    "dashboard.sidebar.myRequests": "My Requests",
+    "dashboard.sidebar.settings": "Settings",
+    "dashboard.sidebar.soon": "Soon",
+    "dashboard.sidebar.noBookmarksYet": "None yet",
+    "dashboard.sidebar.promoTitle": "Expand Your Knowledge",
+    "dashboard.sidebar.promoBody": "Explore thousands of books across multiple categories.",
+    "dashboard.sidebar.queryPrompt": "Have a query? We're here to help.",
+    "dashboard.searchPlaceholder": "Search books, authors, categories...",
+    "dashboard.roleLabel.user": "Member",
+    "dashboard.roleLabel.admin": "Admin",
+    "dashboard.roleLabel.super_admin": "Super Admin",
+    "dashboard.stats.bookmarks": "Bookmarks",
+    "dashboard.stats.bookmarksSub": "Saved items",
+    "dashboard.stats.favorites": "Favourites",
+    "dashboard.stats.favoritesSub": "Saved books",
+    "dashboard.stats.pendingRequests": "Requests",
+    "dashboard.stats.pendingRequestsSub": "Pending",
+    "dashboard.recommended": "Recommended for you",
+    "dashboard.emptyRecommended": "No other books in your category right now — check back soon.",
+    "dashboard.recentlyOpened": "Recently opened",
+    "dashboard.emptyRecentlyOpened": "Nothing opened yet.",
+    "dashboard.viewAll": "View all",
+    "dashboard.contactPrompt": "Any query? Contact us",
+
+    // Request a new book panel (dashboard) — for books that aren't in the library at all
+    "dashboard.requestBook.title": "Request a new book",
+    "dashboard.requestBook.subtitle": "Can't find a book in the library? Request one from the list below.",
+    "dashboard.requestBook.button": "Request a Book",
+    "dashboard.requestBook.dialogTitle": "Request a new book",
+    "dashboard.requestBook.selectLabel": "Choose a book",
+    "dashboard.requestBook.selectPlaceholder": "Select a book...",
+    "dashboard.requestBook.searchPlaceholder": "Type to search a book name...",
+    "dashboard.requestBook.noMatches": "No books match your search.",
+    "dashboard.requestBook.noBooksAvailable": "No books available to request right now. Please check back later.",
+    "dashboard.requestBook.noteLabel": "Note (optional)",
+    "dashboard.requestBook.notePlaceholder": "Any extra details for the admin",
+    "dashboard.requestBook.submit": "Send request",
+    "dashboard.requestBook.submitting": "Sending...",
+    "dashboard.requestBook.error": "Couldn't send that request. Please try again.",
+    "dashboard.requestBook.yourRequests": "Your requests",
+    "dashboard.requestBook.empty": "You haven't requested any books yet.",
+    "dashboard.requestBook.status.pending": "Pending",
+    "dashboard.requestBook.status.added": "Added",
+    "dashboard.requestBook.status.rejected": "Not added",
 
     // Library
     "library.title": "Library",
@@ -44,6 +98,13 @@ export const user = {
     "library.gridView": "Grid view",
     "library.listView": "List view",
     "library.noResults": "No books match your search yet.",
+    "library.locked": "Locked",
+    "library.requestAccess": "Request Access",
+    "library.requestPending": "Request Pending",
+    "library.requestAgain": "Request Again",
+    "library.accessRequired.title": "Access required",
+    "library.accessRequired.body": "You don't have access to this book yet. Send a request and an admin will review it.",
+    "library.accessRequired.back": "Back to library",
 
     // Book card
     "bookCard.openToBookmark": "Open to bookmark",
@@ -52,13 +113,21 @@ export const user = {
     "bookCard.linkCopied": "Link copied",
     "bookCard.open": "Open",
 
+    // Request dialog
+    "requestDialog.title": "Request this book",
+    "requestDialog.noteLabel": "Note to admin (optional)",
+    "requestDialog.notePlaceholder": "Why do you need this book?",
+    "requestDialog.submit": "Send request",
+    "requestDialog.submitting": "Sending...",
+    "requestDialog.success": "Request sent. You'll get access once an admin approves it.",
+    "requestDialog.error": "Couldn't send that request. Please try again.",
+
     // Reader
     "reader.zoomOut": "Zoom out",
     "reader.zoomIn": "Zoom in",
     "reader.toggleDarkMode": "Toggle dark mode",
     "reader.toggleFullscreen": "Toggle fullscreen",
     "reader.addBookmark": "Add bookmark",
-    "reader.download": "Download",
     "reader.bookmarks": "Bookmarks",
     "reader.package": "package",
     "reader.packageNotRenderable": "packages don't render inline yet — download the package to open it in a compatible player.",
@@ -68,6 +137,14 @@ export const user = {
     "reader.removeBookmark": "Remove bookmark",
     "reader.previousPage": "Previous page",
     "reader.nextPage": "Next page",
+    "reader.loading": "Loading book…",
+    "reader.loadError": "Couldn't load this book. Please try again.",
+    "reader.printDisabled": "Printing is disabled for this book.",
+
+    // Bookmarks page (all bookmarks across every book)
+    "bookmarks.title": "Bookmarks",
+    "bookmarks.subtitle": "Every page you've bookmarked, across all your books.",
+    "bookmarks.empty": "You haven't bookmarked any pages yet. Open a book and tap the bookmark icon on any page.",
   } as Record<string, string>,
   hi: {
     "settings.title": "सेटिंग्स",
@@ -88,6 +165,9 @@ export const user = {
     "settings.category.change": "श्रेणी बदलें",
     "settings.category.currentPrefix": "आप अभी इसमें हैं",
 
+    // Footer
+    "footer.contactUs": "संपर्क करें",
+
     // Dashboard
     "dashboard.welcomeBack": "वापसी पर स्वागत है",
     "dashboard.heroSubtitle": "जहाँ से आपने छोड़ा था वहीं से जारी रखें, या लाइब्रेरी देखें।",
@@ -102,6 +182,57 @@ export const user = {
     "dashboard.notifications": "सूचनाएं",
     "dashboard.noNotifications": "अभी कुछ भी नया नहीं है।",
     "dashboard.newUpdates": "नई सूचनाएं",
+    "dashboard.newUser.message": "आपने अभी तक कोई किताब पढ़नी शुरू नहीं की है या पसंदीदा में नहीं जोड़ी है। अपनी ज़रूरत की किताब मांगें, या शुरू करने के लिए लाइब्रेरी देखें।",
+
+    // Dashboard redesign (sidebar, top bar, stat cards, extra sections)
+    "dashboard.sidebar.dashboard": "डैशबोर्ड",
+    "dashboard.sidebar.myLibrary": "मेरी लाइब्रेरी",
+    "dashboard.sidebar.newArrivals": "नई किताबें",
+    "dashboard.sidebar.bookmarks": "बुकमार्क",
+    "dashboard.sidebar.myRequests": "मेरे अनुरोध",
+    "dashboard.sidebar.settings": "सेटिंग्स",
+    "dashboard.sidebar.soon": "जल्द आ रहा है",
+    "dashboard.sidebar.noBookmarksYet": "अभी कोई नहीं",
+    "dashboard.sidebar.promoTitle": "अपना ज्ञान बढ़ाएं",
+    "dashboard.sidebar.promoBody": "कई श्रेणियों में हज़ारों किताबें देखें।",
+    "dashboard.sidebar.queryPrompt": "कोई प्रश्न है? हम मदद के लिए यहाँ हैं।",
+    "dashboard.searchPlaceholder": "किताबें, लेखक, श्रेणियाँ खोजें...",
+    "dashboard.roleLabel.user": "सदस्य",
+    "dashboard.roleLabel.admin": "एडमिन",
+    "dashboard.roleLabel.super_admin": "सुपर एडमिन",
+    "dashboard.stats.bookmarks": "बुकमार्क",
+    "dashboard.stats.bookmarksSub": "सहेजी गई",
+    "dashboard.stats.favorites": "पसंदीदा",
+    "dashboard.stats.favoritesSub": "सहेजी गई किताबें",
+    "dashboard.stats.pendingRequests": "अनुरोध",
+    "dashboard.stats.pendingRequestsSub": "लंबित",
+    "dashboard.recommended": "आपके लिए सुझाव",
+    "dashboard.emptyRecommended": "अभी आपकी श्रेणी में कोई अन्य किताब नहीं है — जल्द ही देखें।",
+    "dashboard.recentlyOpened": "हाल ही में खोली गई",
+    "dashboard.emptyRecentlyOpened": "अभी तक कुछ भी नहीं खोला गया।",
+    "dashboard.viewAll": "सभी देखें",
+    "dashboard.contactPrompt": "कोई प्रश्न है? संपर्क करें",
+
+    // Request a new book panel (dashboard) — for books that aren't in the library at all
+    "dashboard.requestBook.title": "नई पुस्तक मांगें",
+    "dashboard.requestBook.subtitle": "लाइब्रेरी में कोई पुस्तक नहीं मिल रही? नीचे दी गई सूची में से एक मांगें।",
+    "dashboard.requestBook.button": "पुस्तक मांगें",
+    "dashboard.requestBook.dialogTitle": "नई पुस्तक मांगें",
+    "dashboard.requestBook.selectLabel": "एक पुस्तक चुनें",
+    "dashboard.requestBook.selectPlaceholder": "पुस्तक चुनें...",
+    "dashboard.requestBook.searchPlaceholder": "पुस्तक का नाम टाइप करके खोजें...",
+    "dashboard.requestBook.noMatches": "आपकी खोज से कोई पुस्तक मेल नहीं खाती।",
+    "dashboard.requestBook.noBooksAvailable": "अभी मांगने के लिए कोई पुस्तक उपलब्ध नहीं है। कृपया बाद में देखें।",
+    "dashboard.requestBook.noteLabel": "नोट (वैकल्पिक)",
+    "dashboard.requestBook.notePlaceholder": "एडमिन के लिए कोई अतिरिक्त जानकारी",
+    "dashboard.requestBook.submit": "अनुरोध भेजें",
+    "dashboard.requestBook.submitting": "भेजा जा रहा है...",
+    "dashboard.requestBook.error": "वह अनुरोध नहीं भेजा जा सका। कृपया फिर से प्रयास करें।",
+    "dashboard.requestBook.yourRequests": "आपके अनुरोध",
+    "dashboard.requestBook.empty": "आपने अभी तक कोई पुस्तक नहीं मांगी है।",
+    "dashboard.requestBook.status.pending": "लंबित",
+    "dashboard.requestBook.status.added": "जोड़ी गई",
+    "dashboard.requestBook.status.rejected": "नहीं जोड़ी गई",
 
     // Library
     "library.title": "लाइब्रेरी",
@@ -113,6 +244,13 @@ export const user = {
     "library.gridView": "ग्रिड दृश्य",
     "library.listView": "सूची दृश्य",
     "library.noResults": "आपकी खोज से मेल खाने वाली कोई किताब नहीं मिली।",
+    "library.locked": "लॉक",
+    "library.requestAccess": "पहुंच का अनुरोध करें",
+    "library.requestPending": "अनुरोध लंबित",
+    "library.requestAgain": "फिर से अनुरोध करें",
+    "library.accessRequired.title": "पहुंच आवश्यक है",
+    "library.accessRequired.body": "आपके पास अभी इस किताब तक पहुंच नहीं है। अनुरोध भेजें, एडमिन इसकी समीक्षा करेंगे।",
+    "library.accessRequired.back": "लाइब्रेरी पर वापस जाएं",
 
     // Book card
     "bookCard.openToBookmark": "बुकमार्क करने के लिए खोलें",
@@ -121,13 +259,21 @@ export const user = {
     "bookCard.linkCopied": "लिंक कॉपी हो गया",
     "bookCard.open": "खोलें",
 
+    // Request dialog
+    "requestDialog.title": "यह किताब मांगें",
+    "requestDialog.noteLabel": "एडमिन के लिए नोट (वैकल्पिक)",
+    "requestDialog.notePlaceholder": "आपको यह किताब क्यों चाहिए?",
+    "requestDialog.submit": "अनुरोध भेजें",
+    "requestDialog.submitting": "भेजा जा रहा है...",
+    "requestDialog.success": "अनुरोध भेज दिया गया है। एडमिन के स्वीकृत करने पर आपको पहुंच मिल जाएगी।",
+    "requestDialog.error": "वह अनुरोध नहीं भेजा जा सका। कृपया फिर से प्रयास करें।",
+
     // Reader
     "reader.zoomOut": "ज़ूम आउट",
     "reader.zoomIn": "ज़ूम इन",
     "reader.toggleDarkMode": "डार्क मोड टॉगल करें",
     "reader.toggleFullscreen": "फ़ुलस्क्रीन टॉगल करें",
     "reader.addBookmark": "बुकमार्क जोड़ें",
-    "reader.download": "डाउनलोड करें",
     "reader.bookmarks": "बुकमार्क",
     "reader.package": "पैकेज",
     "reader.packageNotRenderable": "पैकेज अभी सीधे नहीं दिखाए जा सकते — इसे किसी संगत प्लेयर में खोलने के लिए डाउनलोड करें।",
@@ -137,5 +283,13 @@ export const user = {
     "reader.removeBookmark": "बुकमार्क हटाएं",
     "reader.previousPage": "पिछला पृष्ठ",
     "reader.nextPage": "अगला पृष्ठ",
+    "reader.loading": "पुस्तक लोड हो रही है…",
+    "reader.loadError": "यह पुस्तक लोड नहीं हो सकी। कृपया पुनः प्रयास करें।",
+    "reader.printDisabled": "इस पुस्तक के लिए प्रिंट करना अक्षम है।",
+
+    // Bookmarks page (all bookmarks across every book)
+    "bookmarks.title": "बुकमार्क",
+    "bookmarks.subtitle": "आपकी सभी पुस्तकों में बुकमार्क किए गए सभी पृष्ठ।",
+    "bookmarks.empty": "आपने अभी तक कोई पृष्ठ बुकमार्क नहीं किया है। कोई पुस्तक खोलें और किसी भी पृष्ठ पर बुकमार्क आइकन पर टैप करें।",
   } as Record<string, string>,
 };

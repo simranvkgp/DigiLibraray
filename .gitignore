@@ -7,4 +7,5 @@ dev.db-journal
 .env.local
 *.log
 public/uploads/
+public/pdf.worker.min.mjs
 *.tsbuildinfo

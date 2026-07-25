@@ -6,6 +6,7 @@ module.exports = {
     extend: {
       colors: {
         navy: "var(--color-navy)",
+        cream: "var(--color-cream)",
         brandred: "var(--color-brandred)",
         accentblue: "var(--color-accentblue)",
         success: "var(--color-success)",
@@ -15,6 +16,10 @@ module.exports = {
         border: "var(--color-border)",
         "text-primary": "var(--color-text-primary)",
         "text-secondary": "var(--color-text-secondary)",
+        "dash-navy": "var(--color-dash-navy)",
+        "dash-blue": "var(--color-dash-blue)",
+        "dash-cream": "var(--color-dash-cream)",
+        "dash-gold": "var(--color-dash-gold)",
       },
       fontFamily: {
         display: ["var(--font-fraunces)", "serif"],

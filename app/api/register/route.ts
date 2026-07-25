@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { registrationSchema } from "@/lib/validations";
+import { sendPushToAdmins } from "@/lib/push";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -36,6 +37,12 @@ export async function POST(req: Request) {
   await prisma.activityLog.create({
     data: { userId: updated.id, action: "REGISTER" },
   });
+
+  sendPushToAdmins(
+    "New user registration",
+    `${updated.name} (${updated.email}) is awaiting approval`,
+    "/admin/users"
+  ).catch(() => {});
 
   return NextResponse.json({ success: true, approvalStatus: updated.approvalStatus });
 }

@@ -1,138 +1,106 @@
+import { Zap, Sparkles, Library } from "lucide-react";
 import { signIn } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
-import { LibraryHeroIllustration } from "@/components/auth/LibraryHeroIllustration";
+import { AnimatedHeadline } from "@/components/auth/AnimatedHeadline";
+import { FadeInUp } from "@/components/auth/FadeInUp";
 import { getUserLanguage } from "@/lib/i18n/get-user-language";
 import { translate } from "@/lib/i18n/translate";
 
-const FEATURES = [
-  {
-    titleKey: "login.feature1Title",
-    bodyKey: "login.feature1Body",
-    icon: (
-      <path d="M13 2 L5 13 h5 l-1 9 8-13h-5z" strokeLinejoin="round" strokeLinecap="round" />
-    ),
-  },
-  {
-    titleKey: "login.feature2Title",
-    bodyKey: "login.feature2Body",
-    icon: (
-      <>
-        <path d="M12 3 v3 M12 18 v3 M3 12 h3 M18 12 h3 M5.6 5.6 l2.1 2.1 M16.3 16.3 l2.1 2.1 M5.6 18.4 l2.1-2.1 M16.3 7.7 l2.1-2.1" strokeLinecap="round" />
-        <circle cx="12" cy="12" r="3.5" />
-      </>
-    ),
-  },
-  {
-    titleKey: "login.feature3Title",
-    bodyKey: "login.feature3Body",
-    icon: (
-      <>
-        <rect x="3" y="4" width="18" height="5" rx="1" />
-        <path d="M5 9 v9 a1 1 0 0 0 1 1 h12 a1 1 0 0 0 1-1 V9" />
-        <path d="M10 13 h4" strokeLinecap="round" />
-      </>
-    ),
-  },
-] as const;
+const FEATURE_ICONS = [Zap, Sparkles, Library];
+const FEATURE_KEYS = ["instant", "smart", "archives"] as const;
 
 export default async function LoginPage() {
   const lang = await getUserLanguage(undefined);
   const t = (key: string) => translate(lang, key);
 
-  async function continueWithGoogle() {
+  async function handleSignIn() {
     "use server";
     await signIn("google", { redirectTo: "/dashboard" });
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
-      <div className="grid w-full max-w-6xl grid-cols-1 overflow-hidden rounded-xl border border-border shadow-card-hover lg:grid-cols-2">
-        {/* illustration panel */}
-        <div className="h-64 sm:h-80 lg:h-auto lg:min-h-[640px]">
-          <LibraryHeroIllustration />
+    <div className="min-h-screen border-r-[10px] border-t-[10px] border-navy bg-cream">
+      <main className="mx-auto grid min-h-screen max-w-[1920px] lg:grid-cols-[7fr_5fr]">
+        <div className="hidden overflow-hidden lg:block">
+          <img
+            src="/images/login-illustration.png"
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none h-full w-full object-cover object-left"
+            style={{
+              WebkitMaskImage: "linear-gradient(to right, black 80%, transparent 100%)",
+              maskImage: "linear-gradient(to right, black 80%, transparent 100%)",
+            }}
+          />
         </div>
 
-        {/* content panel */}
-        <div className="flex flex-col justify-center gap-8 bg-card px-6 py-8 sm:px-10 sm:py-10 lg:px-14">
-          <nav className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-navy">
-                <span className="font-display text-sm font-semibold text-white">V</span>
-              </div>
-              <span className="font-display text-sm font-semibold text-navy">VK Digital Library</span>
-            </div>
-            <div className="hidden items-center gap-6 text-sm font-medium text-text-secondary sm:flex">
-              <a href="/" className="transition-colors hover:text-navy">
-                {t("login.navHome")}
-              </a>
-              <a href="#about" className="transition-colors hover:text-navy">
-                {t("login.navAbout")}
-              </a>
-              <a href="#blog" className="transition-colors hover:text-navy">
-                {t("login.navBlog")}
-              </a>
-            </div>
-          </nav>
+        <div className="flex items-center justify-center px-6 py-12 sm:px-10 lg:justify-start lg:pl-6 lg:pr-6 xl:pl-8 xl:pr-8">
+          <div className="w-full max-w-[560px] p-8 sm:p-10">
+            <AnimatedHeadline
+              text="VK Digital Library"
+              className="text-4xl leading-tight sm:text-5xl"
+            />
+            <FadeInUp delay={0.15}>
+              <p className="mt-2 text-sm font-semibold uppercase tracking-wide text-accentblue sm:text-base">
+                {t("login.tagline")}
+              </p>
+            </FadeInUp>
 
-          <div>
-            <h1 className="font-display text-4xl font-semibold leading-tight text-navy sm:text-5xl">
-              {t("login.heroHeading")}
-            </h1>
-            <p className="mt-3 text-base text-text-secondary sm:text-lg">{t("login.heroTagline")}</p>
-          </div>
-
-          <div>
-            <form action={continueWithGoogle}>
-              <div className="flex items-center gap-3 rounded-full border border-border bg-background py-1.5 pl-5 pr-1.5 shadow-card">
-                <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" className="shrink-0">
-                  <path
-                    fill="#4285F4"
-                    d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.85 2.09-1.81 2.73v2.27h2.92c1.7-1.57 2.69-3.88 2.69-6.64z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.27c-.81.54-1.85.86-3.04.86-2.34 0-4.32-1.58-5.03-3.71H.96v2.33C2.44 15.98 5.48 18 9 18z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M3.97 10.7A5.4 5.4 0 0 1 3.68 9c0-.59.1-1.16.29-1.7V4.97H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.03z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.97l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"
-                  />
-                </svg>
-                <span className="flex-1 truncate text-sm text-text-secondary">{t("login.subtitle")}</span>
-                <Button type="submit" size="default" className="shrink-0 rounded-full">
-                  {t("login.continueWithGoogle")}
-                </Button>
-              </div>
-            </form>
-            <p className="mt-3 text-xs text-text-secondary">{t("login.noSignupNote")}</p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 border-t border-border pt-6 sm:grid-cols-3">
-            {FEATURES.map((feature) => (
-              <div key={feature.titleKey}>
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-accentblue/10">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="var(--color-accentblue)"
-                    strokeWidth="1.75"
-                  >
-                    {feature.icon}
+            <FadeInUp delay={0.2} className="mt-4">
+              <p className="text-sm leading-relaxed text-text-secondary sm:text-base">
+                {t("login.subtitle")}
+              </p>
+              <form action={handleSignIn} className="mt-5">
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-3 rounded-full bg-navy px-8 py-4 text-base font-semibold text-white shadow-lg transition-colors hover:bg-navy/90"
+                >
+                  <svg width="20" height="20" viewBox="0 0 18 18" aria-hidden="true">
+                    <path
+                      fill="#fff"
+                      d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.85 2.09-1.81 2.73v2.27h2.92c1.7-1.57 2.69-3.88 2.69-6.64z"
+                    />
+                    <path
+                      fill="#fff"
+                      d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.27c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.71H.96v2.34C2.44 15.98 5.48 18 9 18z"
+                    />
+                    <path
+                      fill="#fff"
+                      d="M3.97 10.7c-.18-.54-.28-1.11-.28-1.7s.1-1.16.28-1.7V4.96H.96A8.996 8.996 0 000 9c0 1.45.35 2.83.96 4.04l3.01-2.34z"
+                    />
+                    <path
+                      fill="#fff"
+                      d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.59-2.59C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96l3.01 2.34C4.68 5.16 6.66 3.58 9 3.58z"
+                    />
                   </svg>
-                </div>
-                <h3 className="font-display text-sm font-semibold text-navy">{t(feature.titleKey)}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-text-secondary">{t(feature.bodyKey)}</p>
-              </div>
-            ))}
+                  {t("login.continueWithGoogle")}
+                </button>
+              </form>
+              <p className="mt-3 text-xs text-text-secondary">{t("login.noSignupNote")}</p>
+            </FadeInUp>
+
+            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {FEATURE_KEYS.map((key, i) => {
+                const Icon = FEATURE_ICONS[i];
+                return (
+                  <FadeInUp key={key} delay={0.25 + i * 0.08}>
+                    <div className="group rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:bg-card/80 hover:shadow-card-hover">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-navy text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
+                        <Icon className="h-5 w-5" aria-hidden="true" strokeWidth={1.75} />
+                      </div>
+                      <h3 className="mt-3 text-sm font-semibold text-navy">
+                        {t(`login.features.${key}.title`)}
+                      </h3>
+                      <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+                        {t(`login.features.${key}.desc`)}
+                      </p>
+                    </div>
+                  </FadeInUp>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

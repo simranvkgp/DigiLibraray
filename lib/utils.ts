@@ -6,6 +6,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Shared "Contact us" destination (footer, sidebar, etc.) — opens Gmail
+// compose directly rather than a plain mailto:, so it works even when the
+// user has no local mail client configured.
+const CONTACT_EMAIL = "rimpi@vkgp.in";
+export const GMAIL_COMPOSE_URL = `https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT_EMAIL}`;
+
+// Google blocks mail.google.com from being embedded in an <iframe> (it sends
+// framing-denial headers), so a real popup window is the only way to open
+// Gmail compose in a smaller "frame" instead of a full new tab.
+export function openContactPopup() {
+  window.open(GMAIL_COMPOSE_URL, "contactUs", "width=700,height=650,noopener,noreferrer");
+}
+
 /**
  * Accepts any of the common Google Drive share-link formats an admin might
  * paste, e.g.:

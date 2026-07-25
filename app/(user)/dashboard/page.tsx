@@ -1,165 +1,175 @@
+import Link from "next/link";
+import { BookOpen, Bookmark as BookmarkIcon, Heart, ClipboardList } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getUserLanguage } from "@/lib/i18n/get-user-language";
 import { translate } from "@/lib/i18n/translate";
-import { UserTopNav } from "@/components/layout/UserTopNav";
-import { NotificationTicker } from "@/components/dashboard/NotificationTicker";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { formatRelativeTime, notificationBadgeVariant } from "@/lib/utils";
-import Link from "next/link";
+import { DashboardHero } from "@/components/dashboard/DashboardHero";
+import { StatCard } from "@/components/ui/stat-card";
+import { ContinueReadingCard } from "@/components/dashboard/ContinueReadingCard";
+import { RecommendedBooks } from "@/components/dashboard/RecommendedBooks";
+import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
+import { RecentlyOpenedPanel } from "@/components/dashboard/RecentlyOpenedPanel";
+import { RequestBookHeroButton } from "@/components/dashboard/RequestBookHeroButton";
+import { Card } from "@/components/ui/card";
+import { SectionLabel } from "@/components/ui/section-label";
 
 export default async function DashboardPage() {
   const session = await auth();
-  const userId = (session!.user as any).id as string;
+  const user = session!.user as any;
+  const userId = user.id as string;
   const lang = await getUserLanguage(userId);
   const t = (key: string) => translate(lang, key);
 
-  const [continueReading, favorites, notifications, stats] = await Promise.all([
-    prisma.readingProgress.findMany({
-      where: { userId },
-      include: { book: true },
-      orderBy: { lastReadAt: "desc" },
-      take: 4,
-    }),
-    prisma.favorite.findMany({ where: { userId }, include: { book: true }, take: 4 }),
-    prisma.notificationRecipient.findMany({
-      where: { userId },
-      include: { notification: true },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
-    prisma.bookAccess.count({ where: { userId } }),
-  ]);
+  const [continueReading, favorites, notifications, booksOpenedCount, bookmarksCount, favoritesCount, pendingRequestsCount] =
+    await Promise.all([
+      prisma.readingProgress.findMany({
+        where: { userId },
+        include: { book: true },
+        orderBy: { lastReadAt: "desc" },
+        take: 4,
+      }),
+      prisma.favorite.findMany({ where: { userId }, include: { book: true }, take: 4 }),
+      prisma.notificationRecipient.findMany({
+        where: { userId },
+        include: { notification: true },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      }),
+      prisma.bookAccess.count({ where: { userId } }),
+      prisma.bookmark.count({ where: { userId } }),
+      prisma.favorite.count({ where: { userId } }),
+      prisma.bookRequest.count({ where: { userId, status: "PENDING" } }),
+    ]);
+
+  const excludedBookIds = [...continueReading.map((r) => r.bookId), ...favorites.map((f) => f.bookId)];
+  const recommended = user.categoryId
+    ? await prisma.book.findMany({
+        where: {
+          status: "PUBLISHED",
+          categoryId: user.categoryId,
+          id: { notIn: excludedBookIds },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 4,
+      })
+    : [];
 
   return (
-    <div>
-      <UserTopNav name={session!.user!.name ?? ""} image={session!.user!.image} lang={lang} />
-      <main className="mx-auto max-w-7xl px-6 py-8">
-        <Card className="bg-navy text-white shadow-card-hover">
-          <CardContent className="flex items-center justify-between py-8">
-            <div>
-              <h1 className="font-display text-2xl font-medium text-white">
-                {t("dashboard.welcomeBack")}, {session!.user!.name?.split(" ")[0]} 👋
-              </h1>
-              <p className="mt-1 text-sm text-white/70">{t("dashboard.heroSubtitle")}</p>
-            </div>
-            <Link href="/library">
-              <span className="rounded-lg bg-card px-4 py-2 text-sm font-medium text-navy hover:bg-card/90">
-                {t("dashboard.browseLibrary")}
-              </span>
-            </Link>
-          </CardContent>
-        </Card>
+    <div className="space-y-8">
+      <DashboardHero firstName={session!.user!.name?.split(" ")[0] ?? ""} lang={lang} />
 
-        <NotificationTicker
-          label={t("dashboard.newUpdates")}
-          items={notifications
-            .filter((n) => !n.readAt)
-            .map((n) => ({ id: n.id, title: n.notification.title, type: n.notification.type }))}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard icon={BookOpen} label={t("dashboard.booksOpened")} value={booksOpenedCount} tone="navy" />
+        <StatCard
+          icon={BookmarkIcon}
+          label={t("dashboard.stats.bookmarks")}
+          value={bookmarksCount}
+          sublabel={t("dashboard.stats.bookmarksSub")}
+          tone="success"
         />
+        <StatCard
+          icon={Heart}
+          label={t("dashboard.stats.favorites")}
+          value={favoritesCount}
+          sublabel={t("dashboard.stats.favoritesSub")}
+          tone="gold"
+        />
+        <StatCard
+          icon={ClipboardList}
+          label={t("dashboard.stats.pendingRequests")}
+          value={pendingRequestsCount}
+          sublabel={t("dashboard.stats.pendingRequestsSub")}
+          tone="accent"
+        />
+      </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="space-y-8 lg:col-span-2">
+          {continueReading.length === 0 && favorites.length === 0 ? (
+            <Card className="border-dashed p-10 text-center">
+              <p className="text-sm text-text-secondary">{t("dashboard.newUser.message")}</p>
+              <div className="mt-4 flex items-center justify-center gap-3">
+                <RequestBookHeroButton
+                  lang={lang}
+                  triggerClassName="rounded-lg bg-dash-navy px-4 py-2 text-sm font-medium text-white hover:bg-dash-navy/90"
+                />
+                <Link href="/library" className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-dash-navy hover:bg-background">
+                  {t("dashboard.browseLibrary")}
+                </Link>
+              </div>
+            </Card>
+          ) : (
             <section>
-              <h2 className="mb-3 font-display text-lg font-medium text-navy">{t("dashboard.continueReading")}</h2>
+              <SectionLabel>{t("dashboard.continueReading")}</SectionLabel>
               {continueReading.length === 0 ? (
-                <EmptyState message={t("dashboard.emptyContinueReading")} />
+                <p className="mt-4 text-sm text-text-secondary">{t("dashboard.emptyContinueReading")}</p>
               ) : (
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
                   {continueReading.map((rp) => (
-                    <Link key={rp.id} href={`/library/${rp.bookId}`}>
-                      <Card className="p-3">
-                        <div className="aspect-[3/4] w-full overflow-hidden rounded-md bg-background">
-                          {rp.book.coverImageUrl && (
-                            <img
-                              src={rp.book.coverImageUrl}
-                              alt=""
-                              className="h-full w-full object-cover"
-                            />
-                          )}
-                        </div>
-                        <p className="mt-2 truncate font-body text-sm font-medium">{rp.book.title}</p>
-                        <p className="data-text text-xs text-text-secondary">{Math.round(rp.percentComplete)}{t("dashboard.percentComplete")}</p>
-                      </Card>
-                    </Link>
+                    <ContinueReadingCard
+                      key={rp.id}
+                      bookId={rp.bookId}
+                      title={rp.book.title}
+                      coverImageUrl={rp.book.coverImageUrl}
+                      percentComplete={rp.percentComplete}
+                      percentLabel={t("dashboard.percentComplete")}
+                    />
                   ))}
                 </div>
               )}
             </section>
+          )}
 
+          {(continueReading.length > 0 || favorites.length > 0) && (
             <section>
-              <h2 className="mb-3 font-display text-lg font-medium text-navy">{t("dashboard.favoriteBooks")}</h2>
+              <SectionLabel>{t("dashboard.favoriteBooks")}</SectionLabel>
               {favorites.length === 0 ? (
-                <EmptyState message={t("dashboard.emptyFavorites")} />
+                <p className="mt-4 text-sm text-text-secondary">{t("dashboard.emptyFavorites")}</p>
               ) : (
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
                   {favorites.map((f) => (
-                    <Link key={f.id} href={`/library/${f.bookId}`}>
-                      <Card className="p-3">
-                        <div className="aspect-[3/4] w-full overflow-hidden rounded-md bg-background">
-                          {f.book.coverImageUrl && (
-                            <img
-                              src={f.book.coverImageUrl}
-                              alt=""
-                              className="h-full w-full object-cover"
-                            />
-                          )}
-                        </div>
-                        <p className="mt-2 truncate font-body text-sm font-medium">{f.book.title}</p>
-                      </Card>
-                    </Link>
+                    <ContinueReadingCard key={f.id} bookId={f.bookId} title={f.book.title} coverImageUrl={f.book.coverImageUrl} />
                   ))}
                 </div>
               )}
             </section>
-          </div>
+          )}
 
-          <div className="space-y-6">
-            <Card>
-              <CardHeader><CardTitle>{t("dashboard.statistics")}</CardTitle></CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-text-secondary">{t("dashboard.booksOpened")}</span>
-                  <span className="data-text text-lg font-medium text-navy">{stats}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader><CardTitle>{t("dashboard.notifications")}</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                {notifications.length === 0 && <p className="text-sm text-text-secondary">{t("dashboard.noNotifications")}</p>}
-                {notifications.map((n) => (
-                  <div key={n.id} className="border-b border-border pb-3 last:border-0 last:pb-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <Badge variant={notificationBadgeVariant(n.notification.type)}>
-                        {n.notification.type.replace("_", " ")}
-                      </Badge>
-                      <span className="shrink-0 text-xs text-text-secondary">
-                        {formatRelativeTime(n.notification.createdAt)}
-                      </span>
-                    </div>
-                    <p className="mt-1.5 flex items-center gap-1.5 truncate font-body text-sm font-medium">
-                      {!n.readAt && <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-accentblue" />}
-                      <span className="truncate">{n.notification.title}</span>
-                    </p>
-                    <p className="mt-0.5 line-clamp-2 text-xs text-text-secondary">{n.notification.body}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
+          <RecommendedBooks
+            lang={lang}
+            books={recommended.map((b) => ({
+              id: b.id,
+              title: b.title,
+              subject: b.subject,
+              coverImageUrl: b.coverImageUrl,
+            }))}
+          />
         </div>
-      </main>
-    </div>
-  );
-}
 
-function EmptyState({ message }: { message: string }) {
-  return (
-    <Card className="border-dashed p-8 text-center">
-      <p className="text-sm text-text-secondary">{message}</p>
-    </Card>
+        <div className="space-y-6">
+          <NotificationsPanel
+            lang={lang}
+            items={notifications.map((n) => ({
+              id: n.id,
+              type: n.notification.type,
+              title: n.notification.title,
+              body: n.notification.body,
+              createdAt: n.notification.createdAt,
+              readAt: n.readAt,
+            }))}
+          />
+          <RecentlyOpenedPanel
+            lang={lang}
+            items={continueReading.map((rp) => ({
+              bookId: rp.bookId,
+              title: rp.book.title,
+              coverImageUrl: rp.book.coverImageUrl,
+              lastReadAt: rp.lastReadAt,
+            }))}
+          />
+        </div>
+      </div>
+    </div>
   );
 }
