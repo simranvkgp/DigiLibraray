@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const DEFAULT_BOARDS = ["CBSE", "ICSE", "Haryana Board", "Punjab Board", "Rajasthan Board", "University", "Others"];
 
 export async function GET() {
