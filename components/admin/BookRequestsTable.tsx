@@ -101,8 +101,8 @@ export function BookRequestsTable({ lang = "en" }: { lang?: Lang }) {
             <tr>
               <th className="p-3 font-medium">{t("admin.requests.col.user")}</th>
               <th className="p-3 font-medium">{t("admin.requests.col.book")}</th>
-              <th className="p-3 font-medium">{t("admin.requests.col.note")}</th>
-              <th className="p-3 font-medium">{t("admin.requests.col.requested")}</th>
+              <th className="hidden p-3 font-medium md:table-cell">{t("admin.requests.col.note")}</th>
+              <th className="hidden p-3 font-medium md:table-cell">{t("admin.requests.col.requested")}</th>
               <th className="p-3 font-medium">{t("admin.table.status")}</th>
               <th className="p-3 font-medium text-right">{t("admin.table.actions")}</th>
             </tr>
@@ -125,13 +125,13 @@ export function BookRequestsTable({ lang = "en" }: { lang?: Lang }) {
                       {r.book.className ? ` · ${r.book.className}` : ""}
                     </p>
                   </td>
-                  <td className="p-3 max-w-xs">
+                  <td className="hidden p-3 max-w-xs md:table-cell">
                     <p className="text-xs text-text-secondary">{r.note || "—"}</p>
                     {r.status === "REJECTED" && r.adminNote && (
                       <p className="mt-1 text-xs text-brandred">{t("admin.requests.rejectReason")}: {r.adminNote}</p>
                     )}
                   </td>
-                  <td className="p-3 text-xs text-text-secondary">{formatRelativeTime(r.createdAt)}</td>
+                  <td className="hidden p-3 text-xs text-text-secondary md:table-cell">{formatRelativeTime(r.createdAt)}</td>
                   <td className="p-3">
                     <Badge variant={statusVariant[r.status] ?? "warning"}>{t(statusKey[r.status] ?? "admin.status.pending")}</Badge>
                   </td>

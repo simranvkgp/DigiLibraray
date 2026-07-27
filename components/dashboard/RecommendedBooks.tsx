@@ -25,7 +25,7 @@ export function RecommendedBooks({ books, lang = "en" }: { books: RecommendedBoo
           {t("dashboard.emptyRecommended")}
         </p>
       ) : (
-        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {books.map((book) => (
             <Link key={book.id} href={`/library/${book.id}`}>
               <div className="group overflow-hidden rounded-xl border border-border bg-white shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover">

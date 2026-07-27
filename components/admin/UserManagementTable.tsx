@@ -103,11 +103,11 @@ export function UserManagementTable({ lang = "en", canManageRoles = false }: { l
           <thead className="border-b border-border text-left text-text-secondary">
             <tr>
               <th className="p-3 font-medium">{t("admin.users.col.name")}</th>
-              <th className="p-3 font-medium">{t("admin.field.institution")}</th>
-              <th className="p-3 font-medium">{t("admin.table.categoryBoard")}</th>
+              <th className="hidden p-3 font-medium md:table-cell">{t("admin.field.institution")}</th>
+              <th className="hidden p-3 font-medium md:table-cell">{t("admin.table.categoryBoard")}</th>
               <th className="p-3 font-medium">{t("admin.users.col.role")}</th>
               <th className="p-3 font-medium">{t("admin.table.status")}</th>
-              <th className="p-3 font-medium">{t("admin.users.col.booksRead")}</th>
+              <th className="hidden p-3 font-medium lg:table-cell">{t("admin.users.col.booksRead")}</th>
               <th className="p-3 font-medium text-right">{t("admin.table.actions")}</th>
             </tr>
           </thead>
@@ -120,8 +120,8 @@ export function UserManagementTable({ lang = "en", canManageRoles = false }: { l
                     <p className="text-xs text-text-secondary">{u.email}</p>
                     {u.mobileNumber && <p className="text-xs text-text-secondary">{u.mobileNumber}</p>}
                   </td>
-                  <td className="p-3">{u.institution}</td>
-                  <td className="p-3">{u.category} / {u.board}</td>
+                  <td className="hidden p-3 md:table-cell">{u.institution}</td>
+                  <td className="hidden p-3 md:table-cell">{u.category} / {u.board}</td>
                   <td className="p-3">
                     <Badge variant={u.role === "SUPER_ADMIN" ? "success" : u.role === "ADMIN" ? "warning" : "default"}>
                       {u.role === "SUPER_ADMIN" ? t("admin.users.role.superAdmin") : u.role === "ADMIN" ? t("admin.users.role.admin") : t("admin.users.role.user")}
@@ -132,7 +132,7 @@ export function UserManagementTable({ lang = "en", canManageRoles = false }: { l
                       {statusKey[u.approvalStatus] ? t(statusKey[u.approvalStatus]) : u.approvalStatus}
                     </Badge>
                   </td>
-                  <td className="p-3 data-text">{u.booksRead}</td>
+                  <td className="hidden p-3 data-text lg:table-cell">{u.booksRead}</td>
                   <td className="p-3 text-right">
                     <div className="flex justify-end gap-1.5">
                       {u.approvalStatus === "PENDING" && (

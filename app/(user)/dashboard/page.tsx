@@ -59,7 +59,7 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <DashboardHero firstName={session!.user!.name?.split(" ")[0] ?? ""} lang={lang} />
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatCard icon={BookOpen} label={t("dashboard.booksOpened")} value={booksOpenedCount} tone="navy" />
         <StatCard
           icon={BookmarkIcon}
@@ -105,7 +105,7 @@ export default async function DashboardPage() {
               {continueReading.length === 0 ? (
                 <p className="mt-4 text-sm text-text-secondary">{t("dashboard.emptyContinueReading")}</p>
               ) : (
-                <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                   {continueReading.map((rp) => (
                     <ContinueReadingCard
                       key={rp.id}
@@ -127,7 +127,7 @@ export default async function DashboardPage() {
               {favorites.length === 0 ? (
                 <p className="mt-4 text-sm text-text-secondary">{t("dashboard.emptyFavorites")}</p>
               ) : (
-                <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                   {favorites.map((f) => (
                     <ContinueReadingCard key={f.id} bookId={f.bookId} title={f.book.title} coverImageUrl={f.book.coverImageUrl} />
                   ))}

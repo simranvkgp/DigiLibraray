@@ -11,7 +11,7 @@ export function DashboardHero({ firstName, lang = "en" }: { firstName: string; l
         src="/images/login-illustration.png"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-0 h-full w-auto max-w-[55%] object-cover object-left opacity-90"
+        className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-auto max-w-[55%] object-cover object-left opacity-90 sm:block"
         style={{
           WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 35%)",
           maskImage: "linear-gradient(to right, transparent 0%, black 35%)",

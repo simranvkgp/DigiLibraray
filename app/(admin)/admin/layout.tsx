@@ -1,10 +1,9 @@
 import { auth, signOut } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import { getUserLanguage } from "@/lib/i18n/get-user-language";
 import { translate } from "@/lib/i18n/translate";
-import { AdminSidebarNav, type AdminNavModule } from "@/components/admin/AdminSidebarNav";
-import { PushNotificationToggle } from "@/components/admin/PushNotificationToggle";
+import { type AdminNavModule } from "@/components/admin/AdminSidebarNav";
+import { AdminSidebar } from "@/components/admin/AdminSidebar";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -31,30 +30,21 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/settings", label: t("nav.settings"), icon: "Settings", group: t("admin.nav.group.system") },
   ];
 
+  async function handleSignOut() {
+    "use server";
+    await signOut({ redirectTo: "/login" });
+  }
+
   return (
-    <div className="flex min-h-screen">
-      <aside className="hidden w-60 flex-shrink-0 bg-dash-navy lg:block">
-        <div className="flex h-16 items-center border-b border-white/10 px-5">
-          <span className="font-display text-lg font-semibold text-white">{t("admin.nav.brand")}</span>
-        </div>
-        <AdminSidebarNav modules={modules} />
-        <div className="px-3">
-          <PushNotificationToggle lang={lang} />
-        </div>
-        <div className="p-3">
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/login" });
-            }}
-          >
-            <Button variant="outline" size="sm" className="w-full border-white/20 bg-transparent text-white hover:bg-white/10" type="submit">
-              {t("nav.logout")}
-            </Button>
-          </form>
-        </div>
-      </aside>
-      <main className="flex-1 bg-dash-cream">{children}</main>
+    <div className="min-h-screen bg-dash-cream">
+      <AdminSidebar
+        modules={modules}
+        lang={lang}
+        brandLabel={t("admin.nav.brand")}
+        logoutLabel={t("nav.logout")}
+        onSignOut={handleSignOut}
+      />
+      <main className="p-4 pt-20 sm:p-6 sm:pt-20 lg:ml-60 lg:p-8 lg:pt-8">{children}</main>
     </div>
   );
 }
