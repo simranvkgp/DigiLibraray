@@ -8,6 +8,7 @@ export const registrationSchema = z.object({
   institutionName: z.string().trim().min(2, "Institution name is required"),
   city: z.string().trim().min(2, "City is required"),
   state: z.string().trim().min(2, "State is required"),
+  idCardUrl: z.string().min(1, "Please upload your ID card"),
 });
 export type RegistrationInput = z.infer<typeof registrationSchema>;
 

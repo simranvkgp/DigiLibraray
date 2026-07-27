@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,12 +21,37 @@ export function RegistrationForm({
 }) {
   const { update } = useSession();
   const t = (key: string) => translate(lang, key);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
     setError,
   } = useForm<RegistrationInput>({ resolver: zodResolver(registrationSchema) });
+
+  const idCardUrl = watch("idCardUrl");
+
+  async function handleIdCardChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploadError(null);
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload/id-card", { method: "POST", body: formData });
+    setUploading(false);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      setUploadError(typeof err.error === "string" ? err.error : t("register.idCardUploadError"));
+      return;
+    }
+    const { url } = await res.json();
+    setValue("idCardUrl", url, { shouldValidate: true });
+  }
 
   async function onSubmit(data: RegistrationInput) {
     const res = await fetch("/api/register", {
@@ -89,6 +115,29 @@ export function RegistrationForm({
           <Input id="state" className="mt-1.5" {...register("state")} />
           {errors.state && <p className="mt-1 text-xs text-brandred">{errors.state.message}</p>}
         </div>
+      </div>
+
+      <div>
+        <Label>{t("register.idCardLabel")}</Label>
+        <p className="mt-0.5 text-xs text-text-secondary">{t("register.idCardHint")}</p>
+        <div className="mt-1.5 flex items-center gap-3">
+          <label className="cursor-pointer rounded-lg border border-border px-3 py-2 text-sm text-text-secondary hover:border-navy hover:text-navy">
+            {uploading ? t("register.idCardUploading") : t("register.idCardUpload")}
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              disabled={uploading}
+              onChange={handleIdCardChange}
+            />
+          </label>
+          {idCardUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={idCardUrl} alt="" className="h-10 w-16 rounded object-cover" />
+          )}
+        </div>
+        {uploadError && <p className="mt-1 text-xs text-brandred">{uploadError}</p>}
+        {errors.idCardUrl && <p className="mt-1 text-xs text-brandred">{errors.idCardUrl.message}</p>}
       </div>
 
       {errors.root && <p className="text-sm text-brandred">{errors.root.message}</p>}

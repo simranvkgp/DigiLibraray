@@ -35,6 +35,7 @@ model User {
   institution    Institution? @relation(fields: [institutionId], references: [id])
   city           String?
   state          String?
+  idCardUrl      String? // photo of the user's institution ID card, for admin verification
 
   // One-time, permanent category choice
   categoryId     String?

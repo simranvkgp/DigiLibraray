@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
 
-  const { mobileNumber, institutionName, city, state } = parsed.data;
+  const { mobileNumber, institutionName, city, state, idCardUrl } = parsed.data;
 
   let institution = await prisma.institution.findFirst({ where: { name: institutionName } });
   if (!institution) {
@@ -30,6 +30,7 @@ export async function POST(req: Request) {
       institutionId: institution.id,
       city,
       state,
+      idCardUrl,
       approvalStatus: "PENDING",
     },
   });

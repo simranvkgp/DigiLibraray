@@ -34,6 +34,7 @@ export async function GET(req: Request) {
       category: u.category?.name ?? "—",
       board: u.board?.name ?? "—",
       approvalStatus: u.approvalStatus,
+      idCardUrl: u.idCardUrl,
       createdAt: u.createdAt,
       lastLoginAt: u.lastLoginAt,
       booksRead: u._count.bookAccess,

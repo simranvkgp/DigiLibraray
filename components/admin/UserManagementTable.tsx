@@ -15,6 +15,7 @@ interface AdminUserRow {
   category: string;
   board: string;
   approvalStatus: string;
+  idCardUrl: string | null;
   createdAt: string;
   lastLoginAt: string | null;
   booksRead: number;
@@ -107,6 +108,7 @@ export function UserManagementTable({ lang = "en", canManageRoles = false }: { l
               <th className="hidden p-3 font-medium md:table-cell">{t("admin.table.categoryBoard")}</th>
               <th className="p-3 font-medium">{t("admin.users.col.role")}</th>
               <th className="p-3 font-medium">{t("admin.table.status")}</th>
+              <th className="hidden p-3 font-medium md:table-cell">{t("admin.users.col.idCard")}</th>
               <th className="hidden p-3 font-medium lg:table-cell">{t("admin.users.col.booksRead")}</th>
               <th className="p-3 font-medium text-right">{t("admin.table.actions")}</th>
             </tr>
@@ -131,6 +133,20 @@ export function UserManagementTable({ lang = "en", canManageRoles = false }: { l
                     <Badge variant={statusVariant[u.approvalStatus] ?? "default"}>
                       {statusKey[u.approvalStatus] ? t(statusKey[u.approvalStatus]) : u.approvalStatus}
                     </Badge>
+                  </td>
+                  <td className="hidden p-3 md:table-cell">
+                    {u.idCardUrl ? (
+                      <a href={u.idCardUrl} target="_blank" rel="noopener noreferrer">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={u.idCardUrl}
+                          alt={t("admin.users.viewIdCard")}
+                          className="h-10 w-16 rounded object-cover hover:opacity-80"
+                        />
+                      </a>
+                    ) : (
+                      <span className="text-xs text-text-secondary">—</span>
+                    )}
                   </td>
                   <td className="hidden p-3 data-text lg:table-cell">{u.booksRead}</td>
                   <td className="p-3 text-right">
