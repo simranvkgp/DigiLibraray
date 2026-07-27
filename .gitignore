@@ -9,3 +9,6 @@ dev.db-journal
 public/uploads/
 public/pdf.worker.min.mjs
 *.tsbuildinfo
+
+.vercel
+.env*

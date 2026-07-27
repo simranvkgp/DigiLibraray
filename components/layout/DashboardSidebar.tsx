@@ -40,8 +40,7 @@ export function DashboardSidebar({ lang = "en" }: { lang?: Lang }) {
   const content = (
     <div className="flex h-full flex-col bg-dash-navy">
       <div className="flex items-center gap-2.5 border-b border-white/10 px-6 py-6">
-        <BookOpen className="h-6 w-6 text-dash-gold" aria-hidden="true" />
-        <span className="font-display text-base font-semibold text-white">VK Digital Library</span>
+        <img src="/images/logo-sidebar.svg" alt="VK Digital Library" className="h-[52px] w-auto" />
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-6">
