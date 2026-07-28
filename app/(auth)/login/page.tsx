@@ -33,7 +33,7 @@ export default async function LoginPage() {
           />
         </div>
 
-        <div className="flex items-start justify-center px-6 py-12 sm:px-10 lg:items-center lg:justify-start lg:pl-6 lg:pr-6 xl:pl-8 xl:pr-8">
+        <div className="flex items-start justify-center px-6 py-12 sm:px-10 lg:items-center lg:justify-center lg:pl-6 lg:pr-6 xl:pl-8 xl:pr-8">
           <div className="w-full max-w-[560px] p-8 sm:p-10">
             <img src="/images/logo.svg" alt="VK Digital Library" className="mb-8 h-[61px] w-auto" />
             <AnimatedHeadline
