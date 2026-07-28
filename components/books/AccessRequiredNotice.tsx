@@ -19,7 +19,7 @@ export function AccessRequiredNotice({
   const t = (key: string) => translate(lang, key);
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-cream to-background px-6 py-16 text-center">
+    <div className="flex min-h-dvh flex-col items-center bg-gradient-to-br from-cream to-background px-6 py-16 text-center">
       <div className="mx-auto flex w-full max-w-md flex-col items-center">
         <Card className="flex w-full flex-col items-center gap-4 p-8">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-navy/10 text-navy">

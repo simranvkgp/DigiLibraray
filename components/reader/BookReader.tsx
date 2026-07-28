@@ -339,31 +339,41 @@ export function BookReader({
       </div>
 
       <div className="flex">
-        {/* Bookmarks sidebar */}
+        {/* Bookmarks sidebar: overlay drawer on mobile, inline column from md up */}
         {sidebarOpen && (
-          <aside className={`w-64 flex-shrink-0 border-r p-4 print:hidden ${darkMode ? "border-white/10" : "border-border"}`}>
-            <div className="mb-3 flex items-center justify-between">
-              <p className={`text-sm font-medium ${darkMode ? "text-white" : "text-navy"}`}>{t("reader.bookmarks")}</p>
-              <button onClick={() => setSidebarOpen(false)} aria-label={t("action.close")}>
-                <X size={16} className={darkMode ? "text-white/70" : "text-text-secondary"} />
-              </button>
-            </div>
-            {bookmarks.length === 0 && (
-              <p className={`text-xs ${darkMode ? "text-white/50" : "text-text-secondary"}`}>{t("reader.noBookmarks")}</p>
-            )}
-            <div className="space-y-2">
-              {bookmarks.map((b) => (
-                <div key={b.id} className={`flex items-center justify-between rounded-lg px-2 py-1.5 ${darkMode ? "bg-white/5" : "bg-background"}`}>
-                  <button onClick={() => (isPdf ? scrollToPage(b.pageNumber) : setPage(b.pageNumber))} className="data-text text-sm text-accentblue">
-                    {t("reader.page")} {b.pageNumber}
-                  </button>
-                  <button onClick={() => removeBookmark(b.id)} aria-label={t("reader.removeBookmark")}>
-                    <X size={14} className="text-text-secondary" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </aside>
+          <>
+            <div
+              className="fixed inset-0 z-40 bg-black/40 print:hidden md:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <aside
+              className={`fixed inset-y-0 left-0 z-50 w-64 flex-shrink-0 overflow-y-auto border-r p-4 shadow-lg print:hidden md:static md:z-auto md:shadow-none ${
+                darkMode ? "border-white/10 bg-[#111827]" : "border-border bg-background"
+              }`}
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <p className={`text-sm font-medium ${darkMode ? "text-white" : "text-navy"}`}>{t("reader.bookmarks")}</p>
+                <button onClick={() => setSidebarOpen(false)} aria-label={t("action.close")}>
+                  <X size={16} className={darkMode ? "text-white/70" : "text-text-secondary"} />
+                </button>
+              </div>
+              {bookmarks.length === 0 && (
+                <p className={`text-xs ${darkMode ? "text-white/50" : "text-text-secondary"}`}>{t("reader.noBookmarks")}</p>
+              )}
+              <div className="space-y-2">
+                {bookmarks.map((b) => (
+                  <div key={b.id} className={`flex items-center justify-between rounded-lg px-2 py-1.5 ${darkMode ? "bg-white/5" : "bg-background"}`}>
+                    <button onClick={() => (isPdf ? scrollToPage(b.pageNumber) : setPage(b.pageNumber))} className="data-text text-sm text-accentblue">
+                      {t("reader.page")} {b.pageNumber}
+                    </button>
+                    <button onClick={() => removeBookmark(b.id)} aria-label={t("reader.removeBookmark")}>
+                      <X size={14} className="text-text-secondary" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </aside>
+          </>
         )}
 
         {/* Viewer */}
@@ -405,7 +415,7 @@ export function BookReader({
                         ref={(el) => {
                           canvasRefs.current[pageNum - 1] = el;
                         }}
-                        className={`mx-auto block rounded-lg border ${darkMode ? "border-white/10 invert hue-rotate-180" : "border-border"}`}
+                        className={`mx-auto block h-auto max-w-full rounded-lg border ${darkMode ? "border-white/10 invert hue-rotate-180" : "border-border"}`}
                         onDragStart={(e) => e.preventDefault()}
                       />
                     </div>
@@ -416,13 +426,13 @@ export function BookReader({
             </>
           ) : isViewable ? (
             <div
-              className="mx-auto origin-top transition-transform"
-              style={{ transform: `scale(${zoom})`, width: "800px" }}
+              className="mx-auto w-full max-w-[800px] origin-top transition-transform"
+              style={{ transform: `scale(${zoom})` }}
             >
               <iframe
                 key={page}
                 src={`${book.drivePreviewUrl}#page=${page}`}
-                className={`h-[1100px] w-full rounded-lg border ${darkMode ? "border-white/10 invert hue-rotate-180" : "border-border"}`}
+                className={`h-[min(1100px,80vh)] w-full rounded-lg border ${darkMode ? "border-white/10 invert hue-rotate-180" : "border-border"}`}
                 allow="autoplay"
               />
             </div>

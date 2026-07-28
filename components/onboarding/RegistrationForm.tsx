@@ -76,7 +76,7 @@ export function RegistrationForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <Label>{t("register.nameLabel")}</Label>
           <Input value={name} disabled className="mt-1.5 bg-background" />
@@ -104,7 +104,7 @@ export function RegistrationForm({
         {errors.institutionName && <p className="mt-1 text-xs text-brandred">{errors.institutionName.message}</p>}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="city">{t("register.cityLabel")}</Label>
           <Input id="city" className="mt-1.5" {...register("city")} />

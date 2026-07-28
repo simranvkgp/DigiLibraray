@@ -15,7 +15,7 @@ export default async function UserLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <div className="min-h-screen bg-dash-cream">
+    <div className="min-h-dvh bg-dash-cream">
       <DashboardSidebar lang={lang} />
 
       <div className="lg:pl-64">

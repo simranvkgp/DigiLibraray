@@ -18,8 +18,8 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen border-r-[10px] border-t-[10px] border-navy bg-cream">
-      <main className="mx-auto grid min-h-screen max-w-[1920px] lg:grid-cols-[7fr_5fr]">
+    <div className="min-h-dvh border-r-[10px] border-t-[10px] border-navy bg-cream">
+      <main className="mx-auto grid min-h-dvh max-w-[1920px] lg:grid-cols-[7fr_5fr]">
         <div className="hidden overflow-hidden lg:block">
           <img
             src="/images/login-illustration.png"

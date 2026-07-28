@@ -38,7 +38,7 @@ export default async function CategoryPage() {
   const t = (key: string) => translate(lang, key);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-2xl">
         <h1 className="text-center font-display text-2xl font-semibold text-navy">
           {user?.categoryLocked ? t("category.changeTitle") : t("category.chooseTitle")}

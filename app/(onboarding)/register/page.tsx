@@ -13,7 +13,7 @@ export default async function RegisterPage() {
   const t = (key: string) => translate(lang, key);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-lg rounded-xl border border-border bg-card p-8 shadow-card">
         <h1 className="font-display text-2xl font-semibold text-navy">{t("register.title")}</h1>
         <p className="mt-1.5 text-sm text-text-secondary">{t("register.subtitle")}</p>

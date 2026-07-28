@@ -199,17 +199,18 @@ export function BookNameManager({ lang = "en" }: { lang?: Lang }) {
 
   return (
     <div>
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex flex-wrap gap-2">
         <Input
           placeholder={t("admin.bookNames.placeholder")}
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && add()}
+          className="w-full sm:w-auto sm:flex-1"
         />
         <select
           value={newCategoryId}
           onChange={(e) => setNewCategoryId(e.target.value)}
-          className="h-10 w-52 rounded-lg border border-border bg-card px-3 text-sm font-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentblue"
+          className="h-10 w-full rounded-lg border border-border bg-card px-3 text-sm font-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentblue sm:w-52"
         >
           <option value="">{t("admin.common.selectPlaceholder")}</option>
           {categories.map((c) => (
@@ -392,7 +393,7 @@ export function BookNameManager({ lang = "en" }: { lang?: Lang }) {
               <Label htmlFor="eb-name">{t("admin.field.title")}</Label>
               <Input id="eb-name" className="mt-1.5" value={editName} onChange={(e) => setEditName(e.target.value)} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <Label htmlFor="eb-class">{t("admin.field.class")}</Label>
                 <Input id="eb-class" className="mt-1.5" value={editClassName} onChange={(e) => setEditClassName(e.target.value)} />

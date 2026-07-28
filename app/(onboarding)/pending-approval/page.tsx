@@ -42,7 +42,7 @@ export default function PendingApprovalPage() {
   }, [update]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 text-center shadow-card">
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-warning/10">
           <span className="text-2xl">⏳</span>

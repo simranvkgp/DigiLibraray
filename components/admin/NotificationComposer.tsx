@@ -104,7 +104,7 @@ export function NotificationComposer({ lang = "en" }: { lang?: Lang }) {
               className="mt-1.5 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <Label htmlFor="categoryFilter">{t("admin.notifications.form.limitCategory")}</Label>
               <select id="categoryFilter" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="mt-1.5 h-10 w-full rounded-lg border border-border bg-card px-3 text-sm">

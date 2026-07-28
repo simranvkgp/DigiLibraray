@@ -74,8 +74,8 @@ export function AddBookForm({ onCreated, lang = "en" }: { onCreated: () => void;
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
-      <div className="col-span-2">
+    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="col-span-1 sm:col-span-2">
         <Label htmlFor="driveShareUrl">{t("admin.books.form.driveLink")}</Label>
         <Input id="driveShareUrl" placeholder="https://drive.google.com/file/d/.../view?usp=sharing" className="mt-1.5" {...register("driveShareUrl")} />
         {errors.driveShareUrl && <p className="mt-1 text-xs text-brandred">{errors.driveShareUrl.message}</p>}
@@ -126,12 +126,12 @@ export function AddBookForm({ onCreated, lang = "en" }: { onCreated: () => void;
         </select>
       </div>
 
-      <div className="col-span-2">
+      <div className="col-span-1 sm:col-span-2">
         <Label htmlFor="description">{t("admin.field.description")}</Label>
         <Input id="description" className="mt-1.5" {...register("description")} />
       </div>
 
-      <div className="col-span-2">
+      <div className="col-span-1 sm:col-span-2">
         <Label htmlFor="coverImageUrl">{t("admin.books.form.coverImageUrl")}</Label>
         <div className="mt-1.5 flex items-center gap-3">
           <Input id="coverImageUrl" placeholder="https://..." className="flex-1" {...register("coverImageUrl")} />
@@ -159,9 +159,9 @@ export function AddBookForm({ onCreated, lang = "en" }: { onCreated: () => void;
         <Input id="pageCount" type="number" className="mt-1.5" {...register("pageCount")} />
       </div>
 
-      {serverError && <p className="col-span-2 text-sm text-brandred">{serverError}</p>}
+      {serverError && <p className="col-span-1 text-sm text-brandred sm:col-span-2">{serverError}</p>}
 
-      <div className="col-span-2">
+      <div className="col-span-1 sm:col-span-2">
         <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? t("admin.books.form.adding") : t("admin.books.addNew")}
         </Button>

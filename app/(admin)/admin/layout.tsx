@@ -36,7 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="min-h-screen bg-dash-cream">
+    <div className="min-h-dvh bg-dash-cream">
       <AdminSidebar
         modules={modules}
         lang={lang}
@@ -44,7 +44,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         logoutLabel={t("nav.logout")}
         onSignOut={handleSignOut}
       />
-      <main className="p-4 pt-20 sm:p-6 sm:pt-20 lg:ml-60 lg:p-8 lg:pt-8">{children}</main>
+      <main className="p-4 pt-20 sm:p-6 sm:pt-20 lg:ml-60 lg:p-8 lg:pt-8">
+        <div className="mx-auto w-full max-w-[1600px]">{children}</div>
+      </main>
     </div>
   );
 }
