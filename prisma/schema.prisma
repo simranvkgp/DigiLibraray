@@ -208,7 +208,7 @@ model Book {
 model BookAccess {
   id            String   @id @default(cuid())
   userId        String
-  user          User     @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   bookId        String
   book          Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
   firstOpenedAt DateTime @default(now())
@@ -223,7 +223,7 @@ model BookAccess {
 model BookAccessGrant {
   id          String   @id @default(cuid())
   userId      String
-  user        User     @relation("BookAccessGrantUser", fields: [userId], references: [id])
+  user        User     @relation("BookAccessGrantUser", fields: [userId], references: [id], onDelete: Cascade)
   bookId      String
   book        Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
   grantedById String?
@@ -237,7 +237,7 @@ model BookAccessGrant {
 model BookRequest {
   id           String    @id @default(cuid())
   userId       String
-  user         User      @relation("BookRequestUser", fields: [userId], references: [id])
+  user         User      @relation("BookRequestUser", fields: [userId], references: [id], onDelete: Cascade)
   bookId       String
   book         Book      @relation(fields: [bookId], references: [id], onDelete: Cascade)
   status       String    @default("PENDING") // PENDING | APPROVED | REJECTED
@@ -259,7 +259,7 @@ model BookRequest {
 model BookSuggestion {
   id           String    @id @default(cuid())
   userId       String
-  user         User      @relation("BookSuggestionUser", fields: [userId], references: [id])
+  user         User      @relation("BookSuggestionUser", fields: [userId], references: [id], onDelete: Cascade)
   title        String
   author       String?
   subject      String?
@@ -300,7 +300,7 @@ model RequestableBookName {
 model Bookmark {
   id         String   @id @default(cuid())
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   bookId     String
   book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
   pageNumber Int
@@ -314,7 +314,7 @@ model Bookmark {
 model Favorite {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   bookId    String
   book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -326,7 +326,7 @@ model Favorite {
 model ReadingProgress {
   id              String   @id @default(cuid())
   userId          String
-  user            User     @relation(fields: [userId], references: [id])
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   bookId          String
   book            Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
   currentPage     Int      @default(1)
@@ -353,7 +353,7 @@ model NotificationRecipient {
   notificationId String
   notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
   userId         String
-  user           User         @relation(fields: [userId], references: [id])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   readAt         DateTime?
   createdAt      DateTime     @default(now())
 
@@ -379,9 +379,9 @@ model PushSubscription {
 model Approval {
   id           String   @id @default(cuid())
   targetUserId String
-  targetUser   User     @relation("ApprovalTarget", fields: [targetUserId], references: [id])
+  targetUser   User     @relation("ApprovalTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
   actorUserId  String
-  actorUser    User     @relation("ApprovalActor", fields: [actorUserId], references: [id])
+  actorUser    User     @relation("ApprovalActor", fields: [actorUserId], references: [id], onDelete: Cascade)
   action       String // APPROVE | REJECT | SUSPEND | REACTIVATE | DELETE
   reason       String?
   createdAt    DateTime @default(now())
@@ -405,7 +405,7 @@ model ActivityLog {
 model Setting {
   id                 String   @id @default(cuid())
   userId             String   @unique
-  user               User     @relation(fields: [userId], references: [id])
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   theme              String   @default("light") // light | dark | system
   language           String   @default("en")
   emailNotifications Boolean  @default(true)

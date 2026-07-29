@@ -78,6 +78,7 @@ export const admin = {
     "admin.users.suspend": "Suspend",
     "admin.users.reactivate": "Reactivate",
     "admin.users.confirmDelete": "Permanently delete this user? This can't be undone.",
+    "admin.users.deleteFailed": "Failed to delete user. Please try again.",
     "admin.users.empty": "No users in this view.",
 
     // Books page / table
@@ -293,6 +294,7 @@ export const admin = {
     "admin.users.suspend": "निलंबित करें",
     "admin.users.reactivate": "पुनः सक्रिय करें",
     "admin.users.confirmDelete": "इस उपयोगकर्ता को स्थायी रूप से हटाएं? इसे पूर्ववत नहीं किया जा सकता।",
+    "admin.users.deleteFailed": "उपयोगकर्ता को हटाने में विफल। कृपया पुनः प्रयास करें।",
     "admin.users.empty": "इस दृश्य में कोई उपयोगकर्ता नहीं है।",
 
     // Books page / table

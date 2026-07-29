@@ -67,7 +67,10 @@ export function UserManagementTable({ lang = "en", canManageRoles = false }: { l
   async function remove(id: string) {
     if (!confirm(t("admin.users.confirmDelete"))) return;
     setBusyId(id);
-    await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
+    const res = await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      alert(t("admin.users.deleteFailed"));
+    }
     await load();
     setBusyId(null);
   }

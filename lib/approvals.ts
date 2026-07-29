@@ -23,7 +23,11 @@ export async function performApprovalAction(
   }
 
   if (action === "DELETE") {
-    await prisma.user.delete({ where: { id: targetUserId } });
+    try {
+      await prisma.user.delete({ where: { id: targetUserId } });
+    } catch (err) {
+      return NextResponse.json({ error: "Failed to delete user" }, { status: 500 });
+    }
     return NextResponse.json({ success: true });
   }
 
