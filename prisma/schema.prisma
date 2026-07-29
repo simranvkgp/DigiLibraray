@@ -410,5 +410,6 @@ model Setting {
   language           String   @default("en")
   emailNotifications Boolean  @default(true)
   pushNotifications  Boolean  @default(true)
+  newArrivalsSeenAt  DateTime?
   updatedAt          DateTime @updatedAt
 }

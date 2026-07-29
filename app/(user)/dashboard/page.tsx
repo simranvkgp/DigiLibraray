@@ -7,7 +7,6 @@ import { translate } from "@/lib/i18n/translate";
 import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { StatCard } from "@/components/ui/stat-card";
 import { ContinueReadingCard } from "@/components/dashboard/ContinueReadingCard";
-import { RecommendedBooks } from "@/components/dashboard/RecommendedBooks";
 import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
 import { RecentlyOpenedPanel } from "@/components/dashboard/RecentlyOpenedPanel";
 import { RequestBookHeroButton } from "@/components/dashboard/RequestBookHeroButton";
@@ -41,19 +40,6 @@ export default async function DashboardPage() {
       prisma.favorite.count({ where: { userId } }),
       prisma.bookRequest.count({ where: { userId, status: "PENDING" } }),
     ]);
-
-  const excludedBookIds = [...continueReading.map((r) => r.bookId), ...favorites.map((f) => f.bookId)];
-  const recommended = user.categoryId
-    ? await prisma.book.findMany({
-        where: {
-          status: "PUBLISHED",
-          categoryId: user.categoryId,
-          id: { notIn: excludedBookIds },
-        },
-        orderBy: { createdAt: "desc" },
-        take: 4,
-      })
-    : [];
 
   return (
     <div className="space-y-8">
@@ -135,16 +121,6 @@ export default async function DashboardPage() {
               )}
             </section>
           )}
-
-          <RecommendedBooks
-            lang={lang}
-            books={recommended.map((b) => ({
-              id: b.id,
-              title: b.title,
-              subject: b.subject,
-              coverImageUrl: b.coverImageUrl,
-            }))}
-          />
         </div>
 
         <div className="space-y-6">

@@ -29,6 +29,7 @@ export function DashboardSidebar({ lang = "en" }: { lang?: Lang }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [bookmarkCount, setBookmarkCount] = useState(0);
+  const [newArrivalsCount, setNewArrivalsCount] = useState(0);
 
   useEffect(() => {
     fetch("/api/bookmarks")
@@ -36,6 +37,18 @@ export function DashboardSidebar({ lang = "en" }: { lang?: Lang }) {
       .then((d) => setBookmarkCount(d.bookmarks?.length ?? 0))
       .catch(() => {});
   }, [pathname]);
+
+  useEffect(() => {
+    fetch("/api/new-arrivals")
+      .then((r) => r.json())
+      .then((d) => setNewArrivalsCount(d.count ?? 0))
+      .catch(() => {});
+  }, [pathname]);
+
+  function markNewArrivalsSeen() {
+    setNewArrivalsCount(0);
+    fetch("/api/new-arrivals", { method: "POST" }).catch(() => {});
+  }
 
   const content = (
     <div className="flex h-full flex-col bg-dash-navy">
@@ -52,9 +65,14 @@ export function DashboardSidebar({ lang = "en" }: { lang?: Lang }) {
           <Library size={18} aria-hidden="true" />
           {t("dashboard.sidebar.myLibrary")}
         </Link>
-        <Link href="/library" className={rowBase}>
+        <Link href="/library" className={rowBase} onClick={markNewArrivalsSeen}>
           <Sparkles size={18} aria-hidden="true" />
-          {t("dashboard.sidebar.newArrivals")}
+          <span className="flex-1">{t("dashboard.sidebar.newArrivals")}</span>
+          {newArrivalsCount > 0 && (
+            <span className="rounded-full bg-brandred px-2 py-0.5 text-[10px] font-semibold text-white">
+              {newArrivalsCount}
+            </span>
+          )}
         </Link>
         {bookmarkCount > 0 ? (
           <Link href="/bookmarks" className={`${rowBase} ${pathname === "/bookmarks" ? rowActive : ""}`}>
