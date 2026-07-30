@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { BookOpen, Bookmark as BookmarkIcon, Heart, ClipboardList } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -91,9 +90,6 @@ export default async function DashboardPage() {
                   lang={lang}
                   triggerClassName="rounded-lg bg-dash-navy px-4 py-2 text-sm font-medium text-white hover:bg-dash-navy/90"
                 />
-                <Link href="/library" className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-dash-navy hover:bg-background">
-                  {t("dashboard.browseLibrary")}
-                </Link>
               </div>
             </Card>
           ) : (
