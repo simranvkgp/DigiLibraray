@@ -29,6 +29,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
+        token.isFirstLogin = (user as any).isFirstLogin === true;
       }
       if (user || trigger === "update") {
         const dbUser = await prisma.user.findUnique({
@@ -60,6 +61,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         (session.user as any).categoryId = token.categoryId as string | null;
         (session.user as any).categoryLocked = token.categoryLocked as boolean;
         (session.user as any).boardId = token.boardId as string | null;
+        (session.user as any).isFirstLogin = token.isFirstLogin as boolean;
       }
       return session;
     },
@@ -67,6 +69,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Track last login for the "Last Login" column in User Management,
       // and log the event for the daily-logins analytics chart.
       if (user.id) {
+        const existing = await prisma.user
+          .findUnique({ where: { id: user.id }, select: { lastLoginAt: true } })
+          .catch(() => null);
+        // No prior lastLoginAt means this is the user's first-ever sign-in
+        // (covers both a brand-new row and one the adapter hasn't committed
+        // yet). Stashed on `user` here so the `jwt` callback — which receives
+        // this same object — can read it for the dashboard's greeting.
+        (user as any).isFirstLogin = !existing?.lastLoginAt;
+
         await prisma.user
           .update({ where: { id: user.id }, data: { lastLoginAt: new Date() } })
           .then(() => prisma.activityLog.create({ data: { userId: user.id, action: "LOGIN" } }))

@@ -23,6 +23,7 @@ export const user = {
     "footer.contactUs": "Contact us",
 
     // Dashboard
+    "dashboard.welcome": "Welcome",
     "dashboard.welcomeBack": "Welcome back",
     "dashboard.heroSubtitle": "Pick up where you left off, or explore the library.",
     "dashboard.browseLibrary": "Browse library",
@@ -169,6 +170,7 @@ export const user = {
     "footer.contactUs": "संपर्क करें",
 
     // Dashboard
+    "dashboard.welcome": "आपका स्वागत है",
     "dashboard.welcomeBack": "वापसी पर स्वागत है",
     "dashboard.heroSubtitle": "जहाँ से आपने छोड़ा था वहीं से जारी रखें, या लाइब्रेरी देखें।",
     "dashboard.browseLibrary": "लाइब्रेरी देखें",
