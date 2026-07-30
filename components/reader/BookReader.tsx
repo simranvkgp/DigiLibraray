@@ -11,6 +11,8 @@ import {
   Minimize,
   Bookmark,
   Heart,
+  ThumbsUp,
+  PanelRight,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,6 +37,15 @@ interface BookmarkRow {
   note: string | null;
 }
 
+interface PageLikeRow {
+  id: string;
+  pageNumber: number;
+}
+
+// Thumbnails render at a fixed width regardless of zoom — small enough that
+// keeping every rendered one in memory (no eviction, unlike full pages) is fine.
+const THUMB_WIDTH = 110;
+
 // Pages further than this from the current one get their canvas cleared to
 // bound memory while scrolling through a long book — the placeholder div
 // keeps its reserved height so scroll position doesn't jump.
@@ -45,23 +56,31 @@ export function BookReader({
   initialPage,
   initialBookmarks,
   initialIsFavorite,
+  initialPageLikes,
   lang = "en",
 }: {
   book: ReaderBook;
   initialPage: number;
   initialBookmarks: BookmarkRow[];
   initialIsFavorite: boolean;
+  initialPageLikes: PageLikeRow[];
   lang?: Lang;
 }) {
   const [page, setPage] = useState(initialPage || 1);
   const [zoom, setZoom] = useState(1);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [thumbsOpen, setThumbsOpen] = useState(false);
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
+  const [pageLikes, setPageLikes] = useState(initialPageLikes);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const thumbsAreaRef = useRef<HTMLDivElement>(null);
   const pageWrapperRefs = useRef<Array<HTMLDivElement | null>>([]);
   const canvasRefs = useRef<Array<HTMLCanvasElement | null>>([]);
+  const thumbWrapperRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const thumbCanvasRefs = useRef<Array<HTMLCanvasElement | null>>([]);
+  const renderedThumbsRef = useRef<Set<number>>(new Set());
   const pdfDocRef = useRef<PDFDocumentProxy | null>(null);
   const renderTasksRef = useRef<Map<number, RenderTask>>(new Map());
   const renderedAtZoomRef = useRef<Map<number, number>>(new Map());
@@ -214,6 +233,50 @@ export function BookReader({
     return () => observer.disconnect();
   }, [isPdf, loadState, numPages, renderPage]);
 
+  // Renders a single low-res thumbnail (Adobe-style page navigator). Thumbs
+  // are never evicted once rendered — they're small enough that keeping all
+  // of them costs far less than a handful of full-resolution pages.
+  const renderThumb = useCallback(async (pageNum: number) => {
+    const doc = pdfDocRef.current;
+    const canvas = thumbCanvasRefs.current[pageNum - 1];
+    if (!doc || !canvas || renderedThumbsRef.current.has(pageNum)) return;
+
+    const pageProxy = await doc.getPage(pageNum);
+    const unscaled = pageProxy.getViewport({ scale: 1 });
+    const viewport = pageProxy.getViewport({ scale: THUMB_WIDTH / unscaled.width });
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    try {
+      await pageProxy.render({ canvasContext: context, viewport }).promise;
+      renderedThumbsRef.current.add(pageNum);
+    } catch {
+      // Panel closed/unmounted mid-render — safe to ignore.
+    }
+  }, []);
+
+  // Lazily render thumbnails as they scroll into view in the side panel,
+  // rather than rendering all of them (which is heavy for long books) up front.
+  useEffect(() => {
+    if (!isPdf || !thumbsOpen || loadState !== "ready" || !numPages || !thumbsAreaRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const pageNum = Number((entry.target as HTMLElement).dataset.thumbPage);
+          renderThumb(pageNum);
+        });
+      },
+      { root: thumbsAreaRef.current, rootMargin: "400px 0px" }
+    );
+
+    thumbWrapperRefs.current.forEach((el) => el && observer.observe(el));
+    return () => observer.disconnect();
+  }, [isPdf, thumbsOpen, loadState, numPages, renderThumb]);
+
   // Jump to the reader's last reading position once, after the page list mounts.
   useEffect(() => {
     if (!isPdf || loadState !== "ready" || hasScrolledToInitialRef.current) return;
@@ -272,6 +335,23 @@ export function BookReader({
     if (res.ok) {
       const data = await res.json();
       setIsFavorite(data.isFavorite);
+    }
+  }
+
+  const likedPages = new Set(pageLikes.map((p) => p.pageNumber));
+
+  async function toggleLike(pageNumber: number) {
+    const res = await fetch("/api/page-likes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bookId: book.id, pageNumber }),
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.liked) {
+      setPageLikes((prev) => [...prev, data.pageLike].sort((a, b) => a.pageNumber - b.pageNumber));
+    } else {
+      setPageLikes((prev) => prev.filter((p) => p.pageNumber !== pageNumber));
     }
   }
 
@@ -345,6 +425,26 @@ export function BookReader({
           >
             <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
           </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => toggleLike(page)}
+            aria-label={t(likedPages.has(page) ? "reader.unlikePage" : "reader.likePage")}
+            className={likedPages.has(page) ? "text-accentblue" : undefined}
+          >
+            <ThumbsUp size={16} fill={likedPages.has(page) ? "currentColor" : "none"} />
+          </Button>
+          {isPdf && (
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => setThumbsOpen((s) => !s)}
+              aria-label={t("reader.togglePageNavigator")}
+              className={thumbsOpen ? "bg-background" : undefined}
+            >
+              <PanelRight size={16} />
+            </Button>
+          )}
           <Button size="sm" variant="outline" onClick={() => setSidebarOpen((s) => !s)}>
             {t("reader.bookmarks")} ({bookmarks.length})
           </Button>
@@ -426,6 +526,15 @@ export function BookReader({
                         >
                           <Heart size={14} fill={isFavorite ? "currentColor" : "none"} />
                         </button>
+                        <button
+                          onClick={() => toggleLike(pageNum)}
+                          aria-label={t(likedPages.has(pageNum) ? "reader.unlikePage" : "reader.likePage")}
+                          className={`rounded-full p-1.5 transition-colors ${
+                            likedPages.has(pageNum) ? "bg-accentblue text-white" : "bg-black/40 text-white/70 hover:bg-black/60 hover:text-white"
+                          }`}
+                        >
+                          <ThumbsUp size={14} fill={likedPages.has(pageNum) ? "currentColor" : "none"} />
+                        </button>
                       </div>
                       <canvas
                         ref={(el) => {
@@ -464,6 +573,51 @@ export function BookReader({
             </div>
           )}
         </div>
+
+        {/* Page navigator: Adobe-style thumbnail strip, click a page to jump to it */}
+        {isPdf && thumbsOpen && (
+          <>
+            <div
+              className="fixed inset-0 z-40 bg-black/40 print:hidden lg:hidden"
+              onClick={() => setThumbsOpen(false)}
+            />
+            <aside
+              ref={thumbsAreaRef}
+              className="fixed inset-y-0 right-0 z-50 w-40 flex-shrink-0 overflow-y-auto border-l border-border bg-background p-3 shadow-lg print:hidden lg:static lg:z-auto lg:shadow-none"
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-sm font-medium text-navy">{t("reader.pageNavigator")}</p>
+                <button onClick={() => setThumbsOpen(false)} aria-label={t("action.close")}>
+                  <X size={16} className="text-text-secondary" />
+                </button>
+              </div>
+              <div className="space-y-2">
+                {numPages &&
+                  Array.from({ length: numPages }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      ref={(el) => {
+                        thumbWrapperRefs.current[pageNum - 1] = el;
+                      }}
+                      data-thumb-page={pageNum}
+                      onClick={() => (isPdf ? scrollToPage(pageNum) : setPage(pageNum))}
+                      className={`block w-full rounded-lg border-2 p-1 transition-colors ${
+                        page === pageNum ? "border-accentblue" : "border-transparent hover:border-border"
+                      }`}
+                    >
+                      <canvas
+                        ref={(el) => {
+                          thumbCanvasRefs.current[pageNum - 1] = el;
+                        }}
+                        className="mx-auto block h-auto max-w-full rounded border border-border"
+                      />
+                      <p className="mt-1 text-center text-xs text-text-secondary">{pageNum}</p>
+                    </button>
+                  ))}
+              </div>
+            </aside>
+          </>
+        )}
       </div>
 
       {/* Bottom bar: page navigation */}
