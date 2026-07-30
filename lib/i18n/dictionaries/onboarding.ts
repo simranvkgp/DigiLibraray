@@ -53,9 +53,9 @@ export const onboarding = {
     "category.saveChange": "Save change",
     "category.continue": "Continue",
     "category.confirmTitle": "Confirm your category",
-    "category.confirmUniversityNote": "University is permanent — once chosen, it can never be changed.",
+    "category.confirmUniversityNote": "Explore and access university books",
     "category.confirmSwitchNote":
-      "You'll be set to {name}. You can switch between Secondary and Senior Secondary again later, but you can never move to University.",
+      "You'll be set to {name}. You can switch between Secondary and Senior Secondary again later.",
     "category.genericError": "Something went wrong.",
 
     // Account restricted
@@ -117,9 +117,9 @@ export const onboarding = {
     "category.saveChange": "बदलाव सहेजें",
     "category.continue": "जारी रखें",
     "category.confirmTitle": "अपनी श्रेणी की पुष्टि करें",
-    "category.confirmUniversityNote": "विश्वविद्यालय स्थायी है — एक बार चुनने के बाद इसे कभी बदला नहीं जा सकता।",
+    "category.confirmUniversityNote": "विश्वविद्यालय की किताबें खोजें और एक्सेस करें",
     "category.confirmSwitchNote":
-      "आपको {name} पर सेट कर दिया जाएगा। आप बाद में फिर से सेकेंडरी और सीनियर सेकेंडरी के बीच बदल सकते हैं, लेकिन आप कभी भी विश्वविद्यालय में नहीं जा सकते।",
+      "आपको {name} पर सेट कर दिया जाएगा। आप बाद में फिर से सेकेंडरी और सीनियर सेकेंडरी के बीच बदल सकते हैं।",
     "category.genericError": "कुछ गड़बड़ हो गई।",
 
     // Account restricted
