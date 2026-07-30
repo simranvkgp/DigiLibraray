@@ -36,6 +36,15 @@ interface AdminBookOption {
   board: { name: string };
 }
 
+function relatedBooks(requestedTitle: string, books: AdminBookOption[]) {
+  const words = requestedTitle.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 2);
+  if (words.length === 0) return books;
+  return books.filter((b) => {
+    const title = b.title.toLowerCase();
+    return words.some((w) => title.includes(w));
+  });
+}
+
 const statusVariant: Record<string, "warning" | "success" | "destructive"> = {
   PENDING: "warning",
   ADDED: "success",
@@ -57,7 +66,6 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
   const [rejectOpenId, setRejectOpenId] = useState<string | null>(null);
   const [books, setBooks] = useState<AdminBookOption[]>([]);
   const [accessOpenId, setAccessOpenId] = useState<string | null>(null);
-  const [accessQuery, setAccessQuery] = useState("");
   const [accessError, setAccessError] = useState<string | null>(null);
   const [mailSentId, setMailSentId] = useState<string | null>(null);
   const t = (key: string) => translate(lang, key);
@@ -78,7 +86,6 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
 
   function openAccess(id: string) {
     setAccessOpenId(id);
-    setAccessQuery("");
     setAccessError(null);
   }
 
@@ -191,44 +198,26 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                               <DialogTitle>{s.title}</DialogTitle>
                               <DialogDescription>{t("admin.suggestions.access")} — {s.user.name}</DialogDescription>
                             </DialogHeader>
-                            <div className="mt-1">
-                              <input
-                                type="text"
-                                autoComplete="off"
-                                placeholder={t("admin.suggestions.searchBookPlaceholder")}
-                                value={accessQuery}
-                                onChange={(e) => setAccessQuery(e.target.value)}
-                                className="h-10 w-full rounded-lg border border-border bg-card px-3 text-sm font-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentblue"
-                              />
-                              <div className="mt-2 max-h-64 overflow-y-auto rounded-lg border border-border">
-                                {books
-                                  .filter((b) => b.title.toLowerCase().includes(accessQuery.trim().toLowerCase()))
-                                  .map((b) => (
-                                    <div
-                                      key={b.id}
-                                      className="flex items-center justify-between gap-2 border-b border-border p-2.5 last:border-0"
-                                    >
-                                      <div className="min-w-0">
-                                        <p className="truncate text-sm font-medium">{b.title}</p>
-                                        <p className="truncate text-xs text-text-secondary">
-                                          {b.subject} · {b.category.name} / {b.board.name}
-                                        </p>
-                                      </div>
-                                      <Button
-                                        size="sm"
-                                        variant="success"
-                                        className="shrink-0"
-                                        disabled={busyId === s.id}
-                                        onClick={() => giveAccess(s.id, b.id)}
-                                      >
-                                        {t("admin.suggestions.access")}
-                                      </Button>
-                                    </div>
-                                  ))}
-                                {books.filter((b) => b.title.toLowerCase().includes(accessQuery.trim().toLowerCase())).length === 0 && (
-                                  <p className="p-3 text-sm text-text-secondary">{t("admin.suggestions.noBooksFound")}</p>
-                                )}
-                              </div>
+                            <div className="mt-1 max-h-72 space-y-2 overflow-y-auto">
+                              {relatedBooks(s.title, books).map((b) => (
+                                <div key={b.id} className="rounded-lg border border-border p-3">
+                                  <p className="truncate text-sm font-medium">{b.title}</p>
+                                  <p className="truncate text-xs text-text-secondary">
+                                    {b.subject} · {b.category.name} / {b.board.name}
+                                  </p>
+                                  <Button
+                                    className="mt-2 w-full"
+                                    variant="success"
+                                    disabled={busyId === s.id}
+                                    onClick={() => giveAccess(s.id, b.id)}
+                                  >
+                                    {t("admin.suggestions.access")}
+                                  </Button>
+                                </div>
+                              ))}
+                              {relatedBooks(s.title, books).length === 0 && (
+                                <p className="p-3 text-sm text-text-secondary">{t("admin.suggestions.noBooksFound")}</p>
+                              )}
                             </div>
                             {accessError && <p className="mt-2 text-sm text-brandred">{accessError}</p>}
                           </DialogContent>
