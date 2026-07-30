@@ -43,11 +43,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <DashboardHero
-        firstName={session!.user!.name?.split(" ")[0] ?? ""}
-        lang={lang}
-        isFirstLogin={!!user.isFirstLogin}
-      />
+      <DashboardHero firstName={session!.user!.name?.split(" ")[0] ?? ""} lang={lang} />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <StatCard icon={BookOpen} label={t("dashboard.booksOpened")} value={booksOpenedCount} tone="navy" />

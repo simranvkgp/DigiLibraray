@@ -2,15 +2,7 @@ import Link from "next/link";
 import { RequestBookHeroButton } from "@/components/dashboard/RequestBookHeroButton";
 import { translate, type Lang } from "@/lib/i18n/translate";
 
-export function DashboardHero({
-  firstName,
-  lang = "en",
-  isFirstLogin = false,
-}: {
-  firstName: string;
-  lang?: Lang;
-  isFirstLogin?: boolean;
-}) {
+export function DashboardHero({ firstName, lang = "en" }: { firstName: string; lang?: Lang }) {
   const t = (key: string) => translate(lang, key);
 
   return (
@@ -33,7 +25,7 @@ export function DashboardHero({
       <div className="relative flex flex-col gap-5 px-6 py-10 sm:px-10 sm:py-12 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="font-display text-2xl font-medium text-white sm:text-3xl">
-            {t(isFirstLogin ? "dashboard.welcome" : "dashboard.welcomeBack")}, {firstName}! 👋
+            {t("dashboard.welcome")}, {firstName}! 👋
           </h1>
           <p className="mt-2 max-w-md text-sm text-white/75 sm:text-base">{t("dashboard.heroSubtitle")}</p>
         </div>

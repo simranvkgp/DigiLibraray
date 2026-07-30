@@ -31,7 +31,6 @@ export interface SessionUserShape {
   categoryId?: string | null;
   categoryLocked: boolean;
   boardId?: string | null;
-  isFirstLogin?: boolean;
 }
 
 export type BookRequestStatus = "NONE" | "PENDING" | "APPROVED" | "REJECTED";

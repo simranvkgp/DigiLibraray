@@ -24,7 +24,6 @@ export const user = {
 
     // Dashboard
     "dashboard.welcome": "Welcome",
-    "dashboard.welcomeBack": "Welcome back",
     "dashboard.heroSubtitle": "Pick up where you left off, or explore the library.",
     "dashboard.browseLibrary": "Browse library",
     "dashboard.continueReading": "Continue reading",
@@ -171,7 +170,6 @@ export const user = {
 
     // Dashboard
     "dashboard.welcome": "आपका स्वागत है",
-    "dashboard.welcomeBack": "वापसी पर स्वागत है",
     "dashboard.heroSubtitle": "जहाँ से आपने छोड़ा था वहीं से जारी रखें, या लाइब्रेरी देखें।",
     "dashboard.browseLibrary": "लाइब्रेरी देखें",
     "dashboard.continueReading": "पढ़ना जारी रखें",
