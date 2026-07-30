@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { translate, type Lang } from "@/lib/i18n/translate";
 
@@ -25,7 +24,6 @@ export function SettingsForm({
 }) {
   const [settings, setSettings] = useState<SettingsData | null>(null);
   const [saving, setSaving] = useState(false);
-  const { setTheme } = useTheme();
   const t = (key: string) => translate(lang, key);
 
   useEffect(() => {
@@ -41,11 +39,6 @@ export function SettingsForm({
       body: JSON.stringify(patch),
     });
     setSaving(false);
-  }
-
-  function handleThemeChange(nextTheme: string) {
-    setTheme(nextTheme);
-    update({ theme: nextTheme });
   }
 
   async function handleLanguageChange(nextLanguage: string) {
@@ -67,27 +60,6 @@ export function SettingsForm({
             <p className="font-medium text-dash-navy">{name}</p>
             <p className="text-sm text-text-secondary">{email}</p>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card className="rounded-2xl">
-        <CardHeader><CardTitle className="text-dash-navy">{t("settings.theme")}</CardTitle></CardHeader>
-        <CardContent className="flex gap-2">
-          {[
-            { value: "light", label: t("settings.theme.light") },
-            { value: "dark", label: t("settings.theme.dark") },
-            { value: "system", label: t("settings.theme.system") },
-          ].map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => handleThemeChange(value)}
-              className={`rounded-xl border px-4 py-2 text-sm transition-colors ${
-                settings.theme === value ? "border-dash-navy bg-dash-navy text-white" : "border-border text-text-secondary hover:bg-background"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
         </CardContent>
       </Card>
 

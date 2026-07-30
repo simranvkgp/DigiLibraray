@@ -3,10 +3,6 @@ export const user = {
   en: {
     "settings.title": "Settings",
     "settings.profile": "Profile",
-    "settings.theme": "Theme",
-    "settings.theme.light": "Light",
-    "settings.theme.dark": "Dark",
-    "settings.theme.system": "System",
     "settings.language": "Language",
     "settings.notifications": "Notification preferences",
     "settings.emailNotifications": "Email notifications",
@@ -151,10 +147,6 @@ export const user = {
   hi: {
     "settings.title": "सेटिंग्स",
     "settings.profile": "प्रोफ़ाइल",
-    "settings.theme": "थीम",
-    "settings.theme.light": "लाइट",
-    "settings.theme.dark": "डार्क",
-    "settings.theme.system": "सिस्टम",
     "settings.language": "भाषा",
     "settings.notifications": "सूचना प्राथमिकताएं",
     "settings.emailNotifications": "ईमेल सूचनाएं",
