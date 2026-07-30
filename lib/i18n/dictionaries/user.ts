@@ -123,9 +123,10 @@ export const user = {
     // Reader
     "reader.zoomOut": "Zoom out",
     "reader.zoomIn": "Zoom in",
-    "reader.toggleDarkMode": "Toggle dark mode",
     "reader.toggleFullscreen": "Toggle fullscreen",
     "reader.addBookmark": "Add bookmark",
+    "reader.addFavorite": "Add to favourites",
+    "reader.removeFavorite": "Remove from favourites",
     "reader.bookmarks": "Bookmarks",
     "reader.package": "package",
     "reader.packageNotRenderable": "packages don't render inline yet — download the package to open it in a compatible player.",
@@ -267,9 +268,10 @@ export const user = {
     // Reader
     "reader.zoomOut": "ज़ूम आउट",
     "reader.zoomIn": "ज़ूम इन",
-    "reader.toggleDarkMode": "डार्क मोड टॉगल करें",
     "reader.toggleFullscreen": "फ़ुलस्क्रीन टॉगल करें",
     "reader.addBookmark": "बुकमार्क जोड़ें",
+    "reader.addFavorite": "पसंदीदा में जोड़ें",
+    "reader.removeFavorite": "पसंदीदा से हटाएं",
     "reader.bookmarks": "बुकमार्क",
     "reader.package": "पैकेज",
     "reader.packageNotRenderable": "पैकेज अभी सीधे नहीं दिखाए जा सकते — इसे किसी संगत प्लेयर में खोलने के लिए डाउनलोड करें।",

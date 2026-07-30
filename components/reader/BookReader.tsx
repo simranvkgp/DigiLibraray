@@ -9,9 +9,8 @@ import {
   ZoomOut,
   Maximize,
   Minimize,
-  Moon,
-  Sun,
   Bookmark,
+  Heart,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,18 +44,20 @@ export function BookReader({
   book,
   initialPage,
   initialBookmarks,
+  initialIsFavorite,
   lang = "en",
 }: {
   book: ReaderBook;
   initialPage: number;
   initialBookmarks: BookmarkRow[];
+  initialIsFavorite: boolean;
   lang?: Lang;
 }) {
   const [page, setPage] = useState(initialPage || 1);
   const [zoom, setZoom] = useState(1);
-  const [darkMode, setDarkMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
+  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const pageWrapperRefs = useRef<Array<HTMLDivElement | null>>([]);
@@ -261,6 +262,19 @@ export function BookReader({
 
   const bookmarkedPages = new Set(bookmarks.map((b) => b.pageNumber));
 
+  async function toggleFavorite() {
+    setIsFavorite((v) => !v); // optimistic
+    const res = await fetch("/api/favorites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bookId: book.id }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setIsFavorite(data.isFavorite);
+    }
+  }
+
   // Best-effort deterrents against saving/printing/copying the page. None of
   // this can stop a screenshot, screen recording, or someone reading the
   // network response directly — that's a hard ceiling for any browser-based
@@ -292,16 +306,11 @@ export function BookReader({
   const estimatedPageHeight = basePageSizeRef.current ? basePageSizeRef.current.height * zoom * 1.5 : undefined;
 
   return (
-    <div
-      ref={containerRef}
-      tabIndex={-1}
-      className={darkMode ? "bg-[#111827]" : "bg-background"}
-      style={isPdf ? { userSelect: "none" } : undefined}
-    >
+    <div ref={containerRef} tabIndex={-1} className="bg-background" style={isPdf ? { userSelect: "none" } : undefined}>
       {/* Top bar */}
-      <div className={`flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3 print:hidden ${darkMode ? "border-white/10" : "border-border"}`}>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 print:hidden">
         <div className="min-w-0">
-          <p className={`truncate font-display text-base font-medium ${darkMode ? "text-white" : "text-navy"}`}>{book.title}</p>
+          <p className="truncate font-display text-base font-medium text-navy">{book.title}</p>
           <div className="mt-1 flex gap-1.5">
             <Badge variant="outline">{book.subject}</Badge>
             <Badge variant="default">{book.boardName}</Badge>
@@ -312,14 +321,9 @@ export function BookReader({
           <Button size="icon" variant="ghost" onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))} aria-label={t("reader.zoomOut")}>
             <ZoomOut size={16} />
           </Button>
-          <span className={`data-text w-12 text-center text-xs ${darkMode ? "text-white/70" : "text-text-secondary"}`}>
-            {Math.round(zoom * 100)}%
-          </span>
+          <span className="data-text w-12 text-center text-xs text-text-secondary">{Math.round(zoom * 100)}%</span>
           <Button size="icon" variant="ghost" onClick={() => setZoom((z) => Math.min(2, z + 0.1))} aria-label={t("reader.zoomIn")}>
             <ZoomIn size={16} />
-          </Button>
-          <Button size="icon" variant="ghost" onClick={() => setDarkMode((d) => !d)} aria-label={t("reader.toggleDarkMode")}>
-            {darkMode ? <Sun size={16} /> : <Moon size={16} />}
           </Button>
           <Button size="icon" variant="ghost" onClick={toggleFullscreen} aria-label={t("reader.toggleFullscreen")}>
             {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
@@ -331,6 +335,15 @@ export function BookReader({
             aria-label={t(bookmarkedPages.has(page) ? "reader.removeBookmark" : "reader.addBookmark")}
           >
             <Bookmark size={16} fill={bookmarkedPages.has(page) ? "currentColor" : "none"} />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={toggleFavorite}
+            aria-label={t(isFavorite ? "reader.removeFavorite" : "reader.addFavorite")}
+            className={isFavorite ? "text-brandred" : undefined}
+          >
+            <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
           </Button>
           <Button size="sm" variant="outline" onClick={() => setSidebarOpen((s) => !s)}>
             {t("reader.bookmarks")} ({bookmarks.length})
@@ -346,23 +359,17 @@ export function BookReader({
               className="fixed inset-0 z-40 bg-black/40 print:hidden md:hidden"
               onClick={() => setSidebarOpen(false)}
             />
-            <aside
-              className={`fixed inset-y-0 left-0 z-50 w-64 flex-shrink-0 overflow-y-auto border-r p-4 shadow-lg print:hidden md:static md:z-auto md:shadow-none ${
-                darkMode ? "border-white/10 bg-[#111827]" : "border-border bg-background"
-              }`}
-            >
+            <aside className="fixed inset-y-0 left-0 z-50 w-64 flex-shrink-0 overflow-y-auto border-r border-border bg-background p-4 shadow-lg print:hidden md:static md:z-auto md:shadow-none">
               <div className="mb-3 flex items-center justify-between">
-                <p className={`text-sm font-medium ${darkMode ? "text-white" : "text-navy"}`}>{t("reader.bookmarks")}</p>
+                <p className="text-sm font-medium text-navy">{t("reader.bookmarks")}</p>
                 <button onClick={() => setSidebarOpen(false)} aria-label={t("action.close")}>
-                  <X size={16} className={darkMode ? "text-white/70" : "text-text-secondary"} />
+                  <X size={16} className="text-text-secondary" />
                 </button>
               </div>
-              {bookmarks.length === 0 && (
-                <p className={`text-xs ${darkMode ? "text-white/50" : "text-text-secondary"}`}>{t("reader.noBookmarks")}</p>
-              )}
+              {bookmarks.length === 0 && <p className="text-xs text-text-secondary">{t("reader.noBookmarks")}</p>}
               <div className="space-y-2">
                 {bookmarks.map((b) => (
-                  <div key={b.id} className={`flex items-center justify-between rounded-lg px-2 py-1.5 ${darkMode ? "bg-white/5" : "bg-background"}`}>
+                  <div key={b.id} className="flex items-center justify-between rounded-lg bg-background px-2 py-1.5">
                     <button onClick={() => (isPdf ? scrollToPage(b.pageNumber) : setPage(b.pageNumber))} className="data-text text-sm text-accentblue">
                       {t("reader.page")} {b.pageNumber}
                     </button>
@@ -381,9 +388,7 @@ export function BookReader({
           {isPdf ? (
             <>
               {loadState === "loading" && (
-                <p className={`py-20 text-center text-sm ${darkMode ? "text-white/70" : "text-text-secondary"}`}>
-                  {t("reader.loading")}
-                </p>
+                <p className="py-20 text-center text-sm text-text-secondary">{t("reader.loading")}</p>
               )}
               {loadState === "error" && (
                 <p className="py-20 text-center text-sm text-brandred">{t("reader.loadError")}</p>
@@ -400,22 +405,33 @@ export function BookReader({
                       className="relative mx-auto mb-4"
                       style={{ minHeight: estimatedPageHeight }}
                     >
-                      <button
-                        onClick={() => toggleBookmark(pageNum)}
-                        aria-label={t(bookmarkedPages.has(pageNum) ? "reader.removeBookmark" : "reader.addBookmark")}
-                        className={`absolute right-2 top-2 z-10 rounded-full p-1.5 transition-colors ${
-                          bookmarkedPages.has(pageNum)
-                            ? "bg-accentblue text-white"
-                            : "bg-black/40 text-white/70 hover:bg-black/60 hover:text-white"
-                        }`}
-                      >
-                        <Bookmark size={14} fill={bookmarkedPages.has(pageNum) ? "currentColor" : "none"} />
-                      </button>
+                      <div className="absolute right-2 top-2 z-10 flex flex-col gap-1.5">
+                        <button
+                          onClick={() => toggleBookmark(pageNum)}
+                          aria-label={t(bookmarkedPages.has(pageNum) ? "reader.removeBookmark" : "reader.addBookmark")}
+                          className={`rounded-full p-1.5 transition-colors ${
+                            bookmarkedPages.has(pageNum)
+                              ? "bg-accentblue text-white"
+                              : "bg-black/40 text-white/70 hover:bg-black/60 hover:text-white"
+                          }`}
+                        >
+                          <Bookmark size={14} fill={bookmarkedPages.has(pageNum) ? "currentColor" : "none"} />
+                        </button>
+                        <button
+                          onClick={toggleFavorite}
+                          aria-label={t(isFavorite ? "reader.removeFavorite" : "reader.addFavorite")}
+                          className={`rounded-full p-1.5 transition-colors ${
+                            isFavorite ? "bg-brandred text-white" : "bg-black/40 text-white/70 hover:bg-black/60 hover:text-white"
+                          }`}
+                        >
+                          <Heart size={14} fill={isFavorite ? "currentColor" : "none"} />
+                        </button>
+                      </div>
                       <canvas
                         ref={(el) => {
                           canvasRefs.current[pageNum - 1] = el;
                         }}
-                        className={`mx-auto block h-auto max-w-full rounded-lg border ${darkMode ? "border-white/10 invert hue-rotate-180" : "border-border"}`}
+                        className="mx-auto block h-auto max-w-full rounded-lg border border-border"
                         onDragStart={(e) => e.preventDefault()}
                       />
                     </div>
@@ -432,7 +448,7 @@ export function BookReader({
               <iframe
                 key={page}
                 src={`${book.drivePreviewUrl}#page=${page}`}
-                className={`h-[min(1100px,80vh)] w-full rounded-lg border ${darkMode ? "border-white/10 invert hue-rotate-180" : "border-border"}`}
+                className="h-[min(1100px,80vh)] w-full rounded-lg border border-border"
                 allow="autoplay"
               />
             </div>
@@ -452,7 +468,7 @@ export function BookReader({
 
       {/* Bottom bar: page navigation */}
       {isViewable && (
-        <div className={`flex items-center justify-center gap-4 border-t px-4 py-3 print:hidden ${darkMode ? "border-white/10" : "border-border"}`}>
+        <div className="flex items-center justify-center gap-4 border-t border-border px-4 py-3 print:hidden">
           <Button
             size="icon"
             variant="ghost"
@@ -471,9 +487,9 @@ export function BookReader({
                 if (isPdf) scrollToPage(p);
                 else setPage(numPages ? Math.max(1, Math.min(numPages, p)) : Math.max(1, p));
               }}
-              className={`w-14 rounded border px-2 py-1 text-center ${darkMode ? "border-white/20 bg-transparent text-white" : "border-border bg-card"}`}
+              className="w-14 rounded border border-border bg-card px-2 py-1 text-center"
             />
-            <span className={darkMode ? "text-white/60" : "text-text-secondary"}>/ {numPages ?? "—"}</span>
+            <span className="text-text-secondary">/ {numPages ?? "—"}</span>
           </div>
           <Button
             size="icon"
