@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendMail } from "@/lib/mail";
+import { bookAccessGrantedEmail } from "@/lib/email-templates";
 
 // Grants the suggesting user access to a book that's already in the library
 // (picked by the admin in the Access panel), and resolves the suggestion.
@@ -27,7 +29,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     return NextResponse.json({ error: "Please add the book in the library first, then come back here to give access." }, { status: 400 });
   }
 
-  await prisma.$transaction([
+  const [user] = await prisma.$transaction([
+    prisma.user.findUniqueOrThrow({ where: { id: suggestion.userId } }),
     prisma.bookAccessGrant.upsert({
       where: { userId_bookId: { userId: suggestion.userId, bookId } },
       update: { grantedById: actor.id },
@@ -38,6 +41,13 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       data: { status: "ADDED", resolvedById: actor.id, resolvedAt: new Date(), linkedBookId: bookId },
     }),
   ]);
+
+  await sendMail({
+    to: user.email,
+    ...bookAccessGrantedEmail({ name: user.name, bookTitle: book.title }),
+  }).catch(() => {
+    // Access is already granted; a failed notification email shouldn't fail the request.
+  });
 
   return NextResponse.json({ success: true });
 }
