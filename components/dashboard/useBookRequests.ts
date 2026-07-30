@@ -67,5 +67,7 @@ export function useBookRequests() {
     onSuccess?.();
   }
 
-  return { suggestions, bookNames, error, register, setValue, handleSubmit, isSubmitting, onSubmit };
+  const hasPendingSuggestion = suggestions.some((s) => s.status === "PENDING");
+
+  return { suggestions, bookNames, error, register, setValue, handleSubmit, isSubmitting, onSubmit, hasPendingSuggestion };
 }

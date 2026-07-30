@@ -37,6 +37,7 @@ export const user = {
     "dashboard.noNotifications": "Nothing new right now.",
     "dashboard.newUpdates": "New updates",
     "dashboard.newUser.message": "You haven't started reading or favourited any books yet. Request a book you need, or explore the library to get started.",
+    "dashboard.newUser.pendingRequestMessage": "Your book request has been submitted successfully. We'll send you an email once your request is approved.",
 
     // Dashboard redesign (sidebar, top bar, stat cards, extra sections)
     "dashboard.sidebar.dashboard": "Dashboard",
@@ -71,6 +72,7 @@ export const user = {
     "dashboard.requestBook.title": "Request a new book",
     "dashboard.requestBook.subtitle": "Can't find a book in the library? Request one from the list below.",
     "dashboard.requestBook.button": "Request a Book",
+    "dashboard.requestBook.pendingButton": "Waiting for Access",
     "dashboard.requestBook.dialogTitle": "Request a new book",
     "dashboard.requestBook.selectLabel": "Choose a book",
     "dashboard.requestBook.selectPlaceholder": "Select a book...",
@@ -183,6 +185,7 @@ export const user = {
     "dashboard.noNotifications": "अभी कुछ भी नया नहीं है।",
     "dashboard.newUpdates": "नई सूचनाएं",
     "dashboard.newUser.message": "आपने अभी तक कोई किताब पढ़नी शुरू नहीं की है या पसंदीदा में नहीं जोड़ी है। अपनी ज़रूरत की किताब मांगें, या शुरू करने के लिए लाइब्रेरी देखें।",
+    "dashboard.newUser.pendingRequestMessage": "आपका पुस्तक अनुरोध सफलतापूर्वक सबमिट कर दिया गया है। स्वीकृत होते ही हम आपको एक ईमेल भेजेंगे।",
 
     // Dashboard redesign (sidebar, top bar, stat cards, extra sections)
     "dashboard.sidebar.dashboard": "डैशबोर्ड",
@@ -217,6 +220,7 @@ export const user = {
     "dashboard.requestBook.title": "नई पुस्तक मांगें",
     "dashboard.requestBook.subtitle": "लाइब्रेरी में कोई पुस्तक नहीं मिल रही? नीचे दी गई सूची में से एक मांगें।",
     "dashboard.requestBook.button": "पुस्तक मांगें",
+    "dashboard.requestBook.pendingButton": "पहुंच की प्रतीक्षा में",
     "dashboard.requestBook.dialogTitle": "नई पुस्तक मांगें",
     "dashboard.requestBook.selectLabel": "एक पुस्तक चुनें",
     "dashboard.requestBook.selectPlaceholder": "पुस्तक चुनें...",

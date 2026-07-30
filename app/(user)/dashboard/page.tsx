@@ -20,26 +20,35 @@ export default async function DashboardPage() {
   const lang = await getUserLanguage(userId);
   const t = (key: string) => translate(lang, key);
 
-  const [continueReading, favorites, notifications, booksOpenedCount, bookmarksCount, favoritesCount, pendingRequestsCount] =
-    await Promise.all([
-      prisma.readingProgress.findMany({
-        where: { userId },
-        include: { book: true },
-        orderBy: { lastReadAt: "desc" },
-        take: 4,
-      }),
-      prisma.favorite.findMany({ where: { userId }, include: { book: true }, take: 4 }),
-      prisma.notificationRecipient.findMany({
-        where: { userId },
-        include: { notification: true },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-      }),
-      prisma.bookAccess.count({ where: { userId } }),
-      prisma.bookmark.count({ where: { userId } }),
-      prisma.favorite.count({ where: { userId } }),
-      prisma.bookRequest.count({ where: { userId, status: "PENDING" } }),
-    ]);
+  const [
+    continueReading,
+    favorites,
+    notifications,
+    booksOpenedCount,
+    bookmarksCount,
+    favoritesCount,
+    pendingRequestsCount,
+    pendingSuggestionsCount,
+  ] = await Promise.all([
+    prisma.readingProgress.findMany({
+      where: { userId },
+      include: { book: true },
+      orderBy: { lastReadAt: "desc" },
+      take: 4,
+    }),
+    prisma.favorite.findMany({ where: { userId }, include: { book: true }, take: 4 }),
+    prisma.notificationRecipient.findMany({
+      where: { userId },
+      include: { notification: true },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+    }),
+    prisma.bookAccess.count({ where: { userId } }),
+    prisma.bookmark.count({ where: { userId } }),
+    prisma.favorite.count({ where: { userId } }),
+    prisma.bookRequest.count({ where: { userId, status: "PENDING" } }),
+    prisma.bookSuggestion.count({ where: { userId, status: "PENDING" } }),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -74,7 +83,9 @@ export default async function DashboardPage() {
         <div className="space-y-8 lg:col-span-2">
           {continueReading.length === 0 && favorites.length === 0 ? (
             <Card className="border-dashed p-10 text-center">
-              <p className="text-sm text-text-secondary">{t("dashboard.newUser.message")}</p>
+              <p className="text-sm text-text-secondary">
+                {pendingSuggestionsCount > 0 ? t("dashboard.newUser.pendingRequestMessage") : t("dashboard.newUser.message")}
+              </p>
               <div className="mt-4 flex items-center justify-center gap-3">
                 <RequestBookHeroButton
                   lang={lang}

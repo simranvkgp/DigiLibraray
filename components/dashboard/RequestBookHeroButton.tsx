@@ -27,7 +27,8 @@ export function RequestBookHeroButton({
   const [selectedName, setSelectedName] = useState("");
   const [isListOpen, setIsListOpen] = useState(false);
   const comboRef = useRef<HTMLDivElement>(null);
-  const { suggestions, bookNames, error, register, setValue, handleSubmit, isSubmitting, onSubmit } = useBookRequests();
+  const { suggestions, bookNames, error, register, setValue, handleSubmit, isSubmitting, onSubmit, hasPendingSuggestion } =
+    useBookRequests();
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -53,7 +54,7 @@ export function RequestBookHeroButton({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className={triggerClassName ?? defaultTriggerClassName}>
-          {children ?? t("dashboard.requestBook.button")}
+          {children ?? (hasPendingSuggestion ? t("dashboard.requestBook.pendingButton") : t("dashboard.requestBook.button"))}
         </button>
       </DialogTrigger>
       <DialogContent>
