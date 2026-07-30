@@ -58,8 +58,8 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
   const [books, setBooks] = useState<AdminBookOption[]>([]);
   const [accessOpenId, setAccessOpenId] = useState<string | null>(null);
   const [accessQuery, setAccessQuery] = useState("");
-  const [selectedBookId, setSelectedBookId] = useState("");
   const [accessError, setAccessError] = useState<string | null>(null);
+  const [mailSentId, setMailSentId] = useState<string | null>(null);
   const t = (key: string) => translate(lang, key);
 
   const load = useCallback(() => {
@@ -79,21 +79,16 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
   function openAccess(id: string) {
     setAccessOpenId(id);
     setAccessQuery("");
-    setSelectedBookId("");
     setAccessError(null);
   }
 
-  async function giveAccess(id: string) {
-    if (!selectedBookId) {
-      setAccessError(t("admin.suggestions.addBookFirst"));
-      return;
-    }
-    setBusyId(id);
+  async function giveAccess(suggestionId: string, bookId: string) {
+    setBusyId(suggestionId);
     setAccessError(null);
-    const res = await fetch(`/api/admin/book-suggestions/${id}/fulfill`, {
+    const res = await fetch(`/api/admin/book-suggestions/${suggestionId}/fulfill`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookId: selectedBookId }),
+      body: JSON.stringify({ bookId }),
     });
     if (!res.ok) {
       const d = await res.json().catch(() => ({}));
@@ -103,7 +98,9 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
     }
     setBusyId(null);
     setAccessOpenId(null);
+    setMailSentId(suggestionId);
     await load();
+    setTimeout(() => setMailSentId((current) => (current === suggestionId ? null : current)), 4000);
   }
 
   async function reject(id: string) {
@@ -175,6 +172,9 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                     <Badge variant={statusVariant[s.status] ?? "warning"}>{t(statusKey[s.status] ?? "admin.status.pending")}</Badge>
                   </td>
                   <td className="p-3 text-right">
+                    {mailSentId === s.id && (
+                      <p className="text-xs font-medium text-success">{t("admin.suggestions.mailSent")}</p>
+                    )}
                     {s.status === "PENDING" && (
                       <div className="flex justify-end gap-1.5">
                         <Dialog
@@ -188,16 +188,10 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                           </DialogTrigger>
                           <DialogContent>
                             <DialogHeader>
-                              <DialogTitle>{t("admin.suggestions.access")}</DialogTitle>
-                              <DialogDescription>{s.title} — {s.user.name}</DialogDescription>
+                              <DialogTitle>{s.title}</DialogTitle>
+                              <DialogDescription>{t("admin.suggestions.access")} — {s.user.name}</DialogDescription>
                             </DialogHeader>
-                            <div className="space-y-1 rounded-lg border border-border bg-background p-3 text-sm">
-                              <p><span className="text-text-secondary">{t("admin.field.author")}:</span> {s.author || "—"}</p>
-                              <p><span className="text-text-secondary">{t("admin.field.subject")}:</span> {s.subject || "—"}</p>
-                              <p><span className="text-text-secondary">{t("admin.field.class")}:</span> {s.className || "—"}</p>
-                              {s.note && <p><span className="text-text-secondary">{t("admin.requests.col.note")}:</span> {s.note}</p>}
-                            </div>
-                            <div className="mt-3">
+                            <div className="mt-1">
                               <input
                                 type="text"
                                 autoComplete="off"
@@ -206,26 +200,30 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                                 onChange={(e) => setAccessQuery(e.target.value)}
                                 className="h-10 w-full rounded-lg border border-border bg-card px-3 text-sm font-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentblue"
                               />
-                              <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-border">
+                              <div className="mt-2 max-h-64 overflow-y-auto rounded-lg border border-border">
                                 {books
                                   .filter((b) => b.title.toLowerCase().includes(accessQuery.trim().toLowerCase()))
                                   .map((b) => (
-                                    <button
+                                    <div
                                       key={b.id}
-                                      type="button"
-                                      onClick={() => {
-                                        setSelectedBookId(b.id);
-                                        setAccessError(null);
-                                      }}
-                                      className={`block w-full border-b border-border p-2.5 text-left last:border-0 hover:bg-accentblue/10 ${
-                                        selectedBookId === b.id ? "bg-accentblue/10" : ""
-                                      }`}
+                                      className="flex items-center justify-between gap-2 border-b border-border p-2.5 last:border-0"
                                     >
-                                      <p className="truncate text-sm font-medium">{b.title}</p>
-                                      <p className="truncate text-xs text-text-secondary">
-                                        {b.subject} · {b.category.name} / {b.board.name}
-                                      </p>
-                                    </button>
+                                      <div className="min-w-0">
+                                        <p className="truncate text-sm font-medium">{b.title}</p>
+                                        <p className="truncate text-xs text-text-secondary">
+                                          {b.subject} · {b.category.name} / {b.board.name}
+                                        </p>
+                                      </div>
+                                      <Button
+                                        size="sm"
+                                        variant="success"
+                                        className="shrink-0"
+                                        disabled={busyId === s.id}
+                                        onClick={() => giveAccess(s.id, b.id)}
+                                      >
+                                        {t("admin.suggestions.access")}
+                                      </Button>
+                                    </div>
                                   ))}
                                 {books.filter((b) => b.title.toLowerCase().includes(accessQuery.trim().toLowerCase())).length === 0 && (
                                   <p className="p-3 text-sm text-text-secondary">{t("admin.suggestions.noBooksFound")}</p>
@@ -233,14 +231,6 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                               </div>
                             </div>
                             {accessError && <p className="mt-2 text-sm text-brandred">{accessError}</p>}
-                            <Button
-                              className="mt-4 w-full"
-                              variant="success"
-                              disabled={busyId === s.id}
-                              onClick={() => giveAccess(s.id)}
-                            >
-                              {t("admin.suggestions.giveAccess")}
-                            </Button>
                           </DialogContent>
                         </Dialog>
                         <Dialog

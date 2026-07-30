@@ -126,6 +126,7 @@ export const admin = {
     "admin.suggestions.addBookFirst": "Please add the book in the library first, then come back here to give access.",
     "admin.suggestions.searchBookPlaceholder": "Search books in the library...",
     "admin.suggestions.noBooksFound": "No matching book found in the library. Please add it in Books first.",
+    "admin.suggestions.mailSent": "Access granted — email sent",
     "admin.suggestions.reject": "Reject",
     "admin.suggestions.empty": "No new book requests in this view.",
 
@@ -342,6 +343,7 @@ export const admin = {
     "admin.suggestions.addBookFirst": "कृपया पहले पुस्तक को लाइब्रेरी में जोड़ें, फिर एक्सेस देने के लिए यहां वापस आएं।",
     "admin.suggestions.searchBookPlaceholder": "लाइब्रेरी में पुस्तकें खोजें...",
     "admin.suggestions.noBooksFound": "लाइब्रेरी में कोई मेल खाती पुस्तक नहीं मिली। कृपया पहले इसे Books में जोड़ें।",
+    "admin.suggestions.mailSent": "एक्सेस दे दिया गया — ईमेल भेज दिया गया है",
     "admin.suggestions.reject": "अस्वीकृत करें",
     "admin.suggestions.empty": "इस दृश्य में कोई नई पुस्तक अनुरोध नहीं है।",
 
