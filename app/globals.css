@@ -88,16 +88,11 @@
   .animate-marquee {
     animation: marquee 22s linear infinite;
   }
-  .animate-marquee-reverse {
-    animation: marquee 22s linear infinite reverse;
-  }
-  .animate-marquee:hover,
-  .animate-marquee-reverse:hover {
+  .animate-marquee:hover {
     animation-play-state: paused;
   }
   @media (prefers-reduced-motion: reduce) {
-    .animate-marquee,
-    .animate-marquee-reverse {
+    .animate-marquee {
       animation: none;
     }
   }
