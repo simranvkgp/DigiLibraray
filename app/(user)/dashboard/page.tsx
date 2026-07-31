@@ -72,7 +72,10 @@ export default async function DashboardPage() {
           <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-dash-navy text-white">
             <Library size={20} aria-hidden="true" />
           </div>
-          <p className="font-display text-xl font-semibold text-dash-navy">{t("dashboard.sidebar.myLibrary")}</p>
+          <div className="min-w-0">
+            <p className="font-display text-xl font-semibold text-dash-navy">{t("dashboard.sidebar.myLibrary")}</p>
+            <p className="text-xs text-text-secondary">{t("dashboard.stats.myLibrarySub")}</p>
+          </div>
         </Link>
         <BookmarksStatCard lang={lang} count={bookmarksCount} />
         <FavoritesStatCard lang={lang} count={favoritesCount} />

@@ -33,7 +33,10 @@ export function SettingsStatCard({
           <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-warning text-white">
             <Settings size={20} aria-hidden="true" />
           </div>
-          <p className="font-display text-xl font-semibold text-dash-navy">{t("dashboard.sidebar.settings")}</p>
+          <div className="min-w-0">
+            <p className="font-display text-xl font-semibold text-dash-navy">{t("dashboard.sidebar.settings")}</p>
+            <p className="text-xs text-text-secondary">{t("dashboard.stats.settingsSub")}</p>
+          </div>
         </button>
       </DialogTrigger>
       <DialogContent>
