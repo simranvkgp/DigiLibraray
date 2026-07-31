@@ -75,6 +75,15 @@ export default async function DashboardPage() {
     },
   });
 
+  const continueReadingFavorites = new Set(
+    (
+      await prisma.favorite.findMany({
+        where: { userId, bookId: { in: continueReading.map((rp) => rp.bookId) } },
+        select: { bookId: true },
+      })
+    ).map((f) => f.bookId)
+  );
+
   return (
     <div className="space-y-8">
       <DashboardHero firstName={session!.user!.name?.split(" ")[0] ?? ""} lang={lang} />
@@ -147,6 +156,8 @@ export default async function DashboardPage() {
                       coverImageUrl={rp.book.coverImageUrl}
                       percentComplete={rp.percentComplete}
                       percentLabel={t("dashboard.percentComplete")}
+                      initialIsFavorite={continueReadingFavorites.has(rp.bookId)}
+                      lang={lang}
                     />
                   ))}
                 </div>
