@@ -10,12 +10,14 @@ export function DashboardHero({ firstName, lang = "en" }: { firstName: string; l
   return (
     <div className="relative overflow-hidden rounded-2xl bg-dash-navy shadow-card-hover">
       <div className="relative flex flex-col gap-5 px-6 py-10 sm:px-10 sm:py-12 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="flex items-center gap-3 font-display text-2xl font-medium text-white sm:text-3xl">
-            <img src="/images/logo-sidebar.svg" alt="" aria-hidden="true" className="h-8 w-auto sm:h-9" />
-            {t("dashboard.welcome")}, {firstName}! 👋
-          </h1>
-          <p className="mt-2 max-w-md text-sm text-white/75 sm:text-base">{t("dashboard.heroSubtitle")}</p>
+        <div className="flex items-center gap-4">
+          <img src="/images/logo-sidebar.svg" alt="" aria-hidden="true" className="h-[4.25rem] w-auto flex-shrink-0" />
+          <div>
+            <h1 className="font-display text-2xl font-medium text-dash-gold sm:text-3xl">
+              {t("dashboard.welcome")}, {firstName}! 👋
+            </h1>
+            <p className="mt-2 max-w-md text-sm text-white/75 sm:text-base">{t("dashboard.heroSubtitle")}</p>
+          </div>
         </div>
         <div className="flex flex-shrink-0 items-center gap-3">
           <RequestBookHeroButton
