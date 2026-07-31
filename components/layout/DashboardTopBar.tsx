@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { Search, ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronDown } from "lucide-react";
 import { translate, type Lang } from "@/lib/i18n/translate";
 import type { Role } from "@/types";
 
@@ -39,14 +39,7 @@ export function DashboardTopBar({
             <span>{t("reader.backToDashboard")}</span>
           </Link>
         ) : (
-          <div className="relative max-w-md flex-1">
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary" size={16} />
-            <input
-              type="search"
-              placeholder={t("dashboard.searchPlaceholder")}
-              className="h-11 w-full rounded-xl border border-border bg-white pl-10 pr-4 text-sm placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dash-gold"
-            />
-          </div>
+          <img src="/images/logo.svg" alt="VK Digital Library" className="h-9 w-auto flex-shrink-0" />
         )}
 
         <div className="ml-auto flex items-center gap-4">
