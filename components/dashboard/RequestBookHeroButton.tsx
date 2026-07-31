@@ -16,10 +16,12 @@ export function RequestBookHeroButton({
   lang = "en",
   triggerClassName,
   children,
+  showForm = true,
 }: {
   lang?: Lang;
   triggerClassName?: string;
   children?: React.ReactNode;
+  showForm?: boolean;
 }) {
   const t = (key: string) => translate(lang, key);
   const [open, setOpen] = useState(false);
@@ -69,11 +71,11 @@ export function RequestBookHeroButton({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("dashboard.requestBook.dialogTitle")}</DialogTitle>
-          <DialogDescription>{t("dashboard.requestBook.subtitle")}</DialogDescription>
+          <DialogTitle>{showForm ? t("dashboard.requestBook.dialogTitle") : t("dashboard.requestBook.viewTitle")}</DialogTitle>
+          {showForm && <DialogDescription>{t("dashboard.requestBook.subtitle")}</DialogDescription>}
         </DialogHeader>
 
-        {bookNames.length === 0 ? (
+        {showForm && (bookNames.length === 0 ? (
           <p className="text-sm text-text-secondary">{t("dashboard.requestBook.noBooksAvailable")}</p>
         ) : (
           <form
@@ -143,9 +145,9 @@ export function RequestBookHeroButton({
               {isSubmitting ? t("dashboard.requestBook.submitting") : t("dashboard.requestBook.submit")}
             </Button>
           </form>
-        )}
+        ))}
 
-        <div className="mt-5 border-t border-border pt-4">
+        <div className={showForm ? "mt-5 border-t border-border pt-4" : ""}>
           <p className="mb-2 text-sm font-medium text-text-primary">{t("dashboard.requestBook.accessRequests")}</p>
           {accessRequests.length === 0 ? (
             <p className="text-sm text-text-secondary">{t("dashboard.requestBook.empty")}</p>

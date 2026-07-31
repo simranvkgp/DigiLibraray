@@ -107,6 +107,7 @@ export default async function DashboardPage() {
         <RequestBookHeroButton
           lang={lang}
           triggerClassName="flex items-center gap-4 rounded-2xl border border-border bg-white p-5 text-left shadow-card transition-shadow hover:shadow-card-hover"
+          showForm={false}
         >
           <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-dash-blue text-white">
             <ClipboardList size={20} aria-hidden="true" />
