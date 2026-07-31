@@ -1,6 +1,6 @@
 import { Megaphone, BookPlus, Bell } from "lucide-react";
 import { translate, type Lang } from "@/lib/i18n/translate";
-import { formatRelativeTime, notificationBadgeVariant } from "@/lib/utils";
+import { notificationBadgeVariant } from "@/lib/utils";
 
 interface NotificationItem {
   id: string;
@@ -34,17 +34,16 @@ function NotificationPill({ item }: { item: NotificationItem }) {
 
   return (
     <div
-      className={`flex w-64 flex-shrink-0 items-center gap-2.5 rounded-xl border border-l-[3px] px-3 py-2.5 transition-colors ${styles.border} ${
+      className={`flex w-44 flex-shrink-0 items-center gap-2 rounded-lg border border-l-[3px] px-2.5 py-2 transition-colors ${styles.border} ${
         isUnread ? "border-dash-gold/40 bg-dash-gold/10 shadow-card" : "border-border bg-transparent"
       }`}
     >
-      <div className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${styles.icon}`}>
-        <Icon size={14} aria-hidden="true" />
+      <div className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full ${styles.icon}`}>
+        <Icon size={12} aria-hidden="true" />
       </div>
       <div className="flex min-w-0 flex-1 items-center gap-1.5">
         {isUnread && <span aria-hidden="true" className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-dash-gold" />}
-        <span className={`truncate text-sm ${isUnread ? "font-semibold text-dash-navy" : "font-medium text-dash-navy"}`}>{item.title}</span>
-        <span className="ml-auto flex-shrink-0 text-xs text-text-secondary">{formatRelativeTime(item.createdAt)}</span>
+        <span className={`truncate text-xs ${isUnread ? "font-semibold text-dash-navy" : "font-medium text-dash-navy"}`}>{item.title}</span>
       </div>
     </div>
   );
@@ -54,7 +53,7 @@ export function NotificationsPanel({ items, lang = "en" }: { items: Notification
   const t = (key: string) => translate(lang, key);
 
   const track = (
-    <div className="flex flex-shrink-0 items-center gap-3 pr-3">
+    <div className="flex flex-shrink-0 items-center gap-2 pr-2">
       {items.map((n) => (
         <NotificationPill key={n.id} item={n} />
       ))}
@@ -62,13 +61,13 @@ export function NotificationsPanel({ items, lang = "en" }: { items: Notification
   );
 
   return (
-    <div className="rounded-2xl border border-border bg-white p-5 shadow-card">
-      <h2 className="font-display text-base font-medium text-dash-navy">{t("dashboard.notifications")}</h2>
+    <div className="rounded-xl border border-border bg-white p-3 shadow-card">
+      <h2 className="font-display text-sm font-medium text-dash-navy">{t("dashboard.notifications")}</h2>
       {items.length === 0 ? (
-        <p className="mt-3 text-sm text-text-secondary">{t("dashboard.noNotifications")}</p>
+        <p className="mt-2 text-xs text-text-secondary">{t("dashboard.noNotifications")}</p>
       ) : (
-        <div className="mt-3 overflow-hidden">
-          <div className="flex w-max animate-marquee">
+        <div className="mt-2 overflow-hidden">
+          <div className="flex w-max animate-marquee-reverse">
             {track}
             {track}
           </div>
