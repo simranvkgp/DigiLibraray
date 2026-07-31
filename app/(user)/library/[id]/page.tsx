@@ -39,10 +39,10 @@ export default async function ReaderPage({
     );
   }
 
-  const [progress, bookmarks, favorite] = await Promise.all([
+  const [progress, bookmarks, favorites] = await Promise.all([
     prisma.readingProgress.findUnique({ where: { userId_bookId: { userId, bookId: book.id } } }),
     prisma.bookmark.findMany({ where: { userId, bookId: book.id }, orderBy: { pageNumber: "asc" } }),
-    prisma.favorite.findUnique({ where: { userId_bookId: { userId, bookId: book.id } } }),
+    prisma.favorite.findMany({ where: { userId, bookId: book.id }, orderBy: { pageNumber: "asc" } }),
   ]);
 
   return (
@@ -62,7 +62,7 @@ export default async function ReaderPage({
       }}
       initialPage={Number(searchParams.page) || progress?.currentPage || 1}
       initialBookmarks={bookmarks}
-      initialIsFavorite={!!favorite}
+      initialFavorites={favorites}
       lang={lang}
     />
   );

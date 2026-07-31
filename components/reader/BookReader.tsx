@@ -38,6 +38,11 @@ interface BookmarkRow {
   note: string | null;
 }
 
+interface FavoriteRow {
+  id: string;
+  pageNumber: number | null;
+}
+
 // Thumbnails render at a fixed width regardless of zoom — small enough that
 // keeping every rendered one in memory (no eviction, unlike full pages) is fine.
 const THUMB_WIDTH = 110;
@@ -51,13 +56,13 @@ export function BookReader({
   book,
   initialPage,
   initialBookmarks,
-  initialIsFavorite,
+  initialFavorites,
   lang = "en",
 }: {
   book: ReaderBook;
   initialPage: number;
   initialBookmarks: BookmarkRow[];
-  initialIsFavorite: boolean;
+  initialFavorites: FavoriteRow[];
   lang?: Lang;
 }) {
   const [page, setPage] = useState(initialPage || 1);
@@ -65,7 +70,7 @@ export function BookReader({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [thumbsOpen, setThumbsOpen] = useState(false);
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
-  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
+  const [favorites, setFavorites] = useState(initialFavorites);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const thumbsAreaRef = useRef<HTMLDivElement>(null);
@@ -338,18 +343,29 @@ export function BookReader({
 
   const bookmarkedPages = new Set(bookmarks.map((b) => b.pageNumber));
 
-  async function toggleFavorite() {
-    setIsFavorite((v) => !v); // optimistic
+  async function removeFavorite(id: string) {
+    await fetch("/api/favorites", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    setFavorites((prev) => prev.filter((f) => f.id !== id));
+  }
+
+  async function toggleFavorite(pageNumber: number) {
+    const existing = favorites.find((f) => f.pageNumber === pageNumber);
+    if (existing) {
+      await removeFavorite(existing.id);
+      return;
+    }
     const res = await fetch("/api/favorites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookId: book.id }),
+      body: JSON.stringify({ bookId: book.id, pageNumber }),
     });
     if (res.ok) {
-      const data = await res.json();
-      setIsFavorite(data.isFavorite);
+      const { favorite } = await res.json();
+      setFavorites((prev) => [...prev, favorite]);
     }
   }
+
+  const favoritedPages = new Set(favorites.map((f) => f.pageNumber));
 
   // Best-effort deterrents against saving/printing/copying the page. None of
   // this can stop a screenshot, screen recording, or someone reading the
@@ -422,11 +438,11 @@ export function BookReader({
           <Button
             size="icon"
             variant="ghost"
-            onClick={toggleFavorite}
-            aria-label={t(isFavorite ? "reader.removeFavorite" : "reader.addFavorite")}
-            className={isFavorite ? "text-brandred" : undefined}
+            onClick={() => toggleFavorite(page)}
+            aria-label={t(favoritedPages.has(page) ? "reader.removeFavorite" : "reader.addFavorite")}
+            className={favoritedPages.has(page) ? "text-brandred" : undefined}
           >
-            <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
+            <Heart size={16} fill={favoritedPages.has(page) ? "currentColor" : "none"} />
           </Button>
           {isPdf && (
             <Button
@@ -515,13 +531,13 @@ export function BookReader({
                           <Bookmark size={14} fill={bookmarkedPages.has(pageNum) ? "currentColor" : "none"} />
                         </button>
                         <button
-                          onClick={toggleFavorite}
-                          aria-label={t(isFavorite ? "reader.removeFavorite" : "reader.addFavorite")}
+                          onClick={() => toggleFavorite(pageNum)}
+                          aria-label={t(favoritedPages.has(pageNum) ? "reader.removeFavorite" : "reader.addFavorite")}
                           className={`rounded-full p-1.5 transition-colors ${
-                            isFavorite ? "bg-brandred text-white" : "bg-black/40 text-white/70 hover:bg-black/60 hover:text-white"
+                            favoritedPages.has(pageNum) ? "bg-brandred text-white" : "bg-black/40 text-white/70 hover:bg-black/60 hover:text-white"
                           }`}
                         >
-                          <Heart size={14} fill={isFavorite ? "currentColor" : "none"} />
+                          <Heart size={14} fill={favoritedPages.has(pageNum) ? "currentColor" : "none"} />
                         </button>
                       </div>
                       <canvas

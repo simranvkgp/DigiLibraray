@@ -19,8 +19,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ favorites });
   }
 
-  const favorite = await prisma.favorite.findUnique({ where: { userId_bookId: { userId, bookId } } });
-  return NextResponse.json({ isFavorite: !!favorite });
+  const favorites = await prisma.favorite.findMany({ where: { userId, bookId }, orderBy: { pageNumber: "asc" } });
+  const isFavorite = favorites.some((f) => f.pageNumber === null);
+  return NextResponse.json({ isFavorite, favorites });
 }
 
 export async function POST(req: Request) {
@@ -28,14 +29,29 @@ export async function POST(req: Request) {
   if (!session?.user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   const userId = (session.user as any).id as string;
 
-  const { bookId } = await req.json();
+  const { bookId, pageNumber } = await req.json();
   if (!bookId) return NextResponse.json({ error: "bookId is required" }, { status: 400 });
+  const page = pageNumber ?? null;
 
-  const existing = await prisma.favorite.findUnique({ where: { userId_bookId: { userId, bookId } } });
+  const existing = await prisma.favorite.findFirst({ where: { userId, bookId, pageNumber: page } });
   if (existing) {
     await prisma.favorite.delete({ where: { id: existing.id } });
-    return NextResponse.json({ isFavorite: false });
+    return NextResponse.json({ isFavorite: false, favorite: null });
   }
-  await prisma.favorite.create({ data: { userId, bookId } });
-  return NextResponse.json({ isFavorite: true });
+  const favorite = await prisma.favorite.create({ data: { userId, bookId, pageNumber: page } });
+  return NextResponse.json({ isFavorite: true, favorite }, { status: 201 });
+}
+
+export async function DELETE(req: Request) {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  const userId = (session.user as any).id as string;
+
+  const { id } = await req.json();
+  const favorite = await prisma.favorite.findUnique({ where: { id } });
+  if (!favorite || favorite.userId !== userId) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  await prisma.favorite.delete({ where: { id } });
+  return NextResponse.json({ success: true });
 }

@@ -312,15 +312,18 @@ model Bookmark {
 }
 
 model Favorite {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bookId    String
-  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId     String
+  book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  // Null means "whole book" (quick heart from the library grid); a page
+  // number means a specific page was favorited from inside the reader.
+  pageNumber Int?
+  createdAt  DateTime @default(now())
 
-  @@unique([userId, bookId])
   @@index([userId])
+  @@index([bookId])
 }
 
 model ReadingProgress {

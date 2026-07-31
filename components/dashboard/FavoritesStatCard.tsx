@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Heart } from "lucide-react";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { FavoriteBookListItem } from "@/components/dashboard/FavoriteBookListItem";
 import { translate, type Lang } from "@/lib/i18n/translate";
 
 type FavoriteEntry = {
   bookId: string;
-  book: { id: string; title: string; coverImageUrl: string | null };
+  pageNumber: number | null;
+  book: { id: string; title: string; subject: string | null; coverImageUrl: string | null };
 };
 
 export function FavoritesStatCard({ lang = "en", count }: { lang?: Lang; count: number }) {
@@ -29,6 +30,13 @@ export function FavoritesStatCard({ lang = "en", count }: { lang?: Lang; count: 
     }
   }
 
+  const groups = new Map<string, { book: FavoriteEntry["book"]; pages: number[] }>();
+  for (const f of favorites ?? []) {
+    const group = groups.get(f.bookId) ?? { book: f.book, pages: [] };
+    if (f.pageNumber !== null) group.pages.push(f.pageNumber);
+    groups.set(f.bookId, group);
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
@@ -46,19 +54,47 @@ export function FavoritesStatCard({ lang = "en", count }: { lang?: Lang; count: 
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t("dashboard.favoriteBooks")}</DialogTitle>
+          <DialogDescription>{t("dashboard.stats.favoritesSub")}</DialogDescription>
         </DialogHeader>
 
         {loading ? (
           <p className="text-sm text-text-secondary">{t("action.loading")}</p>
-        ) : !favorites || favorites.length === 0 ? (
+        ) : groups.size === 0 ? (
           <div className="flex flex-col items-center rounded-2xl border border-dashed border-border p-8 text-center">
             <Heart size={28} className="text-text-secondary" />
             <p className="mt-3 text-sm text-text-secondary">{t("dashboard.emptyFavorites")}</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {favorites.map((f) => (
-              <FavoriteBookListItem key={f.bookId} bookId={f.bookId} title={f.book.title} coverImageUrl={f.book.coverImageUrl} />
+            {[...groups.entries()].map(([bookId, group]) => (
+              <div key={bookId} className="flex gap-3 rounded-xl border border-border p-3">
+                <div className="h-20 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-background">
+                  {group.book.coverImageUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={group.book.coverImageUrl} alt="" className="h-full w-full object-cover" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <Link href={`/library/${bookId}`} onClick={() => setOpen(false)}>
+                    <p className="truncate font-display text-sm font-medium text-dash-navy">{group.book.title}</p>
+                  </Link>
+                  <p className="truncate text-xs text-text-secondary">{group.book.subject}</p>
+                  {group.pages.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {group.pages.map((p) => (
+                        <Link
+                          key={p}
+                          href={`/library/${bookId}?page=${p}`}
+                          onClick={() => setOpen(false)}
+                          className="rounded-full bg-background px-2.5 py-1 text-xs font-medium text-brandred hover:bg-brandred hover:text-white"
+                        >
+                          {t("reader.page")} {p}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         )}

@@ -37,7 +37,7 @@ export const user = {
     "dashboard.sidebar.myLibrary": "My Library",
     "dashboard.sidebar.settings": "Settings",
     "dashboard.searchPlaceholder": "Search books, authors, categories...",
-    "dashboard.roleLabel.user": "Member",
+    "dashboard.roleLabel.user": "User",
     "dashboard.roleLabel.admin": "Admin",
     "dashboard.roleLabel.super_admin": "Super Admin",
     "dashboard.stats.myLibrarySub": "Explore your books",

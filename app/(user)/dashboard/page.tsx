@@ -43,7 +43,13 @@ export default async function DashboardPage() {
       orderBy: { lastReadAt: "desc" },
       take: 4,
     }),
-    prisma.favorite.findMany({ where: { userId }, include: { book: true }, take: 4 }),
+    prisma.favorite.findMany({
+      where: { userId },
+      include: { book: true },
+      distinct: ["bookId"],
+      orderBy: { createdAt: "desc" },
+      take: 4,
+    }),
     prisma.notificationRecipient.findMany({
       where: { userId },
       include: { notification: true },
@@ -60,6 +66,15 @@ export default async function DashboardPage() {
     ? SWITCHABLE_SLUGS.includes(userWithCategory.category.slug)
     : false;
 
+  // Same scope as the Library page: books in the user's category that they've been granted access to.
+  const myLibraryCount = await prisma.book.count({
+    where: {
+      status: "PUBLISHED",
+      categoryId: userWithCategory?.categoryId ?? "__none__",
+      bookAccessGrants: { some: { userId } },
+    },
+  });
+
   return (
     <div className="space-y-8">
       <DashboardHero firstName={session!.user!.name?.split(" ")[0] ?? ""} lang={lang} />
@@ -73,7 +88,8 @@ export default async function DashboardPage() {
             <Library size={20} aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <p className="font-display text-xl font-semibold text-dash-navy">{t("dashboard.sidebar.myLibrary")}</p>
+            <p className="truncate text-sm text-text-secondary">{t("dashboard.sidebar.myLibrary")}</p>
+            <p className="font-display text-2xl font-semibold text-dash-navy">{myLibraryCount}</p>
             <p className="text-xs text-text-secondary">{t("dashboard.stats.myLibrarySub")}</p>
           </div>
         </Link>
