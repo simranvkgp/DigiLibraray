@@ -10,14 +10,11 @@ import {
   Bookmark as BookmarkIcon,
   ClipboardList,
   Settings,
-  Mail,
   Menu,
   X,
-  BookOpen,
 } from "lucide-react";
 import { RequestBookHeroButton } from "@/components/dashboard/RequestBookHeroButton";
 import { translate, type Lang } from "@/lib/i18n/translate";
-import { openContactPopup } from "@/lib/utils";
 
 const rowBase =
   "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white";
@@ -100,22 +97,6 @@ export function DashboardSidebar({ lang = "en" }: { lang?: Lang }) {
           {t("dashboard.sidebar.settings")}
         </Link>
       </nav>
-
-      <div className="mx-4 mb-4 rounded-2xl border border-white/10 bg-white/5 p-5 text-center">
-        <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-dash-gold/15">
-          <BookOpen className="h-5 w-5 text-dash-gold" aria-hidden="true" />
-        </div>
-        <p className="mt-3 font-display text-sm font-semibold text-white">{t("dashboard.sidebar.promoTitle")}</p>
-        <p className="mt-1 text-xs leading-relaxed text-white/60">{t("dashboard.sidebar.promoBody")}</p>
-        <p className="mt-3 text-xs leading-relaxed text-white/60">{t("dashboard.sidebar.queryPrompt")}</p>
-        <button
-          onClick={openContactPopup}
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-dash-gold px-4 py-2 text-xs font-semibold text-dash-navy transition-colors hover:bg-dash-gold/90"
-        >
-          <Mail size={14} aria-hidden="true" />
-          {t("footer.contactUs")}
-        </button>
-      </div>
 
       <div className="border-t border-white/10 px-6 py-4">
         <p className="text-[11px] text-white/40">© {new Date().getFullYear()} VK Global Group</p>
