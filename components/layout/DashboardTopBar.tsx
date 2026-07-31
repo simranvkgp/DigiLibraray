@@ -24,12 +24,12 @@ export function DashboardTopBar({
   const t = (key: string) => translate(lang, key);
   const roleLabel = t(`dashboard.roleLabel.${role.toLowerCase()}`);
   const pathname = usePathname();
-  const isReaderPage = /^\/library\/[^/]+/.test(pathname ?? "");
+  const showBackToDashboard = pathname !== "/dashboard";
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-dash-cream/95 backdrop-blur">
-      <div className="flex items-center gap-4 py-4 pl-20 pr-6 lg:pl-6">
-        {isReaderPage ? (
+      <div className="flex items-center gap-4 px-6 py-4">
+        {showBackToDashboard ? (
           <Link
             href="/dashboard"
             className="flex max-w-md flex-1 items-center gap-2 text-sm font-medium text-dash-navy hover:text-dash-navy/80"

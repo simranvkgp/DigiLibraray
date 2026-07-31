@@ -7,6 +7,7 @@ import { translate } from "@/lib/i18n/translate";
 import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { BookmarksStatCard } from "@/components/dashboard/BookmarksStatCard";
 import { FavoritesStatCard } from "@/components/dashboard/FavoritesStatCard";
+import { SettingsStatCard } from "@/components/dashboard/SettingsStatCard";
 import { ContinueReadingCard } from "@/components/dashboard/ContinueReadingCard";
 import { FavoriteBookListItem } from "@/components/dashboard/FavoriteBookListItem";
 import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
@@ -14,6 +15,10 @@ import { RecentlyOpenedPanel } from "@/components/dashboard/RecentlyOpenedPanel"
 import { RequestBookHeroButton } from "@/components/dashboard/RequestBookHeroButton";
 import { Card } from "@/components/ui/card";
 import { SectionLabel } from "@/components/ui/section-label";
+
+// Secondary and Senior Secondary are a switchable group; University is
+// permanent. Keep in sync with app/api/category/route.ts.
+const SWITCHABLE_SLUGS = ["secondary", "senior-secondary"];
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -30,6 +35,7 @@ export default async function DashboardPage() {
     favoritesCount,
     pendingRequestsCount,
     pendingSuggestionsCount,
+    userWithCategory,
   ] = await Promise.all([
     prisma.readingProgress.findMany({
       where: { userId },
@@ -48,13 +54,17 @@ export default async function DashboardPage() {
     prisma.favorite.count({ where: { userId } }),
     prisma.bookRequest.count({ where: { userId, status: "PENDING" } }),
     prisma.bookSuggestion.count({ where: { userId, status: "PENDING" } }),
+    prisma.user.findUnique({ where: { id: userId }, include: { category: true } }),
   ]);
+  const canSwitchCategory = userWithCategory?.category
+    ? SWITCHABLE_SLUGS.includes(userWithCategory.category.slug)
+    : false;
 
   return (
     <div className="space-y-8">
       <DashboardHero firstName={session!.user!.name?.split(" ")[0] ?? ""} lang={lang} />
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <Link
           href="/library"
           className="flex items-center gap-4 rounded-2xl border border-border bg-white p-5 shadow-card transition-shadow hover:shadow-card-hover"
@@ -79,6 +89,14 @@ export default async function DashboardPage() {
             <p className="text-xs text-text-secondary">{t("dashboard.stats.pendingRequestsSub")}</p>
           </div>
         </RequestBookHeroButton>
+        <SettingsStatCard
+          lang={lang}
+          name={session!.user!.name ?? ""}
+          email={session!.user!.email ?? ""}
+          image={session!.user!.image}
+          categoryName={userWithCategory?.category?.name ?? null}
+          canSwitchCategory={canSwitchCategory}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">

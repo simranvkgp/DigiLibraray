@@ -34,11 +34,8 @@ export const user = {
     "dashboard.newUser.pendingRequestMessage": "Your book request has been submitted successfully. We'll send you an email once your request is approved.",
 
     // Dashboard redesign (sidebar, top bar, stat cards, extra sections)
-    "dashboard.sidebar.dashboard": "Dashboard",
     "dashboard.sidebar.myLibrary": "My Library",
-    "dashboard.sidebar.newArrivals": "New Arrivals",
     "dashboard.sidebar.settings": "Settings",
-    "dashboard.sidebar.soon": "Soon",
     "dashboard.searchPlaceholder": "Search books, authors, categories...",
     "dashboard.roleLabel.user": "Member",
     "dashboard.roleLabel.admin": "Admin",
@@ -174,11 +171,8 @@ export const user = {
     "dashboard.newUser.pendingRequestMessage": "आपका पुस्तक अनुरोध सफलतापूर्वक सबमिट कर दिया गया है। स्वीकृत होते ही हम आपको एक ईमेल भेजेंगे।",
 
     // Dashboard redesign (sidebar, top bar, stat cards, extra sections)
-    "dashboard.sidebar.dashboard": "डैशबोर्ड",
     "dashboard.sidebar.myLibrary": "मेरी लाइब्रेरी",
-    "dashboard.sidebar.newArrivals": "नई किताबें",
     "dashboard.sidebar.settings": "सेटिंग्स",
-    "dashboard.sidebar.soon": "जल्द आ रहा है",
     "dashboard.searchPlaceholder": "किताबें, लेखक, श्रेणियाँ खोजें...",
     "dashboard.roleLabel.user": "सदस्य",
     "dashboard.roleLabel.admin": "एडमिन",
