@@ -1,3 +1,5 @@
+"use client";
+
 import { RequestBookHeroButton } from "@/components/dashboard/RequestBookHeroButton";
 import { translate, type Lang } from "@/lib/i18n/translate";
 import { openContactPopup } from "@/lib/utils";
