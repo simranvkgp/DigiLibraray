@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -25,42 +25,17 @@ export function RequestBookHeroButton({
 }) {
   const t = (key: string) => translate(lang, key);
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const [selectedName, setSelectedName] = useState("");
-  const [isListOpen, setIsListOpen] = useState(false);
-  const comboRef = useRef<HTMLDivElement>(null);
   const {
     suggestions,
     accessRequests,
     bookNames,
     error,
     register,
-    setValue,
     handleSubmit,
     isSubmitting,
     onSubmit,
     hasPendingSuggestion,
   } = useBookRequests();
-
-  const matches = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return q ? bookNames.filter((b) => b.name.toLowerCase().includes(q)) : bookNames;
-  }, [bookNames, query]);
-
-  useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
-      if (comboRef.current && !comboRef.current.contains(e.target as Node)) setIsListOpen(false);
-    }
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
-  }, []);
-
-  function selectBook(name: string) {
-    setSelectedName(name);
-    setQuery(name);
-    setValue("title", name, { shouldValidate: true });
-    setIsListOpen(false);
-  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -82,53 +57,30 @@ export function RequestBookHeroButton({
             onSubmit={handleSubmit((data) =>
               onSubmit(data, () => {
                 setOpen(false);
-                setQuery("");
-                setSelectedName("");
               })
             )}
             className="space-y-4"
           >
-            <div ref={comboRef} className="relative">
+            <div>
               <Label htmlFor="hb-title">{t("dashboard.requestBook.selectLabel")}</Label>
-              <input type="hidden" {...register("title")} />
-              <input
+              <select
                 id="hb-title"
-                type="text"
-                autoComplete="off"
-                placeholder={t("dashboard.requestBook.searchPlaceholder")}
-                value={query}
-                onFocus={() => setIsListOpen(true)}
-                onChange={(e) => {
-                  setQuery(e.target.value);
-                  setIsListOpen(true);
-                  if (e.target.value !== selectedName) {
-                    setSelectedName("");
-                    setValue("title", "", { shouldValidate: false });
-                  }
-                }}
+                defaultValue=""
                 className="mt-1.5 flex h-10 w-full rounded-lg border border-border bg-card px-3 text-sm font-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentblue"
-              />
-              {isListOpen && (
-                <div className="absolute z-20 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
-                  {matches.length === 0 ? (
-                    <p className="p-3 text-sm text-text-secondary">{t("dashboard.requestBook.noMatches")}</p>
-                  ) : (
-                    matches.map((b) => (
-                      <button
-                        key={b.id}
-                        type="button"
-                        onClick={() => selectBook(b.name)}
-                        className="block w-full border-b border-border p-2.5 text-left last:border-0 hover:bg-accentblue/10"
-                      >
-                        <p className="truncate text-sm font-medium">{b.name}</p>
-                        <p className="truncate text-xs text-text-secondary">
-                          {[b.className, b.author].filter(Boolean).join(" • ") || "—"}
-                        </p>
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
+                {...register("title")}
+              >
+                <option value="" disabled>
+                  {t("dashboard.requestBook.selectPlaceholder")}
+                </option>
+                {bookNames.map((b) => (
+                  <option key={b.id} value={b.name}>
+                    {b.name}
+                    {[b.className, b.author].filter(Boolean).length > 0
+                      ? ` (${[b.className, b.author].filter(Boolean).join(" • ")})`
+                      : ""}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <Label htmlFor="hb-note">{t("dashboard.requestBook.noteLabel")}</Label>
