@@ -1,10 +1,12 @@
-import { BookOpen, Bookmark as BookmarkIcon, Heart, ClipboardList } from "lucide-react";
+import Link from "next/link";
+import { Library, Heart, ClipboardList } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getUserLanguage } from "@/lib/i18n/get-user-language";
 import { translate } from "@/lib/i18n/translate";
 import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { StatCard } from "@/components/ui/stat-card";
+import { BookmarksStatCard } from "@/components/dashboard/BookmarksStatCard";
 import { ContinueReadingCard } from "@/components/dashboard/ContinueReadingCard";
 import { FavoriteBookListItem } from "@/components/dashboard/FavoriteBookListItem";
 import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
@@ -24,7 +26,6 @@ export default async function DashboardPage() {
     continueReading,
     favorites,
     notifications,
-    booksOpenedCount,
     bookmarksCount,
     favoritesCount,
     pendingRequestsCount,
@@ -43,7 +44,6 @@ export default async function DashboardPage() {
       orderBy: { createdAt: "desc" },
       take: 5,
     }),
-    prisma.bookAccess.count({ where: { userId } }),
     prisma.bookmark.count({ where: { userId } }),
     prisma.favorite.count({ where: { userId } }),
     prisma.bookRequest.count({ where: { userId, status: "PENDING" } }),
@@ -55,14 +55,16 @@ export default async function DashboardPage() {
       <DashboardHero firstName={session!.user!.name?.split(" ")[0] ?? ""} lang={lang} />
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard icon={BookOpen} label={t("dashboard.booksOpened")} value={booksOpenedCount} tone="navy" />
-        <StatCard
-          icon={BookmarkIcon}
-          label={t("dashboard.stats.bookmarks")}
-          value={bookmarksCount}
-          sublabel={t("dashboard.stats.bookmarksSub")}
-          tone="success"
-        />
+        <Link
+          href="/library"
+          className="flex items-center gap-4 rounded-2xl border border-border bg-white p-5 shadow-card transition-shadow hover:shadow-card-hover"
+        >
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-dash-navy text-white">
+            <Library size={20} aria-hidden="true" />
+          </div>
+          <p className="font-display text-xl font-semibold text-dash-navy">{t("dashboard.sidebar.myLibrary")}</p>
+        </Link>
+        <BookmarksStatCard lang={lang} count={bookmarksCount} />
         <StatCard
           icon={Heart}
           label={t("dashboard.stats.favorites")}

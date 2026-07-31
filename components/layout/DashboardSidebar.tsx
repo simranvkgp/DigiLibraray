@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   Library,
   Sparkles,
-  Bookmark as BookmarkIcon,
   ClipboardList,
   Settings,
   Menu,
@@ -19,21 +18,12 @@ import { translate, type Lang } from "@/lib/i18n/translate";
 const rowBase =
   "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white";
 const rowActive = "bg-dash-blue text-white shadow-sm";
-const rowDisabled = "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/30 cursor-not-allowed";
 
 export function DashboardSidebar({ lang = "en" }: { lang?: Lang }) {
   const t = (key: string) => translate(lang, key);
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [bookmarkCount, setBookmarkCount] = useState(0);
   const [newArrivalsCount, setNewArrivalsCount] = useState(0);
-
-  useEffect(() => {
-    fetch("/api/bookmarks")
-      .then((r) => r.json())
-      .then((d) => setBookmarkCount(d.bookmarks?.length ?? 0))
-      .catch(() => {});
-  }, [pathname]);
 
   useEffect(() => {
     fetch("/api/new-arrivals")
@@ -71,23 +61,6 @@ export function DashboardSidebar({ lang = "en" }: { lang?: Lang }) {
             </span>
           )}
         </Link>
-        {bookmarkCount > 0 ? (
-          <Link href="/bookmarks" className={`${rowBase} ${pathname === "/bookmarks" ? rowActive : ""}`}>
-            <BookmarkIcon size={18} aria-hidden="true" />
-            <span className="flex-1">{t("dashboard.sidebar.bookmarks")}</span>
-            <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-white">
-              {bookmarkCount}
-            </span>
-          </Link>
-        ) : (
-          <div className={rowDisabled} aria-disabled="true" title={t("dashboard.sidebar.noBookmarksYet")}>
-            <BookmarkIcon size={18} aria-hidden="true" />
-            <span className="flex-1">{t("dashboard.sidebar.bookmarks")}</span>
-            <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/50">
-              {t("dashboard.sidebar.noBookmarksYet")}
-            </span>
-          </div>
-        )}
         <RequestBookHeroButton lang={lang} triggerClassName={`${rowBase} w-full text-left`}>
           <ClipboardList size={18} aria-hidden="true" />
           {t("dashboard.sidebar.myRequests")}

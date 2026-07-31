@@ -14,6 +14,7 @@ export async function GET(req: Request) {
   // (used by the sidebar to know whether the Bookmarks link should activate).
   const bookmarks = await prisma.bookmark.findMany({
     where: bookId ? { userId, bookId } : { userId },
+    include: { book: { select: { id: true, title: true, subject: true, coverImageUrl: true } } },
     orderBy: { pageNumber: "asc" },
   });
   return NextResponse.json({ bookmarks });
