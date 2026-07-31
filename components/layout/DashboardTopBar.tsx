@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { Search, ChevronDown } from "lucide-react";
+import { Search, ArrowLeft, ChevronDown } from "lucide-react";
 import { translate, type Lang } from "@/lib/i18n/translate";
 import type { Role } from "@/types";
 
@@ -21,18 +23,31 @@ export function DashboardTopBar({
 }) {
   const t = (key: string) => translate(lang, key);
   const roleLabel = t(`dashboard.roleLabel.${role.toLowerCase()}`);
+  const pathname = usePathname();
+  const isReaderPage = /^\/library\/[^/]+/.test(pathname ?? "");
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-dash-cream/95 backdrop-blur">
       <div className="flex items-center gap-4 py-4 pl-20 pr-6 lg:pl-6">
-        <div className="relative max-w-md flex-1">
-          <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary" size={16} />
-          <input
-            type="search"
-            placeholder={t("dashboard.searchPlaceholder")}
-            className="h-11 w-full rounded-xl border border-border bg-white pl-10 pr-4 text-sm placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dash-gold"
-          />
-        </div>
+        {isReaderPage ? (
+          <Link
+            href="/dashboard"
+            className="flex max-w-md flex-1 items-center gap-2 text-sm font-medium text-dash-navy hover:text-dash-navy/80"
+            aria-label={t("reader.backToDashboard")}
+          >
+            <ArrowLeft size={18} />
+            <span>{t("reader.backToDashboard")}</span>
+          </Link>
+        ) : (
+          <div className="relative max-w-md flex-1">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-secondary" size={16} />
+            <input
+              type="search"
+              placeholder={t("dashboard.searchPlaceholder")}
+              className="h-11 w-full rounded-xl border border-border bg-white pl-10 pr-4 text-sm placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dash-gold"
+            />
+          </div>
+        )}
 
         <div className="ml-auto flex items-center gap-4">
           <DropdownMenu.Root>
