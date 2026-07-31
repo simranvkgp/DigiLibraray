@@ -7,12 +7,10 @@ import {
   LayoutDashboard,
   Library,
   Sparkles,
-  ClipboardList,
   Settings,
   Menu,
   X,
 } from "lucide-react";
-import { RequestBookHeroButton } from "@/components/dashboard/RequestBookHeroButton";
 import { translate, type Lang } from "@/lib/i18n/translate";
 
 const rowBase =
@@ -61,10 +59,6 @@ export function DashboardSidebar({ lang = "en" }: { lang?: Lang }) {
             </span>
           )}
         </Link>
-        <RequestBookHeroButton lang={lang} triggerClassName={`${rowBase} w-full text-left`}>
-          <ClipboardList size={18} aria-hidden="true" />
-          {t("dashboard.sidebar.myRequests")}
-        </RequestBookHeroButton>
         <Link href="/settings" className={`${rowBase} ${pathname === "/settings" ? rowActive : ""}`}>
           <Settings size={18} aria-hidden="true" />
           {t("dashboard.sidebar.settings")}

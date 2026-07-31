@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { Library, Heart, ClipboardList } from "lucide-react";
+import { Library, ClipboardList } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getUserLanguage } from "@/lib/i18n/get-user-language";
 import { translate } from "@/lib/i18n/translate";
 import { DashboardHero } from "@/components/dashboard/DashboardHero";
-import { StatCard } from "@/components/ui/stat-card";
 import { BookmarksStatCard } from "@/components/dashboard/BookmarksStatCard";
+import { FavoritesStatCard } from "@/components/dashboard/FavoritesStatCard";
 import { ContinueReadingCard } from "@/components/dashboard/ContinueReadingCard";
 import { FavoriteBookListItem } from "@/components/dashboard/FavoriteBookListItem";
 import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
@@ -65,20 +65,20 @@ export default async function DashboardPage() {
           <p className="font-display text-xl font-semibold text-dash-navy">{t("dashboard.sidebar.myLibrary")}</p>
         </Link>
         <BookmarksStatCard lang={lang} count={bookmarksCount} />
-        <StatCard
-          icon={Heart}
-          label={t("dashboard.stats.favorites")}
-          value={favoritesCount}
-          sublabel={t("dashboard.stats.favoritesSub")}
-          tone="gold"
-        />
-        <StatCard
-          icon={ClipboardList}
-          label={t("dashboard.stats.pendingRequests")}
-          value={pendingRequestsCount}
-          sublabel={t("dashboard.stats.pendingRequestsSub")}
-          tone="accent"
-        />
+        <FavoritesStatCard lang={lang} count={favoritesCount} />
+        <RequestBookHeroButton
+          lang={lang}
+          triggerClassName="flex items-center gap-4 rounded-2xl border border-border bg-white p-5 text-left shadow-card transition-shadow hover:shadow-card-hover"
+        >
+          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-dash-blue text-white">
+            <ClipboardList size={20} aria-hidden="true" />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm text-text-secondary">{t("dashboard.stats.pendingRequests")}</p>
+            <p className="font-display text-2xl font-semibold text-dash-navy">{pendingRequestsCount}</p>
+            <p className="text-xs text-text-secondary">{t("dashboard.stats.pendingRequestsSub")}</p>
+          </div>
+        </RequestBookHeroButton>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">

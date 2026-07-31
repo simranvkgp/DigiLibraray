@@ -9,7 +9,15 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url);
   const bookId = searchParams.get("bookId");
-  if (!bookId) return NextResponse.json({ error: "bookId is required" }, { status: 400 });
+
+  if (!bookId) {
+    const favorites = await prisma.favorite.findMany({
+      where: { userId },
+      include: { book: { select: { id: true, title: true, subject: true, coverImageUrl: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json({ favorites });
+  }
 
   const favorite = await prisma.favorite.findUnique({ where: { userId_bookId: { userId, bookId } } });
   return NextResponse.json({ isFavorite: !!favorite });
