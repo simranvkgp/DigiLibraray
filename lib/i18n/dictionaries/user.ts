@@ -121,6 +121,7 @@ export const user = {
     "requestDialog.error": "Couldn't send that request. Please try again.",
 
     // Reader
+    "reader.backToDashboard": "Back to dashboard",
     "reader.zoomOut": "Zoom out",
     "reader.zoomIn": "Zoom in",
     "reader.toggleFullscreen": "Toggle fullscreen",
@@ -268,6 +269,7 @@ export const user = {
     "requestDialog.error": "वह अनुरोध नहीं भेजा जा सका। कृपया फिर से प्रयास करें।",
 
     // Reader
+    "reader.backToDashboard": "डैशबोर्ड पर वापस जाएं",
     "reader.zoomOut": "ज़ूम आउट",
     "reader.zoomIn": "ज़ूम इन",
     "reader.toggleFullscreen": "फ़ुलस्क्रीन टॉगल करें",

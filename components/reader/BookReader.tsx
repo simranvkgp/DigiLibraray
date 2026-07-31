@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import Link from "next/link";
 import type { PDFDocumentProxy, RenderTask } from "pdfjs-dist";
 import {
+  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   ZoomIn,
@@ -363,11 +365,18 @@ export function BookReader({
     <div ref={containerRef} tabIndex={-1} className="bg-background" style={isPdf ? { userSelect: "none" } : undefined}>
       {/* Top bar */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 print:hidden">
-        <div className="min-w-0">
-          <p className="truncate font-display text-base font-medium text-navy">{book.title}</p>
-          <div className="mt-1 flex gap-1.5">
-            <Badge variant="outline">{book.subject}</Badge>
-            <Badge variant="default">{book.boardName}</Badge>
+        <div className="flex min-w-0 items-center gap-2">
+          <Link href="/dashboard">
+            <Button size="icon" variant="ghost" aria-label={t("reader.backToDashboard")}>
+              <ArrowLeft size={16} />
+            </Button>
+          </Link>
+          <div className="min-w-0">
+            <p className="truncate font-display text-base font-medium text-navy">{book.title}</p>
+            <div className="mt-1 flex gap-1.5">
+              <Badge variant="outline">{book.subject}</Badge>
+              <Badge variant="default">{book.boardName}</Badge>
+            </div>
           </div>
         </div>
 
