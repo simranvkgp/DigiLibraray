@@ -63,7 +63,6 @@ export default async function ReaderPage({
       initialPage={Number(searchParams.page) || progress?.currentPage || 1}
       initialBookmarks={bookmarks}
       initialIsFavorite={!!favorite}
-      viewerLabel={`${user.name ?? ""} ${user.email ?? ""}`.trim()}
       lang={lang}
     />
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import type { PDFDocumentProxy, RenderTask } from "pdfjs-dist";
 import {
@@ -52,14 +52,12 @@ export function BookReader({
   initialPage,
   initialBookmarks,
   initialIsFavorite,
-  viewerLabel,
   lang = "en",
 }: {
   book: ReaderBook;
   initialPage: number;
   initialBookmarks: BookmarkRow[];
   initialIsFavorite: boolean;
-  viewerLabel: string;
   lang?: Lang;
 }) {
   const [page, setPage] = useState(initialPage || 1);
@@ -89,16 +87,6 @@ export function BookReader({
 
   const isPdf = book.fileType === "PDF";
   const isViewable = isPdf || book.fileType === "FLIPBOOK" || book.fileType === "HTML";
-
-  // Tiled, semi-transparent watermark of the viewer's identity, so a leaked
-  // screenshot or photo of the screen can be traced back to who took it —
-  // a deterrent, not a block (no web page can detect or prevent an OS-level
-  // screenshot, phone camera, or screen recording).
-  const watermarkBackground = useMemo(() => {
-    const escaped = viewerLabel.replace(/[<>&'"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" }[c] as string));
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="340" height="200"><text x="0" y="110" transform="rotate(-30 170 100)" font-family="sans-serif" font-size="14" fill="rgba(15,23,42,0.09)">${escaped}</text></svg>`;
-    return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
-  }, [viewerLabel]);
 
   // Blur the viewer whenever the tab/window loses focus — deters casual
   // screen-recording or a second device photographing the screen while
@@ -542,11 +530,6 @@ export function BookReader({
                         }}
                         className="mx-auto block h-auto max-w-full rounded-lg border border-border"
                         onDragStart={(e) => e.preventDefault()}
-                      />
-                      <div
-                        aria-hidden
-                        className="pointer-events-none absolute inset-0 z-[5]"
-                        style={{ backgroundImage: watermarkBackground, backgroundRepeat: "repeat" }}
                       />
                     </div>
                   ))}
