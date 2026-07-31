@@ -11,7 +11,6 @@ import {
   Minimize,
   Bookmark,
   Heart,
-  ThumbsUp,
   PanelRight,
   X,
 } from "lucide-react";
@@ -37,11 +36,6 @@ interface BookmarkRow {
   note: string | null;
 }
 
-interface PageLikeRow {
-  id: string;
-  pageNumber: number;
-}
-
 // Thumbnails render at a fixed width regardless of zoom — small enough that
 // keeping every rendered one in memory (no eviction, unlike full pages) is fine.
 const THUMB_WIDTH = 110;
@@ -56,14 +50,12 @@ export function BookReader({
   initialPage,
   initialBookmarks,
   initialIsFavorite,
-  initialPageLikes,
   lang = "en",
 }: {
   book: ReaderBook;
   initialPage: number;
   initialBookmarks: BookmarkRow[];
   initialIsFavorite: boolean;
-  initialPageLikes: PageLikeRow[];
   lang?: Lang;
 }) {
   const [page, setPage] = useState(initialPage || 1);
@@ -72,7 +64,6 @@ export function BookReader({
   const [thumbsOpen, setThumbsOpen] = useState(false);
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
   const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
-  const [pageLikes, setPageLikes] = useState(initialPageLikes);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const thumbsAreaRef = useRef<HTMLDivElement>(null);
@@ -338,23 +329,6 @@ export function BookReader({
     }
   }
 
-  const likedPages = new Set(pageLikes.map((p) => p.pageNumber));
-
-  async function toggleLike(pageNumber: number) {
-    const res = await fetch("/api/page-likes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookId: book.id, pageNumber }),
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    if (data.liked) {
-      setPageLikes((prev) => [...prev, data.pageLike].sort((a, b) => a.pageNumber - b.pageNumber));
-    } else {
-      setPageLikes((prev) => prev.filter((p) => p.pageNumber !== pageNumber));
-    }
-  }
-
   // Best-effort deterrents against saving/printing/copying the page. None of
   // this can stop a screenshot, screen recording, or someone reading the
   // network response directly — that's a hard ceiling for any browser-based
@@ -424,15 +398,6 @@ export function BookReader({
             className={isFavorite ? "text-brandred" : undefined}
           >
             <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => toggleLike(page)}
-            aria-label={t(likedPages.has(page) ? "reader.unlikePage" : "reader.likePage")}
-            className={likedPages.has(page) ? "text-accentblue" : undefined}
-          >
-            <ThumbsUp size={16} fill={likedPages.has(page) ? "currentColor" : "none"} />
           </Button>
           {isPdf && (
             <Button
@@ -525,15 +490,6 @@ export function BookReader({
                           }`}
                         >
                           <Heart size={14} fill={isFavorite ? "currentColor" : "none"} />
-                        </button>
-                        <button
-                          onClick={() => toggleLike(pageNum)}
-                          aria-label={t(likedPages.has(pageNum) ? "reader.unlikePage" : "reader.likePage")}
-                          className={`rounded-full p-1.5 transition-colors ${
-                            likedPages.has(pageNum) ? "bg-accentblue text-white" : "bg-black/40 text-white/70 hover:bg-black/60 hover:text-white"
-                          }`}
-                        >
-                          <ThumbsUp size={14} fill={likedPages.has(pageNum) ? "currentColor" : "none"} />
                         </button>
                       </div>
                       <canvas

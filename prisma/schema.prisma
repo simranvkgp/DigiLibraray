@@ -50,7 +50,6 @@ model User {
   updatedAt   DateTime  @updatedAt
 
   bookmarks               Bookmark[]
-  pageLikes               PageLike[]
   favorites               Favorite[]
   readingProgress         ReadingProgress[]
   notifications           NotificationRecipient[]
@@ -191,7 +190,6 @@ model Book {
 
   bookAccess        BookAccess[]
   bookmarks         Bookmark[]
-  pageLikes         PageLike[]
   favorites         Favorite[]
   readingProgress   ReadingProgress[]
   bookAccessGrants  BookAccessGrant[]
@@ -307,19 +305,6 @@ model Bookmark {
   book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
   pageNumber Int
   note       String?
-  createdAt  DateTime @default(now())
-
-  @@index([userId])
-  @@index([bookId])
-}
-
-model PageLike {
-  id         String   @id @default(cuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bookId     String
-  book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  pageNumber Int
   createdAt  DateTime @default(now())
 
   @@index([userId])

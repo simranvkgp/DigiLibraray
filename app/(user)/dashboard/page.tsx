@@ -6,6 +6,7 @@ import { translate } from "@/lib/i18n/translate";
 import { DashboardHero } from "@/components/dashboard/DashboardHero";
 import { StatCard } from "@/components/ui/stat-card";
 import { ContinueReadingCard } from "@/components/dashboard/ContinueReadingCard";
+import { FavoriteBookListItem } from "@/components/dashboard/FavoriteBookListItem";
 import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
 import { RecentlyOpenedPanel } from "@/components/dashboard/RecentlyOpenedPanel";
 import { RequestBookHeroButton } from "@/components/dashboard/RequestBookHeroButton";
@@ -120,9 +121,9 @@ export default async function DashboardPage() {
               {favorites.length === 0 ? (
                 <p className="mt-4 text-sm text-text-secondary">{t("dashboard.emptyFavorites")}</p>
               ) : (
-                <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                <div className="mt-4 space-y-3">
                   {favorites.map((f) => (
-                    <ContinueReadingCard key={f.id} bookId={f.bookId} title={f.book.title} coverImageUrl={f.book.coverImageUrl} />
+                    <FavoriteBookListItem key={f.id} bookId={f.bookId} title={f.book.title} coverImageUrl={f.book.coverImageUrl} />
                   ))}
                 </div>
               )}
