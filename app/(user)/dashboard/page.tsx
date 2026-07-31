@@ -88,6 +88,18 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <DashboardHero firstName={session!.user!.name?.split(" ")[0] ?? ""} lang={lang} />
 
+      <NotificationsPanel
+        lang={lang}
+        items={notifications.map((n) => ({
+          id: n.id,
+          type: n.notification.type,
+          title: n.notification.title,
+          body: n.notification.body,
+          createdAt: n.notification.createdAt,
+          readAt: n.readAt,
+        }))}
+      />
+
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <Link
           href="/library"
@@ -183,17 +195,6 @@ export default async function DashboardPage() {
         </div>
 
         <div className="space-y-6">
-          <NotificationsPanel
-            lang={lang}
-            items={notifications.map((n) => ({
-              id: n.id,
-              type: n.notification.type,
-              title: n.notification.title,
-              body: n.notification.body,
-              createdAt: n.notification.createdAt,
-              readAt: n.readAt,
-            }))}
-          />
           <RecentlyOpenedPanel
             lang={lang}
             items={continueReading.map((rp) => ({
