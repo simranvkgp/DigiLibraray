@@ -39,7 +39,12 @@ export function DashboardTopBar({
             <span>{t("reader.backToDashboard")}</span>
           </Link>
         ) : (
-          <img src="/images/logo.svg" alt="VK Digital Library" className="h-[3.25rem] w-auto flex-shrink-0" />
+          <img
+            src="/images/logo.svg"
+            alt="VK Digital Library"
+            className="h-[3.25rem] w-auto flex-shrink-0"
+            style={{ marginLeft: "20px" }}
+          />
         )}
 
         <div className="ml-auto flex items-center gap-4">
