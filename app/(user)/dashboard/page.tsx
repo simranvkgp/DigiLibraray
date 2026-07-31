@@ -58,7 +58,7 @@ export default async function DashboardPage() {
     }),
     prisma.bookmark.count({ where: { userId } }),
     prisma.favorite.count({ where: { userId } }),
-    prisma.bookRequest.count({ where: { userId, status: "PENDING" } }),
+    prisma.bookRequest.count({ where: { userId, status: { in: ["PENDING", "APPROVED"] } } }),
     prisma.bookSuggestion.count({ where: { userId, status: "PENDING" } }),
     prisma.user.findUnique({ where: { id: userId }, include: { category: true } }),
   ]);

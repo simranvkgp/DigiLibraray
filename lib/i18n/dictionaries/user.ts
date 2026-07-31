@@ -71,9 +71,11 @@ export const user = {
     "dashboard.requestBook.submit": "Send request",
     "dashboard.requestBook.submitting": "Sending...",
     "dashboard.requestBook.error": "Couldn't send that request. Please try again.",
+    "dashboard.requestBook.accessRequests": "Book access requests",
     "dashboard.requestBook.yourRequests": "Your requests",
     "dashboard.requestBook.empty": "You haven't requested any books yet.",
     "dashboard.requestBook.status.pending": "Pending",
+    "dashboard.requestBook.status.approved": "Approved",
     "dashboard.requestBook.status.added": "Added",
     "dashboard.requestBook.status.rejected": "Not added",
 
@@ -210,9 +212,11 @@ export const user = {
     "dashboard.requestBook.submit": "अनुरोध भेजें",
     "dashboard.requestBook.submitting": "भेजा जा रहा है...",
     "dashboard.requestBook.error": "वह अनुरोध नहीं भेजा जा सका। कृपया फिर से प्रयास करें।",
+    "dashboard.requestBook.accessRequests": "पुस्तक एक्सेस अनुरोध",
     "dashboard.requestBook.yourRequests": "आपके अनुरोध",
     "dashboard.requestBook.empty": "आपने अभी तक कोई पुस्तक नहीं मांगी है।",
     "dashboard.requestBook.status.pending": "लंबित",
+    "dashboard.requestBook.status.approved": "स्वीकृत",
     "dashboard.requestBook.status.added": "जोड़ी गई",
     "dashboard.requestBook.status.rejected": "नहीं जोड़ी गई",
 

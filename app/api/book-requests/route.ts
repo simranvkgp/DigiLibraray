@@ -3,6 +3,22 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { bookRequestSchema } from "@/lib/validations";
 
+export async function GET() {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  const userId = (session.user as any).id as string;
+
+  // Rejected requests are a dead end for the requester — only surface the
+  // ones still pending admin review or already approved.
+  const requests = await prisma.bookRequest.findMany({
+    where: { userId, status: { in: ["PENDING", "APPROVED"] } },
+    include: { book: { select: { id: true, title: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return NextResponse.json({ requests });
+}
+
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });

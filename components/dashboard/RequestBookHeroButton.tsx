@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { formatRelativeTime } from "@/lib/utils";
 import { translate, type Lang } from "@/lib/i18n/translate";
-import { useBookRequests, statusVariant } from "@/components/dashboard/useBookRequests";
+import { useBookRequests, statusVariant, accessRequestStatusVariant } from "@/components/dashboard/useBookRequests";
 
 const defaultTriggerClassName =
   "rounded-lg border border-white/40 px-4 py-2 text-sm font-medium text-white hover:bg-white/10";
@@ -27,8 +27,18 @@ export function RequestBookHeroButton({
   const [selectedName, setSelectedName] = useState("");
   const [isListOpen, setIsListOpen] = useState(false);
   const comboRef = useRef<HTMLDivElement>(null);
-  const { suggestions, bookNames, error, register, setValue, handleSubmit, isSubmitting, onSubmit, hasPendingSuggestion } =
-    useBookRequests();
+  const {
+    suggestions,
+    accessRequests,
+    bookNames,
+    error,
+    register,
+    setValue,
+    handleSubmit,
+    isSubmitting,
+    onSubmit,
+    hasPendingSuggestion,
+  } = useBookRequests();
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -134,6 +144,27 @@ export function RequestBookHeroButton({
             </Button>
           </form>
         )}
+
+        <div className="mt-5 border-t border-border pt-4">
+          <p className="mb-2 text-sm font-medium text-text-primary">{t("dashboard.requestBook.accessRequests")}</p>
+          {accessRequests.length === 0 ? (
+            <p className="text-sm text-text-secondary">{t("dashboard.requestBook.empty")}</p>
+          ) : (
+            <div className="max-h-60 space-y-3 overflow-y-auto">
+              {accessRequests.map((r) => (
+                <div key={r.id} className="flex items-start justify-between gap-2 border-b border-border pb-2 last:border-0 last:pb-0">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{r.book.title}</p>
+                    <p className="text-xs text-text-secondary">{formatRelativeTime(r.createdAt)}</p>
+                  </div>
+                  <Badge variant={accessRequestStatusVariant[r.status]} className="shrink-0">
+                    {t(`dashboard.requestBook.status.${r.status.toLowerCase()}`)}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         <div className="mt-5 border-t border-border pt-4">
           <p className="mb-2 text-sm font-medium text-text-primary">{t("dashboard.requestBook.yourRequests")}</p>

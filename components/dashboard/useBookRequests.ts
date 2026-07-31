@@ -13,6 +13,13 @@ export interface SuggestionRow {
   createdAt: string;
 }
 
+export interface AccessRequestRow {
+  id: string;
+  status: "PENDING" | "APPROVED";
+  createdAt: string;
+  book: { id: string; title: string };
+}
+
 export interface BookNameOption {
   id: string;
   name: string;
@@ -26,8 +33,14 @@ export const statusVariant: Record<BookSuggestionStatus, "warning" | "success" |
   REJECTED: "destructive",
 };
 
+export const accessRequestStatusVariant: Record<AccessRequestRow["status"], "warning" | "success"> = {
+  PENDING: "warning",
+  APPROVED: "success",
+};
+
 export function useBookRequests() {
   const [suggestions, setSuggestions] = useState<SuggestionRow[]>([]);
+  const [accessRequests, setAccessRequests] = useState<AccessRequestRow[]>([]);
   const [bookNames, setBookNames] = useState<BookNameOption[]>([]);
   const [error, setError] = useState(false);
   const {
@@ -49,6 +62,9 @@ export function useBookRequests() {
     fetch("/api/book-names")
       .then((r) => r.json())
       .then((data) => setBookNames(data.bookNames ?? []));
+    fetch("/api/book-requests")
+      .then((r) => r.json())
+      .then((data) => setAccessRequests(data.requests ?? []));
   }, [loadSuggestions]);
 
   async function onSubmit(data: BookSuggestionInput, onSuccess?: () => void) {
@@ -69,5 +85,16 @@ export function useBookRequests() {
 
   const hasPendingSuggestion = suggestions.some((s) => s.status === "PENDING");
 
-  return { suggestions, bookNames, error, register, setValue, handleSubmit, isSubmitting, onSubmit, hasPendingSuggestion };
+  return {
+    suggestions,
+    accessRequests,
+    bookNames,
+    error,
+    register,
+    setValue,
+    handleSubmit,
+    isSubmitting,
+    onSubmit,
+    hasPendingSuggestion,
+  };
 }
