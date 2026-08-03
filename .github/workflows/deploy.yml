@@ -45,15 +45,15 @@ jobs:
       - name: SSH in, pull image, run container
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ vars.EC2_HOST }}
-          username: ${{ vars.EC2_USER }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             set -e
 
             echo "===== digiclass-library deploy ====="
-            echo "Server IP : ${{ vars.EC2_HOST }}"
-            echo "SSH user  : ${{ vars.EC2_USER }}"
+            echo "Server IP : $(hostname -I 2>/dev/null | awk '{print $1}')"
+            echo "SSH user  : $(whoami)"
             echo "Image     : ${{ env.IMAGE_NAME }}:latest"
             echo "Commit    : ${{ github.sha }}"
             echo "====================================="
