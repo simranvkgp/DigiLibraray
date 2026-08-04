@@ -33,7 +33,7 @@ export default async function DashboardPage() {
     notifications,
     bookmarksCount,
     favoritesCount,
-    pendingRequestsCount,
+    totalRequestsCount,
     pendingSuggestionsCount,
     userWithCategory,
   ] = await Promise.all([
@@ -58,7 +58,7 @@ export default async function DashboardPage() {
     }),
     prisma.bookmark.count({ where: { userId } }),
     prisma.favorite.count({ where: { userId } }),
-    prisma.bookRequest.count({ where: { userId, status: { in: ["PENDING", "APPROVED"] } } }),
+    prisma.bookRequest.count({ where: { userId } }),
     prisma.bookSuggestion.count({ where: { userId, status: "PENDING" } }),
     prisma.user.findUnique({ where: { id: userId }, include: { category: true } }),
   ]);
@@ -114,7 +114,7 @@ export default async function DashboardPage() {
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm text-text-secondary">{t("dashboard.stats.pendingRequests")}</p>
-            <p className="font-display text-2xl font-semibold text-dash-navy">{pendingRequestsCount}</p>
+            <p className="font-display text-2xl font-semibold text-dash-navy">{totalRequestsCount}</p>
             <p className="text-xs text-text-secondary">{t("dashboard.stats.pendingRequestsSub")}</p>
           </div>
         </RequestBookHeroButton>
