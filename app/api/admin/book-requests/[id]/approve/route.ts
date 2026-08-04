@@ -32,8 +32,9 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
   await sendMail({
     to: request.user.email,
     ...bookAccessGrantedEmail({ name: request.user.name, bookTitle: request.book.title }),
-  }).catch(() => {
+  }).catch((err) => {
     // Access is already granted; a failed notification email shouldn't fail the approval.
+    console.error("Failed to send book-access-granted email:", err);
   });
 
   return NextResponse.json({ request: updated });
