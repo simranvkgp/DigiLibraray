@@ -335,7 +335,7 @@ export function BookNameManager({ lang = "en" }: { lang?: Lang }) {
                       <th className="p-3 font-medium">{t("admin.field.class")}</th>
                       <th className="p-3 font-medium">{t("admin.field.medium")}</th>
                       <th className="p-3 font-medium">{t("admin.field.author")}</th>
-                      <th className="p-3 font-medium">{t("admin.field.institution")}</th>
+                      <th className="p-3 font-medium">{t("admin.bookNames.institutionHeader")}</th>
                       <th className="p-3 font-medium text-right">{t("admin.table.actions")}</th>
                     </tr>
                   </thead>

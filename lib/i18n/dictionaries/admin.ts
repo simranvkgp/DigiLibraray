@@ -131,6 +131,7 @@ export const admin = {
 
     // Book names catalog page (dropdown source for user book requests)
     "admin.bookNames.subtitle": "Maintain the list of book names users can pick from when requesting a new book.",
+    "admin.bookNames.institutionHeader": "Institution/Board",
     "admin.bookNames.placeholder": "New book name",
     "admin.bookNames.empty": "No book names yet — add one above.",
     "admin.bookNames.uploadButton": "Upload catalog file",
@@ -347,6 +348,7 @@ export const admin = {
 
     // Book names catalog page (dropdown source for user book requests)
     "admin.bookNames.subtitle": "उन पुस्तक नामों की सूची बनाए रखें जिनमें से उपयोगकर्ता नई पुस्तक मांगते समय चुन सकते हैं।",
+    "admin.bookNames.institutionHeader": "संस्थान/बोर्ड",
     "admin.bookNames.placeholder": "नया पुस्तक नाम",
     "admin.bookNames.empty": "अभी तक कोई पुस्तक नाम नहीं है — ऊपर एक जोड़ें।",
     "admin.bookNames.uploadButton": "कैटलॉग फ़ाइल अपलोड करें",
