@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { ArrowLeft, ChevronDown, Menu, X } from "lucide-react";
+import { ArrowLeft, ChevronDown } from "lucide-react";
 import { translate, type Lang } from "@/lib/i18n/translate";
-import { UserNavLinks } from "@/components/layout/UserNavLinks";
 import type { Role } from "@/types";
 
 export function DashboardTopBar({
@@ -27,31 +25,29 @@ export function DashboardTopBar({
   const roleLabel = t(`dashboard.roleLabel.${role.toLowerCase()}`);
   const pathname = usePathname();
   const showBackToDashboard = pathname !== "/dashboard";
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-dash-cream/95 backdrop-blur">
-      <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4">
+      <div className="flex items-center gap-4 px-6 py-4">
         {showBackToDashboard ? (
           <Link
             href="/dashboard"
-            className="flex min-w-0 flex-1 items-center gap-2 text-sm font-medium text-dash-navy hover:text-dash-navy/80 md:max-w-md md:flex-initial"
+            className="flex max-w-md flex-1 items-center gap-2 text-sm font-medium text-dash-navy hover:text-dash-navy/80"
             aria-label={t("reader.backToDashboard")}
           >
-            <ArrowLeft size={18} className="flex-shrink-0" />
-            <span className="truncate">{t("reader.backToDashboard")}</span>
+            <ArrowLeft size={18} />
+            <span>{t("reader.backToDashboard")}</span>
           </Link>
         ) : (
           <img
             src="/images/logo.svg"
             alt="VK Digital Library"
-            className="h-10 w-auto flex-shrink-0 sm:h-[3.25rem]"
+            className="h-[3.25rem] w-auto flex-shrink-0"
+            style={{ marginLeft: "20px" }}
           />
         )}
 
-        <UserNavLinks lang={lang} className="hidden md:flex" />
-
-        <div className="ml-auto flex items-center gap-1 sm:gap-4">
+        <div className="ml-auto flex items-center gap-4">
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
               <button className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-2.5 transition-colors hover:bg-dash-navy/5">
@@ -87,27 +83,8 @@ export function DashboardTopBar({
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
           </DropdownMenu.Root>
-
-          <button
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-dash-navy transition-colors hover:bg-dash-navy/5 md:hidden"
-            aria-label={mobileMenuOpen ? t("action.close") : t("nav.menu")}
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
         </div>
       </div>
-
-      {mobileMenuOpen && (
-        <div className="border-t border-border bg-dash-cream px-4 py-3 md:hidden">
-          <UserNavLinks
-            lang={lang}
-            className="flex flex-col items-start gap-1"
-            onNavigate={() => setMobileMenuOpen(false)}
-          />
-        </div>
-      )}
     </header>
   );
 }
