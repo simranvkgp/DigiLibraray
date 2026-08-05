@@ -88,35 +88,33 @@ export function BookReader({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [numPages, setNumPages] = useState<number | null>(book.pageCount ?? null);
   const [loadState, setLoadState] = useState<"loading" | "ready" | "error">("loading");
+  const [viewerContentWidth, setViewerContentWidth] = useState(0);
   const t = (key: string) => translate(lang, key);
 
   const isPdf = book.fileType === "PDF";
   const isViewable = isPdf || book.fileType === "FLIPBOOK" || book.fileType === "HTML";
 
-  // Blur the viewer whenever the tab/window loses focus — deters casual
-  // screen-recording or a second device photographing the screen while
-  // switching windows, though it can't catch a screenshot taken while this
-  // tab stays focused.
-  const [isBlurred, setIsBlurred] = useState(false);
-  useEffect(() => {
-    if (!isPdf) return;
-    const onBlur = () => setIsBlurred(true);
-    const onFocus = () => setIsBlurred(false);
-    const onVisibility = () => setIsBlurred(document.hidden);
-    window.addEventListener("blur", onBlur);
-    window.addEventListener("focus", onFocus);
-    document.addEventListener("visibilitychange", onVisibility);
-    return () => {
-      window.removeEventListener("blur", onBlur);
-      window.removeEventListener("focus", onFocus);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [isPdf]);
-
   useEffect(() => {
     const handler = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handler);
     return () => document.removeEventListener("fullscreenchange", handler);
+  }, []);
+
+  // Track the viewer's actual content width so the placeholder height
+  // reserved for off-screen pages (below) matches how tall a page canvas
+  // will actually render once CSS scales it down to fit — without this,
+  // narrow screens (where the canvas is scaled down a lot more than on
+  // desktop) end up with a placeholder far taller than the real page,
+  // leaving a big gap before the next one.
+  useEffect(() => {
+    const el = scrollAreaRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width;
+      if (width) setViewerContentWidth(width);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   const saveProgress = useCallback(
@@ -395,7 +393,19 @@ export function BookReader({
     };
   }, [isPdf]);
 
-  const estimatedPageHeight = basePageSizeRef.current ? basePageSizeRef.current.height * zoom * 1.5 : undefined;
+  // The canvas itself is capped at 100% width (see className below), so on
+  // screens narrower than the PDF's native render size it gets scaled down
+  // by the browser — match that here or the reserved placeholder height
+  // will be far taller than the page actually displays at.
+  const estimatedPageHeight = (() => {
+    const base = basePageSizeRef.current;
+    if (!base) return undefined;
+    const nativeWidth = base.width * zoom * 1.5;
+    const nativeHeight = base.height * zoom * 1.5;
+    if (!viewerContentWidth) return nativeHeight;
+    const displayWidth = Math.min(viewerContentWidth, nativeWidth);
+    return (displayWidth / nativeWidth) * nativeHeight;
+  })();
 
   return (
     <div ref={containerRef} tabIndex={-1} className="bg-background" style={isPdf ? { userSelect: "none" } : undefined}>
@@ -494,10 +504,7 @@ export function BookReader({
         )}
 
         {/* Viewer */}
-        <div
-          ref={scrollAreaRef}
-          className={`flex-1 overflow-auto p-6 transition-[filter] duration-150 ${isBlurred ? "blur-lg" : ""}`}
-        >
+        <div ref={scrollAreaRef} className="flex-1 overflow-auto p-6">
           {isPdf ? (
             <>
               {loadState === "loading" && (
