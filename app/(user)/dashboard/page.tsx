@@ -11,6 +11,7 @@ import { SettingsStatCard } from "@/components/dashboard/SettingsStatCard";
 import { ContinueReadingCard } from "@/components/dashboard/ContinueReadingCard";
 import { FavoriteBookListItem } from "@/components/dashboard/FavoriteBookListItem";
 import { NotificationsPanel } from "@/components/dashboard/NotificationsPanel";
+import { NotificationTicker } from "@/components/dashboard/NotificationTicker";
 import { RecentlyOpenedPanel } from "@/components/dashboard/RecentlyOpenedPanel";
 import { RequestBookHeroButton } from "@/components/dashboard/RequestBookHeroButton";
 import { Card } from "@/components/ui/card";
@@ -87,6 +88,11 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       <DashboardHero firstName={session!.user!.name?.split(" ")[0] ?? ""} lang={lang} />
+
+      <NotificationTicker
+        label={t("dashboard.notifications")}
+        items={notifications.map((n) => ({ id: n.id, title: n.notification.title, type: n.notification.type }))}
+      />
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <Link
