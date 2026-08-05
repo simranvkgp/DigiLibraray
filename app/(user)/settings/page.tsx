@@ -22,7 +22,7 @@ export default async function SettingsPage() {
   const t = (key: string) => translate(lang, key);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 sm:py-8">
+    <div className="max-w-2xl">
       <h1 className="font-display text-2xl font-medium text-dash-navy sm:text-3xl">{t("settings.title")}</h1>
       <div className="mt-6">
         <SettingsForm

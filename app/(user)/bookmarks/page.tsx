@@ -26,7 +26,7 @@ export default async function BookmarksPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+    <div>
       <h1 className="font-display text-2xl font-medium text-dash-navy">{t("bookmarks.title")}</h1>
       <p className="mt-1 text-sm text-text-secondary">{t("bookmarks.subtitle")}</p>
 

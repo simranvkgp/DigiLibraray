@@ -3,11 +3,9 @@ export const common = {
   en: {
     "nav.dashboard": "Dashboard",
     "nav.library": "Library",
-    "nav.bookmarks": "Bookmarks",
     "nav.settings": "Settings",
     "nav.admin": "Admin",
     "nav.logout": "Log out",
-    "nav.menu": "Menu",
     "action.save": "Save",
     "action.cancel": "Cancel",
     "action.confirm": "Confirm",
@@ -21,11 +19,9 @@ export const common = {
   hi: {
     "nav.dashboard": "डैशबोर्ड",
     "nav.library": "लाइब्रेरी",
-    "nav.bookmarks": "बुकमार्क",
     "nav.settings": "सेटिंग्स",
     "nav.admin": "एडमिन",
     "nav.logout": "लॉग आउट",
-    "nav.menu": "मेनू",
     "action.save": "सहेजें",
     "action.cancel": "रद्द करें",
     "action.confirm": "पुष्टि करें",
