@@ -3,7 +3,7 @@ import { Megaphone } from "lucide-react";
 type TickerItem = {
   id: string;
   title: string;
-  type: string;
+  body: string;
 };
 
 export function NotificationTicker({ items, label }: { items: TickerItem[]; label: string }) {
@@ -13,7 +13,7 @@ export function NotificationTicker({ items, label }: { items: TickerItem[]; labe
     <div className="flex shrink-0 items-center gap-10 pr-10">
       {items.map((n) => (
         <span key={n.id} className="whitespace-nowrap text-sm font-semibold text-brandred">
-          {n.title}
+          {n.title} : {n.body}
         </span>
       ))}
     </div>

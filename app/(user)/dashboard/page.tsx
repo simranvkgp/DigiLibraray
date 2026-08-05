@@ -91,7 +91,7 @@ export default async function DashboardPage() {
 
       <NotificationTicker
         label={t("dashboard.notifications")}
-        items={notifications.map((n) => ({ id: n.id, title: n.notification.title, type: n.notification.type }))}
+        items={notifications.map((n) => ({ id: n.id, title: n.notification.title, body: n.notification.body }))}
       />
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-5">
