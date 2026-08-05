@@ -34,10 +34,10 @@ export function SettingsStatCard({
             <Settings size={20} aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <p className="text-sm leading-tight text-text-secondary">{t("dashboard.sidebar.settings")}</p>
-            <p className="font-display text-lg font-semibold leading-tight text-dash-navy sm:text-2xl">
-              {t("dashboard.stats.settingsSub")}
+            <p className="font-display text-2xl font-semibold leading-tight text-dash-navy">
+              {t("dashboard.sidebar.settings")}
             </p>
+            <p className="text-xs leading-tight text-text-secondary">{t("dashboard.stats.settingsSub")}</p>
           </div>
         </button>
       </DialogTrigger>
