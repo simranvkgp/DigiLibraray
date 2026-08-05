@@ -23,7 +23,7 @@ export default async function UserLayout({ children }: { children: React.ReactNo
         onSignOut={handleSignOut}
       />
 
-      <main className="mx-auto max-w-7xl px-6 py-8">{children}</main>
+      <main>{children}</main>
     </div>
   );
 }

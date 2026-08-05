@@ -85,7 +85,7 @@ export default async function DashboardPage() {
   );
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-6 sm:px-6 sm:py-8">
       <DashboardHero firstName={session!.user!.name?.split(" ")[0] ?? ""} lang={lang} />
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">

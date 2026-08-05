@@ -400,7 +400,7 @@ export function BookReader({
   return (
     <div ref={containerRef} tabIndex={-1} className="bg-background" style={isPdf ? { userSelect: "none" } : undefined}>
       {/* Top bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 print:hidden">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-3 py-2 sm:px-4 sm:py-3 print:hidden">
         <div className="flex min-w-0 items-center gap-2">
           <Link href="/dashboard">
             <Button size="icon" variant="ghost" aria-label={t("reader.backToDashboard")}>
@@ -408,15 +408,15 @@ export function BookReader({
             </Button>
           </Link>
           <div className="min-w-0">
-            <p className="truncate font-display text-base font-medium text-navy">{book.title}</p>
-            <div className="mt-1 flex gap-1.5">
+            <p className="max-w-[45vw] truncate font-display text-base font-medium text-navy sm:max-w-none">{book.title}</p>
+            <div className="mt-1 flex flex-wrap gap-1.5">
               <Badge variant="outline">{book.subject}</Badge>
               <Badge variant="default">{book.boardName}</Badge>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5">
           <Button size="icon" variant="ghost" onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))} aria-label={t("reader.zoomOut")}>
             <ZoomOut size={16} />
           </Button>
@@ -455,8 +455,8 @@ export function BookReader({
               <PanelRight size={16} />
             </Button>
           )}
-          <Button size="sm" variant="outline" onClick={() => setSidebarOpen((s) => !s)}>
-            {t("reader.bookmarks")} ({bookmarks.length})
+          <Button size="sm" variant="outline" onClick={() => setSidebarOpen((s) => !s)} className="whitespace-nowrap">
+            <span className="hidden sm:inline">{t("reader.bookmarks")} </span>({bookmarks.length})
           </Button>
         </div>
       </div>
@@ -496,7 +496,7 @@ export function BookReader({
         {/* Viewer */}
         <div
           ref={scrollAreaRef}
-          className={`flex-1 overflow-auto p-6 transition-[filter] duration-150 ${isBlurred ? "blur-lg" : ""}`}
+          className={`flex-1 overflow-auto p-3 transition-[filter] duration-150 sm:p-6 ${isBlurred ? "blur-lg" : ""}`}
         >
           {isPdf ? (
             <>
@@ -626,7 +626,7 @@ export function BookReader({
 
       {/* Bottom bar: page navigation */}
       {isViewable && (
-        <div className="flex items-center justify-center gap-4 border-t border-border px-4 py-3 print:hidden">
+        <div className="flex flex-wrap items-center justify-center gap-2 border-t border-border px-3 py-2 sm:gap-4 sm:px-4 sm:py-3 print:hidden">
           <Button
             size="icon"
             variant="ghost"
