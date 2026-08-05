@@ -40,14 +40,14 @@ export function BookmarksStatCard({ lang = "en", count }: { lang?: Lang; count: 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-4 rounded-2xl border border-border bg-white p-5 text-left shadow-card transition-shadow hover:shadow-card-hover">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-success text-white">
+        <button className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 text-left shadow-card transition-shadow hover:shadow-card-hover sm:gap-4 sm:p-5">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-success text-white sm:h-12 sm:w-12">
             <BookmarkIcon size={20} aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm text-text-secondary">{t("dashboard.stats.bookmarks")}</p>
+            <p className="text-sm leading-tight text-text-secondary">{t("dashboard.stats.bookmarks")}</p>
             <p className="font-display text-2xl font-semibold text-dash-navy">{count}</p>
-            <p className="text-xs text-text-secondary">{t("dashboard.stats.bookmarksSub")}</p>
+            <p className="text-xs leading-tight text-text-secondary">{t("dashboard.stats.bookmarksSub")}</p>
           </div>
         </button>
       </DialogTrigger>

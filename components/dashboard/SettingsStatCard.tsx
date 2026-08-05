@@ -29,13 +29,15 @@ export function SettingsStatCard({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-4 rounded-2xl border border-border bg-white p-5 text-left shadow-card transition-shadow hover:shadow-card-hover">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-warning text-white">
+        <button className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 text-left shadow-card transition-shadow hover:shadow-card-hover sm:gap-4 sm:p-5">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-warning text-white sm:h-12 sm:w-12">
             <Settings size={20} aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <p className="font-display text-xl font-semibold text-dash-navy">{t("dashboard.sidebar.settings")}</p>
-            <p className="text-xs text-text-secondary">{t("dashboard.stats.settingsSub")}</p>
+            <p className="text-sm leading-tight text-text-secondary">{t("dashboard.sidebar.settings")}</p>
+            <p className="font-display text-lg font-semibold leading-tight text-dash-navy sm:text-2xl">
+              {t("dashboard.stats.settingsSub")}
+            </p>
           </div>
         </button>
       </DialogTrigger>

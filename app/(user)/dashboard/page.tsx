@@ -88,34 +88,34 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <DashboardHero firstName={session!.user!.name?.split(" ")[0] ?? ""} lang={lang} />
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <Link
           href="/library"
-          className="flex items-center gap-4 rounded-2xl border border-border bg-white p-5 shadow-card transition-shadow hover:shadow-card-hover"
+          className="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 shadow-card transition-shadow hover:shadow-card-hover sm:gap-4 sm:p-5"
         >
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-dash-navy text-white">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-dash-navy text-white sm:h-12 sm:w-12">
             <Library size={20} aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm text-text-secondary">{t("dashboard.sidebar.myLibrary")}</p>
+            <p className="text-sm leading-tight text-text-secondary">{t("dashboard.sidebar.myLibrary")}</p>
             <p className="font-display text-2xl font-semibold text-dash-navy">{myLibraryCount}</p>
-            <p className="text-xs text-text-secondary">{t("dashboard.stats.myLibrarySub")}</p>
+            <p className="text-xs leading-tight text-text-secondary">{t("dashboard.stats.myLibrarySub")}</p>
           </div>
         </Link>
         <BookmarksStatCard lang={lang} count={bookmarksCount} />
         <FavoritesStatCard lang={lang} count={favoritesCount} />
         <RequestBookHeroButton
           lang={lang}
-          triggerClassName="flex items-center gap-4 rounded-2xl border border-border bg-white p-5 text-left shadow-card transition-shadow hover:shadow-card-hover"
+          triggerClassName="flex items-center gap-3 rounded-2xl border border-border bg-white p-4 text-left shadow-card transition-shadow hover:shadow-card-hover sm:gap-4 sm:p-5"
           showForm={false}
         >
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-dash-blue text-white">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-dash-blue text-white sm:h-12 sm:w-12">
             <ClipboardList size={20} aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm text-text-secondary">{t("dashboard.stats.pendingRequests")}</p>
+            <p className="text-sm leading-tight text-text-secondary">{t("dashboard.stats.pendingRequests")}</p>
             <p className="font-display text-2xl font-semibold text-dash-navy">{totalRequestsCount}</p>
-            <p className="text-xs text-text-secondary">{t("dashboard.stats.pendingRequestsSub")}</p>
+            <p className="text-xs leading-tight text-text-secondary">{t("dashboard.stats.pendingRequestsSub")}</p>
           </div>
         </RequestBookHeroButton>
         <SettingsStatCard
