@@ -60,7 +60,15 @@ export function RegistrationForm({
       body: JSON.stringify(data),
     });
     if (!res.ok) {
-      setError("root", { message: t("register.genericError") });
+      const err = await res.json().catch(() => ({}));
+      let message = t("register.genericError");
+      if (err) {
+        if (typeof err.error === "string") message = err.error;
+        else if (err.error?.formErrors && err.error.formErrors.length) message = err.error.formErrors[0];
+        else if (err.error) message = typeof err.error === "object" ? JSON.stringify(err.error) : String(err.error);
+        else if (err.message) message = String(err.message);
+      }
+      setError("root", { message });
       return;
     }
     // The session cookie still has the pre-registration approvalStatus baked

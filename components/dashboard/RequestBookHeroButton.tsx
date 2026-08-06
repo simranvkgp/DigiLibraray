@@ -29,6 +29,7 @@ export function RequestBookHeroButton({
     suggestions,
     accessRequests,
     bookNames,
+    searchBookNames,
     error,
     register,
     handleSubmit,
@@ -36,9 +37,17 @@ export function RequestBookHeroButton({
     onSubmit,
     hasPendingSuggestion,
   } = useBookRequests();
+  const [filter, setFilter] = useState("");
+  const [debounceTimer, setDebounceTimer] = useState<number | null>(null);
+
+  // Load initial list when dialog opens
+  function onOpenChange(open: boolean) {
+    setOpen(open);
+    if (open) searchBookNames("");
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <button className={triggerClassName ?? defaultTriggerClassName}>
           {children ?? (hasPendingSuggestion ? t("dashboard.requestBook.pendingButton") : t("dashboard.requestBook.button"))}
@@ -62,6 +71,22 @@ export function RequestBookHeroButton({
             className="space-y-4"
           >
             <div>
+              <Label htmlFor="hb-search">Search</Label>
+              <input
+                id="hb-search"
+                value={filter}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setFilter(v);
+                  if (debounceTimer) window.clearTimeout(debounceTimer);
+                  const tId = window.setTimeout(() => searchBookNames(v), 250);
+                  setDebounceTimer(tId);
+                }}
+                placeholder={t("dashboard.requestBook.searchPlaceholder")}
+                className="mt-1.5 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
               <Label htmlFor="hb-title">{t("dashboard.requestBook.selectLabel")}</Label>
               <select
                 id="hb-title"
@@ -75,9 +100,9 @@ export function RequestBookHeroButton({
                 {bookNames.map((b) => (
                   <option key={b.id} value={b.name}>
                     {b.name}
-                    {[b.className, b.author].filter(Boolean).length > 0
-                      ? ` (${[b.className, b.author].filter(Boolean).join(" • ")})`
-                      : ""}
+                    {([b.className, b.author, b.medium, b.institutionName].filter(Boolean).length > 0
+                      ? ` (${[b.className, b.author, b.medium, b.institutionName].filter(Boolean).join(" • ")})`
+                      : "")}
                   </option>
                 ))}
               </select>

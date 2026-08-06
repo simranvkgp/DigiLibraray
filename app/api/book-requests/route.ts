@@ -12,7 +12,7 @@ export async function GET() {
   // ones still pending admin review or already approved.
   const requests = await prisma.bookRequest.findMany({
     where: { userId, status: { in: ["PENDING", "APPROVED"] } },
-    include: { book: { select: { id: true, title: true } } },
+    include: { book: { select: { id: true, title: true, subject: true, className: true, category: { select: { name: true } }, board: { select: { name: true } } } } },
     orderBy: { createdAt: "desc" },
   });
 

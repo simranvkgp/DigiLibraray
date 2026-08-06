@@ -25,6 +25,8 @@ export interface BookNameOption {
   name: string;
   className: string | null;
   author: string | null;
+  medium: string | null;
+  institutionName: string | null;
 }
 
 export const statusVariant: Record<BookSuggestionStatus, "warning" | "success" | "destructive"> = {
@@ -67,6 +69,14 @@ export function useBookRequests() {
       .then((data) => setAccessRequests(data.requests ?? []));
   }, [loadSuggestions]);
 
+  async function searchBookNames(q: string) {
+    const url = q ? `/api/book-names?q=${encodeURIComponent(q)}` : `/api/book-names`;
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json().catch(() => ({}));
+    setBookNames(data.bookNames ?? []);
+  }
+
   async function onSubmit(data: BookSuggestionInput, onSuccess?: () => void) {
     setError(false);
     const res = await fetch("/api/book-suggestions", {
@@ -89,6 +99,7 @@ export function useBookRequests() {
     suggestions,
     accessRequests,
     bookNames,
+    searchBookNames,
     error,
     register,
     setValue,

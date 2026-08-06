@@ -125,6 +125,7 @@ export const admin = {
     "admin.suggestions.giveAccess": "Give access",
     "admin.suggestions.addBookFirst": "Please add the book in the library first, then come back here to give access.",
     "admin.suggestions.noBooksFound": "No matching book found in the library. Please add it in Books first.",
+    "admin.suggestions.bookNameMatches": "Catalog matches",
     "admin.suggestions.mailSent": "Access granted — email sent",
     "admin.suggestions.reject": "Reject",
     "admin.suggestions.empty": "No new book requests in this view.",

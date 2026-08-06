@@ -65,6 +65,7 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
   const [rejectNote, setRejectNote] = useState("");
   const [rejectOpenId, setRejectOpenId] = useState<string | null>(null);
   const [books, setBooks] = useState<AdminBookOption[]>([]);
+  const [bookNamesAdmin, setBookNamesAdmin] = useState<any[]>([]);
   const [accessOpenId, setAccessOpenId] = useState<string | null>(null);
   const [accessError, setAccessError] = useState<string | null>(null);
   const [mailSentId, setMailSentId] = useState<string | null>(null);
@@ -82,6 +83,7 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
   useEffect(() => {
     load();
     fetch("/api/admin/books").then((r) => r.json()).then((d) => setBooks(d.books ?? []));
+    fetch("/api/admin/book-names").then((r) => r.json()).then((d) => setBookNamesAdmin(d.bookNames ?? []));
   }, [load]);
 
   function openAccess(id: string) {
@@ -215,6 +217,21 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                                   </Button>
                                 </div>
                               ))}
+                                {bookNamesAdmin.length > 0 && (
+                                  <div className="mt-3">
+                                    <p className="mb-2 text-sm font-medium">{t("admin.suggestions.bookNameMatches")}</p>
+                                    {bookNamesAdmin
+                                      .filter((bn) => bn.name.toLowerCase().includes(s.title.toLowerCase()))
+                                      .map((bn) => (
+                                        <div key={bn.id} className="rounded-lg border border-border p-3">
+                                          <p className="truncate text-sm font-medium">{bn.name}</p>
+                                          <p className="truncate text-xs text-text-secondary">
+                                            {[bn.className, bn.medium, bn.institution?.name].filter(Boolean).join(" · ")}
+                                          </p>
+                                        </div>
+                                      ))}
+                                  </div>
+                                )}
                               {relatedBooks(s.title, books).length === 0 && (
                                 <p className="p-3 text-sm text-text-secondary">{t("admin.suggestions.noBooksFound")}</p>
                               )}
