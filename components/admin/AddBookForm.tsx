@@ -87,8 +87,13 @@ export function AddBookForm({ onCreated, lang = "en" }: { onCreated: () => void;
         {errors.title && <p className="mt-1 text-xs text-brandred">{errors.title.message}</p>}
       </div>
       <div>
-        <Label htmlFor="subject">{t("admin.field.subject")}</Label>
-        <Input id="subject" className="mt-1.5" {...register("subject")} />
+        <Label htmlFor="medium">{t("admin.field.medium")}</Label>
+        <select id="medium" className="mt-1.5 h-10 w-full rounded-lg border border-border bg-card px-3 text-sm" {...register("subject")}> 
+          <option value="">{t("admin.common.selectPlaceholder")}</option>
+          <option value="Hindi">Hindi</option>
+          <option value="Punjabi">Punjabi</option>
+          <option value="English">English</option>
+        </select>
         {errors.subject && <p className="mt-1 text-xs text-brandred">{errors.subject.message}</p>}
       </div>
 
