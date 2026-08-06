@@ -22,7 +22,7 @@ interface AdminBookRequestRow {
   createdAt: string;
   resolvedAt: string | null;
   user: { id: string; name: string; email: string; institution: string; category: string; board: string };
-  book: { id: string; title: string; subject: string | null; className: string | null; coverImageUrl: string | null; board?: { name: string } | null };
+  book: { id: string; title: string; subject: string | null; className: string | null; coverImageUrl: string | null; category: string; board: string };
 }
 
 const statusVariant: Record<string, "warning" | "success" | "destructive"> = {
@@ -121,7 +121,7 @@ export function BookRequestsTable({ lang = "en" }: { lang?: Lang }) {
                   <td className="p-3">
                     <p className="font-medium">{r.book.title}</p>
                     <p className="text-xs text-text-secondary">
-                      {[r.book.subject, r.book.className, r.book.board?.name].filter(Boolean).join(" · ")}
+                      {[r.book.subject, r.book.className, r.book.category, r.book.board].filter(Boolean).join(" · ")}
                     </p>
                   </td>
                   <td className="hidden p-3 max-w-xs md:table-cell">

@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     where: status ? { status } : undefined,
     include: {
       user: { include: { institution: true, category: true, board: true } },
-      book: true,
+      book: { include: { category: true, board: true } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -43,6 +43,8 @@ export async function GET(req: Request) {
         subject: r.book.subject,
         className: r.book.className,
         coverImageUrl: r.book.coverImageUrl,
+        category: r.book.category?.name ?? "—",
+        board: r.book.board?.name ?? "—",
       },
     })),
   });
