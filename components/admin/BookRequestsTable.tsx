@@ -66,6 +66,13 @@ export function BookRequestsTable({ lang = "en" }: { lang?: Lang }) {
     setBusyId(null);
   }
 
+  async function deleteRequest(id: string) {
+    setBusyId(id);
+    await fetch(`/api/admin/book-requests/${id}`, { method: "DELETE" });
+    await load();
+    setBusyId(null);
+  }
+
   async function reject(id: string) {
     setBusyId(id);
     await fetch(`/api/admin/book-requests/${id}/reject`, {
@@ -135,47 +142,66 @@ export function BookRequestsTable({ lang = "en" }: { lang?: Lang }) {
                     <Badge variant={statusVariant[r.status] ?? "warning"}>{t(statusKey[r.status] ?? "admin.status.pending")}</Badge>
                   </td>
                   <td className="p-3 text-right">
-                    {r.status === "PENDING" && (
-                      <div className="flex justify-end gap-1.5">
+                    <div className="flex justify-end gap-1.5 flex-wrap">
+                      {r.status === "PENDING" && (
+                        <>
+                          <Button size="sm" variant="success" disabled={busyId === r.id} onClick={() => approve(r.id)}>
+                            {t("admin.requests.approve")}
+                          </Button>
+                          <Dialog
+                            open={rejectOpenId === r.id}
+                            onOpenChange={(open) => {
+                              setRejectOpenId(open ? r.id : null);
+                              if (!open) setRejectNote("");
+                            }}
+                          >
+                            <DialogTrigger asChild>
+                              <Button size="sm" variant="destructive" disabled={busyId === r.id}>
+                                {t("admin.requests.reject")}
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>{t("admin.requests.reject")}</DialogTitle>
+                                <DialogDescription>{r.book.title} — {r.user.name}</DialogDescription>
+                              </DialogHeader>
+                              <textarea
+                                rows={3}
+                                placeholder={t("admin.requests.rejectReason")}
+                                value={rejectNote}
+                                onChange={(e) => setRejectNote(e.target.value)}
+                                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm font-body placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentblue"
+                              />
+                              <Button
+                                className="mt-4 w-full"
+                                variant="destructive"
+                                disabled={busyId === r.id}
+                                onClick={() => reject(r.id)}
+                              >
+                                {t("admin.requests.rejectSubmit")}
+                              </Button>
+                            </DialogContent>
+                          </Dialog>
+                        </>
+                      )}
+                      {r.status === "APPROVED" && (
                         <Button size="sm" variant="success" disabled={busyId === r.id} onClick={() => approve(r.id)}>
-                          {t("admin.requests.approve")}
+                          {t("admin.requests.reaccess")}
                         </Button>
-                        <Dialog
-                          open={rejectOpenId === r.id}
-                          onOpenChange={(open) => {
-                            setRejectOpenId(open ? r.id : null);
-                            if (!open) setRejectNote("");
-                          }}
-                        >
-                          <DialogTrigger asChild>
-                            <Button size="sm" variant="destructive" disabled={busyId === r.id}>
-                              {t("admin.requests.reject")}
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>{t("admin.requests.reject")}</DialogTitle>
-                              <DialogDescription>{r.book.title} — {r.user.name}</DialogDescription>
-                            </DialogHeader>
-                            <textarea
-                              rows={3}
-                              placeholder={t("admin.requests.rejectReason")}
-                              value={rejectNote}
-                              onChange={(e) => setRejectNote(e.target.value)}
-                              className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm font-body placeholder:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentblue"
-                            />
-                            <Button
-                              className="mt-4 w-full"
-                              variant="destructive"
-                              disabled={busyId === r.id}
-                              onClick={() => reject(r.id)}
-                            >
-                              {t("admin.requests.rejectSubmit")}
-                            </Button>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    )}
+                      )}
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        disabled={busyId === r.id}
+                        onClick={() => {
+                          if (window.confirm(t("admin.requests.confirmDelete"))) {
+                            deleteRequest(r.id);
+                          }
+                        }}
+                      >
+                        {t("admin.requests.delete")}
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -117,6 +117,9 @@ export const admin = {
     "admin.requests.reject": "Reject",
     "admin.requests.rejectReason": "Reason (optional)",
     "admin.requests.rejectSubmit": "Confirm reject",
+    "admin.requests.reaccess": "Reaccess",
+    "admin.requests.delete": "Delete",
+    "admin.requests.confirmDelete": "Delete this request?",
     "admin.requests.empty": "No requests in this view.",
 
     // New book suggestions (books not yet in the library)
