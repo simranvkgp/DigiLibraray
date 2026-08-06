@@ -109,6 +109,8 @@ export const admin = {
     "admin.requests.subtitle": "Review new book requests from users and grant access once the book is in the library.",
     "admin.requests.col.user": "User",
     "admin.requests.col.book": "Book",
+    "admin.requests.col.medium": "Medium",
+    "admin.requests.col.institutionBoard": "Institution / Board",
     "admin.requests.col.note": "Note",
     "admin.requests.col.requested": "Requested",
     "admin.requests.approve": "Approve",

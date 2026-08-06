@@ -45,6 +45,14 @@ function relatedBooks(requestedTitle: string, books: AdminBookOption[]) {
   });
 }
 
+function findSuggestionMedium(title: string, bookNames: any[]) {
+  const normalizedTitle = title.toLowerCase().trim();
+  const exact = bookNames.find((bn) => bn.name?.toLowerCase().trim() === normalizedTitle);
+  if (exact) return exact.medium ?? "—";
+  const partial = bookNames.find((bn) => bn.name?.toLowerCase().trim().includes(normalizedTitle) || normalizedTitle.includes(bn.name?.toLowerCase().trim() ?? ""));
+  return partial?.medium ?? "—";
+}
+
 const statusVariant: Record<string, "warning" | "success" | "destructive"> = {
   PENDING: "warning",
   ADDED: "success",
@@ -147,6 +155,8 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
             <tr>
               <th className="p-3 font-medium">{t("admin.requests.col.user")}</th>
               <th className="p-3 font-medium">{t("admin.suggestions.col.book")}</th>
+              <th className="hidden p-3 font-medium md:table-cell">{t("admin.requests.col.medium")}</th>
+              <th className="hidden p-3 font-medium md:table-cell">{t("admin.requests.col.institutionBoard")}</th>
               <th className="hidden p-3 font-medium md:table-cell">{t("admin.requests.col.note")}</th>
               <th className="hidden p-3 font-medium md:table-cell">{t("admin.requests.col.requested")}</th>
               <th className="p-3 font-medium">{t("admin.table.status")}</th>
@@ -169,6 +179,12 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                     <p className="text-xs text-text-secondary">
                       {[s.author, s.subject, s.className].filter(Boolean).join(" · ") || "—"}
                     </p>
+                  </td>
+                  <td className="hidden p-3 text-xs text-text-secondary md:table-cell">
+                    {findSuggestionMedium(s.title, bookNamesAdmin)}
+                  </td>
+                  <td className="hidden p-3 text-xs text-text-secondary md:table-cell">
+                    {bookNamesAdmin.find((bn) => bn.name?.toLowerCase().trim() === s.title.toLowerCase().trim())?.institutionName ?? "—"}
                   </td>
                   <td className="hidden p-3 max-w-xs md:table-cell">
                     <p className="text-xs text-text-secondary">{s.note || "—"}</p>
