@@ -15,8 +15,8 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
   const suggestion = await prisma.bookSuggestion.findUnique({ where: { id: params.id } });
   if (!suggestion) return NextResponse.json({ error: "Suggestion not found" }, { status: 404 });
-  if (suggestion.status !== "PENDING") {
-    return NextResponse.json({ error: "That suggestion has already been resolved" }, { status: 409 });
+  if (suggestion.status === "REJECTED") {
+    return NextResponse.json({ error: "That suggestion has already been rejected" }, { status: 409 });
   }
 
   const { bookId } = await req.json();
