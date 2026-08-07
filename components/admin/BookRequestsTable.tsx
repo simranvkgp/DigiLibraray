@@ -37,7 +37,13 @@ const statusKey: Record<string, string> = {
   REJECTED: "admin.status.rejected",
 };
 
-export function BookRequestsTable({ lang = "en" }: { lang?: Lang }) {
+export function BookRequestsTable({
+  lang = "en",
+  onEmptyChange,
+}: {
+  lang?: Lang;
+  onEmptyChange?: (isEmpty: boolean) => void;
+}) {
   const [requests, setRequests] = useState<AdminBookRequestRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
@@ -51,9 +57,13 @@ export function BookRequestsTable({ lang = "en" }: { lang?: Lang }) {
     const qs = filter ? `?status=${filter}` : "";
     fetch(`/api/admin/book-requests${qs}`)
       .then((r) => r.json())
-      .then((data) => setRequests(data.requests ?? []))
+      .then((data) => {
+        const list = data.requests ?? [];
+        setRequests(list);
+        if (!filter) onEmptyChange?.(list.length === 0);
+      })
       .finally(() => setLoading(false));
-  }, [filter]);
+  }, [filter, onEmptyChange]);
 
   useEffect(() => {
     load();
