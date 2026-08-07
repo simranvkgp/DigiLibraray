@@ -27,6 +27,7 @@ export async function GET(req: Request) {
       author: s.author,
       subject: s.subject,
       className: s.className,
+      medium: s.medium,
       note: s.note,
       status: s.status,
       adminNote: s.adminNote,

@@ -32,6 +32,7 @@ export function RequestBookHeroButton({
     searchBookNames,
     error,
     register,
+    setValue,
     handleSubmit,
     isSubmitting,
     onSubmit,
@@ -39,6 +40,16 @@ export function RequestBookHeroButton({
   } = useBookRequests();
   const [filter, setFilter] = useState("");
   const [debounceTimer, setDebounceTimer] = useState<number | null>(null);
+  const [selectedTitle, setSelectedTitle] = useState("");
+
+  const mediumOptions = Array.from(
+    new Set(
+      bookNames
+        .filter((b) => b.name === selectedTitle)
+        .map((b) => b.medium)
+        .filter((m): m is string => !!m)
+    )
+  );
 
   // Load initial list when dialog opens
   function onOpenChange(open: boolean) {
@@ -92,7 +103,12 @@ export function RequestBookHeroButton({
                 id="hb-title"
                 defaultValue=""
                 className="mt-1.5 flex h-10 w-full rounded-lg border border-border bg-card px-3 text-sm font-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentblue"
-                {...register("title")}
+                {...register("title", {
+                  onChange: (e) => {
+                    setSelectedTitle(e.target.value);
+                    setValue("medium", "");
+                  },
+                })}
               >
                 <option value="" disabled>
                   {t("dashboard.requestBook.selectPlaceholder")}
@@ -107,6 +123,26 @@ export function RequestBookHeroButton({
                 ))}
               </select>
             </div>
+            {mediumOptions.length > 0 && (
+              <div>
+                <Label htmlFor="hb-medium">{t("dashboard.requestBook.mediumLabel")}</Label>
+                <select
+                  id="hb-medium"
+                  defaultValue=""
+                  className="mt-1.5 flex h-10 w-full rounded-lg border border-border bg-card px-3 text-sm font-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentblue"
+                  {...register("medium")}
+                >
+                  <option value="" disabled>
+                    {t("dashboard.requestBook.mediumPlaceholder")}
+                  </option>
+                  {mediumOptions.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div>
               <Label htmlFor="hb-note">{t("dashboard.requestBook.noteLabel")}</Label>
               <textarea

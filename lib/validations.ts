@@ -66,6 +66,7 @@ export const bookSuggestionSchema = z.object({
   author: z.string().trim().max(200).optional().or(z.literal("")),
   subject: z.string().trim().max(100).optional().or(z.literal("")),
   className: z.string().trim().max(100).optional().or(z.literal("")),
+  medium: z.string().trim().max(50).optional().or(z.literal("")),
   note: z.string().trim().max(500).optional().or(z.literal("")),
 });
 export type BookSuggestionInput = z.infer<typeof bookSuggestionSchema>;

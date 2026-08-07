@@ -264,6 +264,7 @@ model BookSuggestion {
   author       String?
   subject      String?
   className    String?
+  medium       String?
   note         String?
   status       String    @default("PENDING") // PENDING | ADDED | REJECTED
   createdAt    DateTime  @default(now())

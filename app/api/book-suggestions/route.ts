@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   const body = await req.json();
   const parsed = bookSuggestionSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
-  const { title, author, subject, className, note } = parsed.data;
+  const { title, author, subject, className, medium, note } = parsed.data;
 
   const suggestion = await prisma.bookSuggestion.create({
     data: {
@@ -34,6 +34,7 @@ export async function POST(req: Request) {
       author: author || null,
       subject: subject || null,
       className: className || null,
+      medium: medium || null,
       note: note || null,
     },
   });

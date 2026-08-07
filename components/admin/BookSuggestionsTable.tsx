@@ -20,6 +20,7 @@ interface AdminBookSuggestionRow {
   author: string | null;
   subject: string | null;
   className: string | null;
+  medium: string | null;
   status: string;
   note: string | null;
   adminNote: string | null;
@@ -43,14 +44,6 @@ function relatedBooks(requestedTitle: string, books: AdminBookOption[]) {
     const title = b.title.toLowerCase();
     return words.some((w) => title.includes(w));
   });
-}
-
-function findSuggestionMedium(title: string, bookNames: any[]) {
-  const normalizedTitle = title.toLowerCase().trim();
-  const exact = bookNames.find((bn) => bn.name?.toLowerCase().trim() === normalizedTitle);
-  if (exact) return exact.medium ?? "—";
-  const partial = bookNames.find((bn) => bn.name?.toLowerCase().trim().includes(normalizedTitle) || normalizedTitle.includes(bn.name?.toLowerCase().trim() ?? ""));
-  return partial?.medium ?? "—";
 }
 
 const statusVariant: Record<string, "warning" | "success" | "destructive"> = {
@@ -188,7 +181,7 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                     </p>
                   </td>
                   <td className="hidden p-3 text-xs text-text-secondary md:table-cell">
-                    {findSuggestionMedium(s.title, bookNamesAdmin)}
+                    {s.medium ?? "—"}
                   </td>
                   <td className="hidden p-3 text-xs text-text-secondary md:table-cell">
                     {bookNamesAdmin.find((bn) => bn.name?.toLowerCase().trim() === s.title.toLowerCase().trim())?.institutionName ?? "—"}
