@@ -133,6 +133,13 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
     setBusyId(null);
   }
 
+  async function deleteSuggestion(id: string) {
+    setBusyId(id);
+    await fetch(`/api/admin/book-suggestions/${id}`, { method: "DELETE" });
+    await load();
+    setBusyId(null);
+  }
+
   return (
     <div>
       <div className="mb-4 flex gap-2">
@@ -200,15 +207,15 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                     {mailSentId === s.id && (
                       <p className="text-xs font-medium text-success">{t("admin.suggestions.mailSent")}</p>
                     )}
-                    {s.status === "PENDING" && (
-                      <div className="flex justify-end gap-1.5">
+                    <div className="flex justify-end gap-1.5 flex-wrap">
+                      {(s.status === "PENDING" || s.status === "ADDED") && (
                         <Dialog
                           open={accessOpenId === s.id}
                           onOpenChange={(open) => (open ? openAccess(s.id) : setAccessOpenId(null))}
                         >
                           <DialogTrigger asChild>
                             <Button size="sm" variant="success" disabled={busyId === s.id}>
-                              {t("admin.suggestions.access")}
+                              {s.status === "ADDED" ? t("admin.requests.reaccess") : t("admin.suggestions.access")}
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
@@ -255,6 +262,8 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                             {accessError && <p className="mt-2 text-sm text-brandred">{accessError}</p>}
                           </DialogContent>
                         </Dialog>
+                      )}
+                      {s.status === "PENDING" && (
                         <Dialog
                           open={rejectOpenId === s.id}
                           onOpenChange={(open) => {
@@ -289,8 +298,20 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                             </Button>
                           </DialogContent>
                         </Dialog>
-                      </div>
-                    )}
+                      )}
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        disabled={busyId === s.id}
+                        onClick={() => {
+                          if (window.confirm(t("admin.requests.confirmDelete"))) {
+                            deleteSuggestion(s.id);
+                          }
+                        }}
+                      >
+                        {t("admin.requests.delete")}
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
