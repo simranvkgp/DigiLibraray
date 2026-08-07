@@ -30,17 +30,18 @@ export function RequestAccessDialog({
     reset,
     formState: { isSubmitting },
   } = useForm<BookRequestInput>({ resolver: zodResolver(bookRequestSchema), defaultValues: { bookId: book.id } });
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function onSubmit(data: BookRequestInput) {
-    setError(false);
+    setErrorMessage("");
     const res = await fetch("/api/book-requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ bookId: book.id, note: data.note }),
     });
     if (!res.ok) {
-      setError(true);
+      const payload = await res.json().catch(() => null);
+      setErrorMessage(payload?.error || t("requestDialog.error"));
       return;
     }
     onChange?.("PENDING");
@@ -81,7 +82,7 @@ export function RequestAccessDialog({
               {...register("note")}
             />
           </div>
-          {error && <p className="text-sm text-brandred">{t("requestDialog.error")}</p>}
+          {errorMessage && <p className="text-sm text-brandred">{errorMessage}</p>}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? t("requestDialog.submitting") : t("requestDialog.submit")}
           </Button>
