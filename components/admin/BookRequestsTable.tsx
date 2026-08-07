@@ -44,31 +44,47 @@ export function BookRequestsTable({ lang = "en" }: { lang?: Lang }) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [rejectNote, setRejectNote] = useState("");
   const [rejectOpenId, setRejectOpenId] = useState<string | null>(null);
-  const t = (key: string) => translate(lang, key);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const t = useCallback((key: string) => translate(lang, key), [lang]);
 
   const load = useCallback(() => {
     setLoading(true);
+    setErrorMessage(null);
     const qs = filter ? `?status=${filter}` : "";
-    fetch(`/api/admin/book-requests${qs}`)
-      .then((r) => r.json())
+    fetch(`/api/admin/book-requests${qs}`, { credentials: "same-origin" })
+      .then(async (r) => {
+        if (!r.ok) {
+          const payload = await r.json().catch(() => null);
+          throw new Error(payload?.error || translate(lang, "admin.requests.loadError") || "Failed to load requests");
+        }
+        return r.json();
+      })
       .then((data) => setRequests(data.requests ?? []))
+      .catch((err) => setErrorMessage(err.message || translate(lang, "admin.requests.loadError") || "Failed to load requests"))
       .finally(() => setLoading(false));
-  }, [filter]);
+  }, [filter, lang]);
 
   useEffect(() => {
     load();
   }, [load]);
 
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      load();
+    }, 15000);
+    return () => window.clearInterval(interval);
+  }, [load]);
+
   async function approve(id: string) {
     setBusyId(id);
-    await fetch(`/api/admin/book-requests/${id}/approve`, { method: "POST" });
+    await fetch(`/api/admin/book-requests/${id}/approve`, { method: "POST", credentials: "same-origin" });
     await load();
     setBusyId(null);
   }
 
   async function deleteRequest(id: string) {
     setBusyId(id);
-    await fetch(`/api/admin/book-requests/${id}`, { method: "DELETE" });
+    await fetch(`/api/admin/book-requests/${id}`, { method: "DELETE", credentials: "same-origin" });
     await load();
     setBusyId(null);
   }
@@ -77,6 +93,7 @@ export function BookRequestsTable({ lang = "en" }: { lang?: Lang }) {
     setBusyId(id);
     await fetch(`/api/admin/book-requests/${id}/reject`, {
       method: "POST",
+      credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ adminNote: rejectNote }),
     });
@@ -208,7 +225,10 @@ export function BookRequestsTable({ lang = "en" }: { lang?: Lang }) {
           </tbody>
         </table>
         {loading && <p className="p-6 text-center text-sm text-text-secondary">{t("action.loading")}</p>}
-        {!loading && requests.length === 0 && (
+        {!loading && errorMessage && (
+          <p className="p-6 text-center text-sm text-brandred">{errorMessage}</p>
+        )}
+        {!loading && !errorMessage && requests.length === 0 && (
           <p className="p-6 text-center text-sm text-text-secondary">{t("admin.requests.empty")}</p>
         )}
       </div>
