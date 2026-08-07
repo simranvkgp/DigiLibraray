@@ -54,23 +54,37 @@ export function RegistrationForm({
   }
 
   async function onSubmit(data: RegistrationInput) {
+    if (!data.idCardUrl) {
+      setError("idCardUrl", { message: t("register.idCardRequired") });
+      return;
+    }
+
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
+
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      let message = t("register.genericError");
-      if (err) {
-        if (typeof err.error === "string") message = err.error;
-        else if (err.error?.formErrors && err.error.formErrors.length) message = err.error.formErrors[0];
-        else if (err.error) message = typeof err.error === "object" ? JSON.stringify(err.error) : String(err.error);
-        else if (err.message) message = String(err.message);
+      const errorBody = await res.json().catch(() => ({}));
+      const validationError = errorBody?.error;
+
+      if (validationError?.fieldErrors) {
+        for (const field of Object.keys(validationError.fieldErrors)) {
+          const message = validationError.fieldErrors[field]?.[0];
+          if (message) {
+            setError(field as keyof RegistrationInput, { message });
+          }
+        }
+      } else if (typeof validationError === "string") {
+        setError("root", { message: validationError });
+      } else {
+        setError("root", { message: t("register.genericError") });
       }
-      setError("root", { message });
+
       return;
     }
+
     // The session cookie still has the pre-registration approvalStatus baked
     // in; refresh it so middleware doesn't bounce us back to /register.
     // `update()` with no argument is a no-op GET — passing a (even empty)
@@ -97,7 +111,7 @@ export function RegistrationForm({
 
       <div>
         <Label htmlFor="mobileNumber">{t("register.mobileLabel")}</Label>
-        <Input id="mobileNumber" placeholder="9876543210" className="mt-1.5" {...register("mobileNumber")} />
+        <Input id="mobileNumber" className="mt-1.5" {...register("mobileNumber")} />
         {errors.mobileNumber && <p className="mt-1 text-xs text-brandred">{errors.mobileNumber.message}</p>}
       </div>
 
@@ -105,7 +119,6 @@ export function RegistrationForm({
         <Label htmlFor="institutionName">{t("register.institutionLabel")}</Label>
         <Input
           id="institutionName"
-          placeholder={t("register.institutionPlaceholder")}
           className="mt-1.5"
           {...register("institutionName")}
         />
@@ -126,6 +139,7 @@ export function RegistrationForm({
       </div>
 
       <div>
+        <input type="hidden" {...register("idCardUrl")} />
         <Label>{t("register.idCardLabel")}</Label>
         <p className="mt-0.5 text-xs text-text-secondary">{t("register.idCardHint")}</p>
         <div className="mt-1.5 flex items-center gap-3">
