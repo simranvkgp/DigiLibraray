@@ -10,15 +10,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const userId = (session?.user as any)?.id as string | undefined;
   const lang = await getUserLanguage(userId);
   const t = (key: string) => translate(lang, key);
-  const [pendingSuggestionCount, pendingUserCount] = await Promise.all([
-    prisma.bookSuggestion.count({ where: { status: "PENDING" } }),
+  const [pendingRequestCount, pendingUserCount] = await Promise.all([
+    prisma.bookRequest.count({ where: { status: "PENDING" } }),
     prisma.user.count({ where: { approvalStatus: "PENDING" } }),
   ]);
 
   const modules: AdminNavModule[] = [
     { href: "/admin/dashboard", label: t("nav.dashboard"), icon: "LayoutDashboard", group: t("admin.nav.group.overview") },
     { href: "/admin/books", label: t("admin.nav.books"), icon: "BookOpen", group: t("admin.nav.group.content") },
-    { href: "/admin/requests", label: t("admin.nav.requests"), icon: "Inbox", badge: pendingSuggestionCount, group: t("admin.nav.group.content") },
+    { href: "/admin/requests", label: t("admin.nav.requests"), icon: "Inbox", badge: pendingRequestCount, group: t("admin.nav.group.content") },
     { href: "/admin/book-names", label: t("admin.nav.bookNames"), icon: "ListPlus", group: t("admin.nav.group.content") },
     { href: "/admin/boards", label: t("admin.nav.boards"), icon: "GraduationCap", group: t("admin.nav.group.content") },
     { href: "/admin/categories", label: t("admin.nav.categories"), icon: "Boxes", group: t("admin.nav.group.content") },
