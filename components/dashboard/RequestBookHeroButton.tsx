@@ -41,6 +41,15 @@ export function RequestBookHeroButton({
   const [filter, setFilter] = useState("");
   const [debounceTimer, setDebounceTimer] = useState<number | null>(null);
   const [selectedTitle, setSelectedTitle] = useState("");
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+
+  function selectBook(name: string) {
+    setFilter(name);
+    setValue("title", name);
+    setSelectedTitle(name);
+    setValue("medium", "");
+    setSuggestionsOpen(false);
+  }
 
   const mediumOptions = Array.from(
     new Set(
@@ -81,47 +90,52 @@ export function RequestBookHeroButton({
             )}
             className="space-y-4"
           >
-            <div>
-              <Label htmlFor="hb-search">Search</Label>
+            <div className="relative">
+              <Label htmlFor="hb-search">{t("dashboard.requestBook.selectLabel")}</Label>
               <input
                 id="hb-search"
                 value={filter}
+                onFocus={() => setSuggestionsOpen(true)}
+                onBlur={() => window.setTimeout(() => setSuggestionsOpen(false), 100)}
                 onChange={(e) => {
                   const v = e.target.value;
                   setFilter(v);
+                  setValue("title", "");
+                  setSelectedTitle("");
+                  setSuggestionsOpen(true);
                   if (debounceTimer) window.clearTimeout(debounceTimer);
                   const tId = window.setTimeout(() => searchBookNames(v), 250);
                   setDebounceTimer(tId);
                 }}
                 placeholder={t("dashboard.requestBook.searchPlaceholder")}
                 className="mt-1.5 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm"
+                autoComplete="off"
               />
-            </div>
-            <div>
-              <Label htmlFor="hb-title">{t("dashboard.requestBook.selectLabel")}</Label>
-              <select
-                id="hb-title"
-                defaultValue=""
-                className="mt-1.5 flex h-10 w-full rounded-lg border border-border bg-card px-3 text-sm font-body focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentblue"
-                {...register("title", {
-                  onChange: (e) => {
-                    setSelectedTitle(e.target.value);
-                    setValue("medium", "");
-                  },
-                })}
-              >
-                <option value="" disabled>
-                  {t("dashboard.requestBook.selectPlaceholder")}
-                </option>
-                {bookNames.map((b) => (
-                  <option key={b.id} value={b.name}>
-                    {b.name}
-                    {([b.className, b.author, b.medium, b.institutionName].filter(Boolean).length > 0
-                      ? ` (${[b.className, b.author, b.medium, b.institutionName].filter(Boolean).join(" • ")})`
-                      : "")}
-                  </option>
-                ))}
-              </select>
+              <input type="hidden" {...register("title")} />
+              {suggestionsOpen && (
+                <div className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-border bg-card shadow-lg">
+                  {bookNames.length === 0 ? (
+                    <p className="p-3 text-sm text-text-secondary">{t("dashboard.requestBook.noMatches")}</p>
+                  ) : (
+                    bookNames.map((b) => (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => selectBook(b.name)}
+                        className="block w-full px-3 py-2 text-left text-sm hover:bg-background"
+                      >
+                        <p className="font-medium">{b.name}</p>
+                        {[b.className, b.author, b.medium, b.institutionName].filter(Boolean).length > 0 && (
+                          <p className="text-xs text-text-secondary">
+                            {[b.className, b.author, b.medium, b.institutionName].filter(Boolean).join(" • ")}
+                          </p>
+                        )}
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
             {mediumOptions.length > 0 && (
               <div>
