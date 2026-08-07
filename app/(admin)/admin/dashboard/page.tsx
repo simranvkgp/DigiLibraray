@@ -19,13 +19,13 @@ export default async function AdminDashboardPage() {
   ]);
 
   return (
-    <div className="min-h-full bg-dash-cream p-8">
-      <div className="rounded-2xl bg-dash-navy px-6 py-8 shadow-card-hover sm:px-8">
-        <h1 className="font-display text-2xl font-medium text-white">{t("nav.dashboard")}</h1>
+    <div className="min-h-full bg-dash-cream">
+      <div className="rounded-2xl bg-dash-navy px-5 py-6 shadow-card-hover sm:px-8 sm:py-8">
+        <h1 className="font-display text-xl font-medium text-white sm:text-2xl">{t("nav.dashboard")}</h1>
         <p className="mt-1.5 text-sm text-white/75">{t("admin.dashboard.subtitle")}</p>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={Users} label={t("admin.dashboard.totalUsers")} value={totalUsers} tone="navy" />
         <StatCard
           icon={UserCheck}
