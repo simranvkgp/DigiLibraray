@@ -54,6 +54,31 @@ export function parseDriveLink(shareUrl: string): DriveLinkParts {
   };
 }
 
+const DRIVE_HOSTS = new Set(["drive.google.com", "docs.google.com"]);
+
+/**
+ * Resolves whatever link an admin pastes into the "book source" field.
+ * Google Drive links are parsed as before (parseDriveLink). Anything else
+ * is treated as a direct/live link to the file itself — the same URL is
+ * reused for preview and download since there's no separate Drive preview
+ * page to build. The /api/books/[id]/file proxy and the FLIPBOOK/HTML
+ * iframe both work unchanged against a live link: the proxy only kicks in
+ * its Drive-specific confirm-token handling when it sees an HTML
+ * interstitial, otherwise it streams whatever bytes come back.
+ */
+export function parseBookSourceLink(url: string): DriveLinkParts {
+  let host: string;
+  try {
+    host = new URL(url).hostname;
+  } catch {
+    throw new Error("Enter a valid URL.");
+  }
+
+  if (DRIVE_HOSTS.has(host)) return parseDriveLink(url);
+
+  return { fileId: url, previewUrl: url, downloadUrl: url };
+}
+
 export function formatReadingTime(minutes: number | null | undefined): string {
   if (!minutes) return "—";
   if (minutes < 60) return `${minutes} min`;

@@ -31,7 +31,7 @@ export const bookFormSchema = z.object({
   keywords: z.string().trim().optional(),
   categoryId: z.string().min(1, "Category is required"),
   boardId: z.string().min(1, "Board is required"),
-  driveShareUrl: z.string().url("Paste a valid Google Drive share link"),
+  driveShareUrl: z.string().url("Paste a valid Google Drive share link or a direct/live file link"),
   // Accepts either a pasted absolute URL or the Vercel Blob URL returned by
   // an upload (see app/api/admin/upload/route.ts).
   coverImageUrl: z

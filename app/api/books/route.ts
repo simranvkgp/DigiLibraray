@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { bookFormSchema } from "@/lib/validations";
-import { parseDriveLink } from "@/lib/utils";
+import { parseBookSourceLink } from "@/lib/utils";
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -83,7 +83,7 @@ export async function GET(req: Request) {
   });
 }
 
-// Admin-only: add a book via a pasted Google Drive share link.
+// Admin-only: add a book via a pasted Google Drive share link or a direct/live file link.
 export async function POST(req: Request) {
   const session = await auth();
   const user = session?.user as any;
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
 
   let driveParts;
   try {
-    driveParts = parseDriveLink(parsed.data.driveShareUrl);
+    driveParts = parseBookSourceLink(parsed.data.driveShareUrl);
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 400 });
   }

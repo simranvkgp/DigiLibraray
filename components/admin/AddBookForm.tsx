@@ -77,7 +77,13 @@ export function AddBookForm({ onCreated, lang = "en" }: { onCreated: () => void;
     <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div className="col-span-1 sm:col-span-2">
         <Label htmlFor="driveShareUrl">{t("admin.books.form.driveLink")}</Label>
-        <Input id="driveShareUrl" placeholder="https://drive.google.com/file/d/.../view?usp=sharing" className="mt-1.5" {...register("driveShareUrl")} />
+        <Input
+          id="driveShareUrl"
+          placeholder="https://drive.google.com/file/d/.../view?usp=sharing or https://example.com/book.pdf"
+          className="mt-1.5"
+          {...register("driveShareUrl")}
+        />
+        <p className="mt-1 text-xs text-text-secondary">{t("admin.books.form.driveLinkHint")}</p>
         {errors.driveShareUrl && <p className="mt-1 text-xs text-brandred">{errors.driveShareUrl.message}</p>}
       </div>
 
