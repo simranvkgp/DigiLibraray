@@ -37,13 +37,25 @@ interface AdminBookOption {
   board: { name: string };
 }
 
-function relatedBooks(requestedTitle: string, books: AdminBookOption[]) {
-  const words = requestedTitle.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 2);
-  if (words.length === 0) return books;
-  return books.filter((b) => {
+function bestMatchBook(requestedTitle: string, books: AdminBookOption[]): AdminBookOption | null {
+  const target = requestedTitle.toLowerCase().trim();
+  const exact = books.find((b) => b.title.toLowerCase().trim() === target);
+  if (exact) return exact;
+
+  const words = target.split(/[^a-z0-9]+/).filter((w) => w.length > 2);
+  if (words.length === 0) return null;
+
+  let best: AdminBookOption | null = null;
+  let bestScore = 0;
+  for (const b of books) {
     const title = b.title.toLowerCase();
-    return words.some((w) => title.includes(w));
-  });
+    const score = words.filter((w) => title.includes(w)).length;
+    if (score > bestScore) {
+      bestScore = score;
+      best = b;
+    }
+  }
+  return best;
 }
 
 const statusVariant: Record<string, "warning" | "success" | "destructive"> = {
@@ -217,40 +229,28 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                               <DialogDescription>{t("admin.suggestions.access")} — {s.user.name}</DialogDescription>
                             </DialogHeader>
                             <div className="mt-1 max-h-72 space-y-2 overflow-y-auto">
-                              {relatedBooks(s.title, books).map((b) => (
-                                <div key={b.id} className="rounded-lg border border-border p-3">
-                                  <p className="truncate text-sm font-medium">{b.title}</p>
-                                  <p className="truncate text-xs text-text-secondary">
-                                    {b.subject} · {b.category.name} / {b.board.name}
-                                  </p>
-                                  <Button
-                                    className="mt-2 w-full"
-                                    variant="success"
-                                    disabled={busyId === s.id}
-                                    onClick={() => giveAccess(s.id, b.id)}
-                                  >
-                                    {t("admin.suggestions.access")}
-                                  </Button>
-                                </div>
-                              ))}
-                                {bookNamesAdmin.length > 0 && (
-                                  <div className="mt-3">
-                                    <p className="mb-2 text-sm font-medium">{t("admin.suggestions.bookNameMatches")}</p>
-                                    {bookNamesAdmin
-                                      .filter((bn) => bn.name.toLowerCase().includes(s.title.toLowerCase()))
-                                      .map((bn) => (
-                                        <div key={bn.id} className="rounded-lg border border-border p-3">
-                                          <p className="truncate text-sm font-medium">{bn.name}</p>
-                                          <p className="truncate text-xs text-text-secondary">
-                                            {[bn.className, bn.medium, bn.institution?.name].filter(Boolean).join(" · ")}
-                                          </p>
-                                        </div>
-                                      ))}
+                              {(() => {
+                                const match = bestMatchBook(s.title, books);
+                                if (!match) {
+                                  return <p className="p-3 text-sm text-text-secondary">{t("admin.suggestions.noBooksFound")}</p>;
+                                }
+                                return (
+                                  <div className="rounded-lg border border-border p-3">
+                                    <p className="truncate text-sm font-medium">{match.title}</p>
+                                    <p className="truncate text-xs text-text-secondary">
+                                      {match.subject} · {match.category.name} / {match.board.name}
+                                    </p>
+                                    <Button
+                                      className="mt-2 w-full"
+                                      variant="success"
+                                      disabled={busyId === s.id}
+                                      onClick={() => giveAccess(s.id, match.id)}
+                                    >
+                                      {t("admin.suggestions.access")}
+                                    </Button>
                                   </div>
-                                )}
-                              {relatedBooks(s.title, books).length === 0 && (
-                                <p className="p-3 text-sm text-text-secondary">{t("admin.suggestions.noBooksFound")}</p>
-                              )}
+                                );
+                              })()}
                             </div>
                             {accessError && <p className="mt-2 text-sm text-brandred">{accessError}</p>}
                           </DialogContent>
