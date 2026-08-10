@@ -72,12 +72,12 @@ export function BookCard({
       </div>
 
       <div className="flex flex-1 flex-col">
-        <div className="flex items-start justify-between gap-2">
-          <div>
+        <div className="flex items-start justify-between gap-1">
+          <div className="min-w-0 flex-1">
             <p className="font-display text-base font-medium leading-tight text-dash-navy">{book.title}</p>
             <p className="mt-0.5 text-xs text-text-secondary">{book.subject}{book.className ? ` · ${book.className}` : ""}</p>
           </div>
-          <div className="flex gap-1 text-text-secondary">
+          <div className="flex flex-shrink-0 gap-0.5 text-text-secondary sm:gap-1">
             <Link href={`/library/${book.id}`} aria-label={t("bookCard.openToBookmark")} className="rounded p-1 hover:bg-background hover:text-dash-navy">
               <Bookmark size={16} />
             </Link>
