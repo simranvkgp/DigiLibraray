@@ -162,6 +162,10 @@ export const admin = {
     "admin.bookNames.removeAllConfirmBody": "Are you sure you want to delete all {count} book name(s)? This data cannot be recovered again.",
     "admin.bookNames.removeAllConfirmButton": "Yes, delete all",
     "admin.bookNames.removeAllError": "Couldn't remove all book names.",
+    "admin.bookNames.removeCategoryAll": "Remove all in {category}",
+    "admin.bookNames.removeCategoryConfirmTitle": "Delete all {category} book names?",
+    "admin.bookNames.removeCategoryConfirmBody": "Are you sure you want to delete all {count} book name(s) in {category}? Other categories are not affected. This data cannot be recovered again.",
+    "admin.bookNames.removeCategoryError": "Couldn't remove that category's book names.",
 
     // Categories page
     "admin.categories.subtitle": "Secondary, Senior Secondary, University, etc. Users choose one permanently at onboarding.",
@@ -380,6 +384,10 @@ export const admin = {
     "admin.bookNames.removeAllConfirmBody": "क्या आप वाकई सभी {count} पुस्तक नाम हटाना चाहते हैं? यह डेटा दोबारा वापस नहीं लाया जा सकता।",
     "admin.bookNames.removeAllConfirmButton": "हां, सभी हटाएं",
     "admin.bookNames.removeAllError": "सभी पुस्तक नाम हटाए नहीं जा सके।",
+    "admin.bookNames.removeCategoryAll": "{category} में सभी हटाएं",
+    "admin.bookNames.removeCategoryConfirmTitle": "{category} के सभी पुस्तक नाम हटाएं?",
+    "admin.bookNames.removeCategoryConfirmBody": "क्या आप वाकई {category} में सभी {count} पुस्तक नाम हटाना चाहते हैं? अन्य श्रेणियां प्रभावित नहीं होंगी। यह डेटा दोबारा वापस नहीं लाया जा सकता।",
+    "admin.bookNames.removeCategoryError": "उस श्रेणी के पुस्तक नाम हटाए नहीं जा सके।",
 
     // Categories page
     "admin.categories.subtitle": "माध्यमिक, वरिष्ठ माध्यमिक, विश्वविद्यालय, आदि। उपयोगकर्ता ऑनबोर्डिंग के दौरान स्थायी रूप से एक श्रेणी चुनते हैं।",

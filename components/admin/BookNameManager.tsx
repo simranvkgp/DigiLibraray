@@ -63,6 +63,8 @@ export function BookNameManager({ lang = "en" }: { lang?: Lang }) {
   const [removingAll, setRemovingAll] = useState(false);
   const [showRemoveAllConfirm, setShowRemoveAllConfirm] = useState(false);
   const [activeCategoryId, setActiveCategoryId] = useState("");
+  const [removeCategoryTarget, setRemoveCategoryTarget] = useState<CategoryOption | null>(null);
+  const [removingCategory, setRemovingCategory] = useState(false);
 
   const rowsByCategory = useMemo(() => {
     const map = new Map<string, Row[]>();
@@ -197,6 +199,20 @@ export function BookNameManager({ lang = "en" }: { lang?: Lang }) {
     setShowRemoveAllConfirm(false);
   }
 
+  async function confirmRemoveCategory() {
+    if (!removeCategoryTarget) return;
+    setRemovingCategory(true);
+    setError(null);
+    const res = await fetch(`/api/admin/book-names?categoryId=${removeCategoryTarget.id}`, { method: "DELETE" });
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      setError(d.error ?? t("admin.bookNames.removeCategoryError"));
+    }
+    await load();
+    setRemovingCategory(false);
+    setRemoveCategoryTarget(null);
+  }
+
   return (
     <div>
       <div className="mb-4 flex flex-wrap gap-2">
@@ -300,19 +316,31 @@ export function BookNameManager({ lang = "en" }: { lang?: Lang }) {
 
       {!loading && categories.length > 0 && (
         <div>
-          <div className="mb-4 flex gap-2 border-b border-border">
+          <div className="mb-4 flex flex-wrap gap-2 border-b border-border">
             {categories.map((c) => {
               const count = rowsByCategory.get(c.id)?.length ?? 0;
+              const isActive = activeCategoryId === c.id;
               return (
-                <button
+                <div
                   key={c.id}
-                  onClick={() => setActiveCategoryId(c.id)}
-                  className={`border-b-2 px-3 py-2 text-sm font-medium ${
-                    activeCategoryId === c.id ? "border-navy text-navy" : "border-transparent text-text-secondary"
-                  }`}
+                  className={`flex items-center gap-0.5 border-b-2 ${isActive ? "border-navy" : "border-transparent"}`}
                 >
-                  {c.name} ({count})
-                </button>
+                  <button
+                    onClick={() => setActiveCategoryId(c.id)}
+                    className={`px-3 py-2 text-sm font-medium ${isActive ? "text-navy" : "text-text-secondary"}`}
+                  >
+                    {c.name} ({count})
+                  </button>
+                  <button
+                    onClick={() => setRemoveCategoryTarget(c)}
+                    disabled={count === 0}
+                    aria-label={t("admin.bookNames.removeCategoryAll").replace("{category}", c.name)}
+                    title={t("admin.bookNames.removeCategoryAll").replace("{category}", c.name)}
+                    className="rounded p-1.5 text-text-secondary hover:bg-background hover:text-brandred disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-text-secondary"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -451,6 +479,29 @@ export function BookNameManager({ lang = "en" }: { lang?: Lang }) {
             </Button>
             <Button variant="destructive" disabled={removingAll} onClick={confirmRemoveAll}>
               {removingAll ? t("admin.bookNames.removingAll") : t("admin.bookNames.removeAllConfirmButton")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!removeCategoryTarget} onOpenChange={(o) => !removingCategory && !o && setRemoveCategoryTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t("admin.bookNames.removeCategoryConfirmTitle").replace("{category}", removeCategoryTarget?.name ?? "")}
+            </DialogTitle>
+            <DialogDescription>
+              {t("admin.bookNames.removeCategoryConfirmBody")
+                .replace("{count}", String(removeCategoryTarget ? rowsByCategory.get(removeCategoryTarget.id)?.length ?? 0 : 0))
+                .replace("{category}", removeCategoryTarget?.name ?? "")}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 pt-1">
+            <Button variant="outline" disabled={removingCategory} onClick={() => setRemoveCategoryTarget(null)}>
+              {t("action.cancel")}
+            </Button>
+            <Button variant="destructive" disabled={removingCategory} onClick={confirmRemoveCategory}>
+              {removingCategory ? t("admin.bookNames.removingAll") : t("admin.bookNames.removeAllConfirmButton")}
             </Button>
           </div>
         </DialogContent>

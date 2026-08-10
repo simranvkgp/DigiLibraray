@@ -41,9 +41,23 @@ export async function POST(req: Request) {
   return NextResponse.json({ bookName }, { status: 201 });
 }
 
-export async function DELETE() {
+export async function DELETE(req: Request) {
   const admin = await requireAdmin();
   if (!admin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const { searchParams } = new URL(req.url);
+  const categoryId = searchParams.get("categoryId");
+
+  // With no categoryId, wipe every category's book names — used by the
+  // page-level "Remove all" control. With one, scope the delete to just
+  // that category so clearing e.g. Secondary doesn't touch University.
+  if (categoryId) {
+    const category = await prisma.category.findUnique({ where: { id: categoryId } });
+    if (!category) return NextResponse.json({ error: "That category doesn't exist" }, { status: 400 });
+    const result = await prisma.requestableBookName.deleteMany({ where: { categoryId } });
+    return NextResponse.json({ deleted: result.count });
+  }
+
   const result = await prisma.requestableBookName.deleteMany({});
   return NextResponse.json({ deleted: result.count });
 }
