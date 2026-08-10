@@ -458,13 +458,16 @@ export function BookReader({
       }));
     if (rects.length === 0) return;
 
+    // Clamp so the popup never gets cut off near the screen edges on narrow devices.
     const anchorRect = range.getBoundingClientRect();
+    const rawX = anchorRect.left + anchorRect.width / 2;
+    const x = Math.min(Math.max(rawX, 56), window.innerWidth - 56);
     setSelectionPopup({
       pageNum,
       text: selection.toString().trim(),
       rects,
-      x: anchorRect.left + anchorRect.width / 2,
-      y: anchorRect.top,
+      x,
+      y: Math.max(anchorRect.top, 44),
     });
   }
 
@@ -556,16 +559,16 @@ export function BookReader({
       )}
 
       {/* Top bar */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 print:hidden">
-        <div className="flex min-w-0 items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-2.5 print:hidden sm:px-4 sm:py-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
           <Link href="/dashboard">
             <Button size="icon" variant="ghost" aria-label={t("reader.backToDashboard")}>
               <ArrowLeft size={16} />
             </Button>
           </Link>
-          <div className="min-w-0">
-            <p className="truncate font-display text-base font-medium text-navy">{book.title}</p>
-            <div className="mt-1 flex gap-1.5">
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-display text-sm font-medium text-navy sm:text-base">{book.title}</p>
+            <div className="mt-1 flex flex-wrap gap-1.5">
               <Badge variant="outline">{book.subject}</Badge>
               <Badge variant="default">{book.boardName}</Badge>
             </div>
@@ -577,8 +580,8 @@ export function BookReader({
         {/* Adobe-style vertical action rail, fixed to the right edge of the viewer */}
         {isViewable && (
           <div
-            className={`fixed top-1/2 z-30 flex -translate-y-1/2 flex-col items-center gap-1 rounded-2xl border border-border bg-background/95 p-2 shadow-lg backdrop-blur print:hidden ${
-              thumbsOpen && isPdf ? "right-44" : "right-4"
+            className={`fixed top-1/2 z-30 flex max-h-[90vh] -translate-y-1/2 flex-col items-center gap-1 overflow-y-auto rounded-2xl border border-border bg-background/95 p-1.5 shadow-lg backdrop-blur print:hidden sm:p-2 ${
+              thumbsOpen && isPdf ? "right-44" : "right-2 sm:right-4"
             }`}
           >
             <Button size="icon" variant="ghost" onClick={() => setZoom((z) => Math.min(2, z + 0.1))} aria-label={t("reader.zoomIn")}>
@@ -698,7 +701,7 @@ export function BookReader({
         )}
 
         {/* Viewer */}
-        <div ref={scrollAreaRef} className="flex-1 overflow-auto p-6">
+        <div ref={scrollAreaRef} className="flex-1 overflow-auto p-2 sm:p-6">
           {isPdf ? (
             <>
               {loadState === "loading" && (
@@ -860,7 +863,7 @@ export function BookReader({
 
       {/* Bottom bar: page navigation */}
       {isViewable && (
-        <div className="flex items-center justify-center gap-4 border-t border-border px-4 py-3 print:hidden">
+        <div className="flex items-center justify-center gap-2 border-t border-border px-3 py-2.5 print:hidden sm:gap-4 sm:px-4 sm:py-3">
           <Button
             size="icon"
             variant="ghost"
@@ -879,7 +882,7 @@ export function BookReader({
                 if (isPdf) scrollToPage(p);
                 else setPage(numPages ? Math.max(1, Math.min(numPages, p)) : Math.max(1, p));
               }}
-              className="w-14 rounded border border-border bg-card px-2 py-1 text-center"
+              className="w-12 rounded border border-border bg-card px-2 py-1 text-center sm:w-14"
             />
             <span className="text-text-secondary">/ {numPages ?? "—"}</span>
           </div>

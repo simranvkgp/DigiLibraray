@@ -28,26 +28,25 @@ export function DashboardTopBar({
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-dash-cream/95 backdrop-blur">
-      <div className="flex items-center gap-4 px-6 py-4">
+      <div className="flex items-center gap-2 px-3 py-3 sm:gap-4 sm:px-6 sm:py-4">
         {showBackToDashboard ? (
           <Link
             href="/dashboard"
-            className="flex max-w-md flex-1 items-center gap-2 text-sm font-medium text-dash-navy hover:text-dash-navy/80"
+            className="flex max-w-md flex-1 items-center gap-2 truncate text-sm font-medium text-dash-navy hover:text-dash-navy/80"
             aria-label={t("reader.backToDashboard")}
           >
-            <ArrowLeft size={18} />
-            <span>{t("reader.backToDashboard")}</span>
+            <ArrowLeft size={18} className="flex-shrink-0" />
+            <span className="truncate">{t("reader.backToDashboard")}</span>
           </Link>
         ) : (
           <img
             src="/images/logo.svg"
             alt="VK Digital Library"
-            className="h-[3.25rem] w-auto flex-shrink-0"
-            style={{ marginLeft: "20px" }}
+            className="ml-1 h-10 w-auto flex-shrink-0 sm:ml-5 sm:h-[3.25rem]"
           />
         )}
 
-        <div className="ml-auto flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-2 sm:gap-4">
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
               <button className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-2.5 transition-colors hover:bg-dash-navy/5">
