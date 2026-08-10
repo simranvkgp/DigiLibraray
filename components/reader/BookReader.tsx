@@ -12,7 +12,9 @@ import {
   Maximize,
   Minimize,
   Bookmark,
+  BookMarked,
   Heart,
+  Highlighter,
   PanelRight,
   X,
 } from "lucide-react";
@@ -43,6 +45,21 @@ interface FavoriteRow {
   pageNumber: number | null;
 }
 
+interface HighlightRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface HighlightRow {
+  id: string;
+  pageNumber: number;
+  text: string;
+  rects: HighlightRect[];
+  color: string;
+}
+
 // Thumbnails render at a fixed width regardless of zoom — small enough that
 // keeping every rendered one in memory (no eviction, unlike full pages) is fine.
 const THUMB_WIDTH = 110;
@@ -57,12 +74,14 @@ export function BookReader({
   initialPage,
   initialBookmarks,
   initialFavorites,
+  initialHighlights,
   lang = "en",
 }: {
   book: ReaderBook;
   initialPage: number;
   initialBookmarks: BookmarkRow[];
   initialFavorites: FavoriteRow[];
+  initialHighlights: HighlightRow[];
   lang?: Lang;
 }) {
   const [page, setPage] = useState(initialPage || 1);
@@ -71,11 +90,22 @@ export function BookReader({
   const [thumbsOpen, setThumbsOpen] = useState(false);
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
   const [favorites, setFavorites] = useState(initialFavorites);
+  const [highlights, setHighlights] = useState(initialHighlights);
+  const [selectionPopup, setSelectionPopup] = useState<{
+    pageNum: number;
+    text: string;
+    rects: HighlightRect[];
+    x: number;
+    y: number;
+  } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const thumbsAreaRef = useRef<HTMLDivElement>(null);
   const pageWrapperRefs = useRef<Array<HTMLDivElement | null>>([]);
   const canvasRefs = useRef<Array<HTMLCanvasElement | null>>([]);
+  const textLayerRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const textLayerRenderedRef = useRef<Set<number>>(new Set());
+  const selectionPopupRef = useRef<HTMLDivElement>(null);
   const thumbWrapperRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const thumbCanvasRefs = useRef<Array<HTMLCanvasElement | null>>([]);
   const renderedThumbsRef = useRef<Set<number>>(new Set());
@@ -98,6 +128,18 @@ export function BookReader({
     const handler = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handler);
     return () => document.removeEventListener("fullscreenchange", handler);
+  }, []);
+
+  // Dismiss the "Highlight" selection popup on any interaction outside it —
+  // covers clicking away without starting a new text selection, which the
+  // per-page text layer's onMouseUp handler alone wouldn't catch.
+  useEffect(() => {
+    function handleDocMouseDown(e: MouseEvent) {
+      if (selectionPopupRef.current?.contains(e.target as Node)) return;
+      setSelectionPopup(null);
+    }
+    document.addEventListener("mousedown", handleDocMouseDown);
+    return () => document.removeEventListener("mousedown", handleDocMouseDown);
   }, []);
 
   // Track the viewer's actual content width so the placeholder height
@@ -201,6 +243,28 @@ export function BookReader({
     [zoom]
   );
 
+  // Renders an invisible text layer over a page's canvas, once, so its text
+  // becomes selectable (needed for highlighting) — the canvas already shows
+  // the rendered glyphs, this just makes them selectable on top of it.
+  // Position/size is driven entirely by the container's --scale-factor CSS
+  // variable (set from JSX), so this never needs to re-run on zoom changes.
+  const renderTextLayer = useCallback(async (pageNum: number) => {
+    const doc = pdfDocRef.current;
+    const container = textLayerRefs.current[pageNum - 1];
+    if (!doc || !container || textLayerRenderedRef.current.has(pageNum)) return;
+    textLayerRenderedRef.current.add(pageNum);
+
+    try {
+      const { TextLayer } = await import("pdfjs-dist");
+      const pageProxy = await doc.getPage(pageNum);
+      const viewport = pageProxy.getViewport({ scale: 1 });
+      const textContent = await pageProxy.getTextContent();
+      await new TextLayer({ textContentSource: textContent, container, viewport }).render();
+    } catch {
+      textLayerRenderedRef.current.delete(pageNum);
+    }
+  }, []);
+
   function evictFarPages(centerPage: number) {
     renderedAtZoomRef.current.forEach((_zoomRenderedAt, pageNum) => {
       if (Math.abs(pageNum - centerPage) > KEEP_RENDERED_RANGE) {
@@ -225,7 +289,10 @@ export function BookReader({
         entries.forEach((entry) => {
           const pageNum = Number((entry.target as HTMLElement).dataset.page);
           intersectionRatiosRef.current.set(pageNum, entry.isIntersecting ? entry.intersectionRatio : 0);
-          if (entry.isIntersecting) renderPage(pageNum);
+          if (entry.isIntersecting) {
+            renderPage(pageNum);
+            renderTextLayer(pageNum);
+          }
         });
 
         let bestPage: number | null = null;
@@ -247,7 +314,7 @@ export function BookReader({
 
     pageWrapperRefs.current.forEach((el) => el && observer.observe(el));
     return () => observer.disconnect();
-  }, [isPdf, loadState, numPages, renderPage]);
+  }, [isPdf, loadState, numPages, renderPage, renderTextLayer]);
 
   // Renders a single low-res thumbnail (Adobe-style page navigator). Thumbs
   // are never evicted once rendered — they're small enough that keeping all
@@ -365,6 +432,66 @@ export function BookReader({
 
   const favoritedPages = new Set(favorites.map((f) => f.pageNumber));
 
+  // Captures the current text selection (if any) within a page's text layer
+  // as candidate highlight rects, in unscaled (scale=1) page coordinates —
+  // dividing by effectiveScale here undoes whatever scale the selection was
+  // made at, so the stored rects stay valid at any future zoom level.
+  function handleTextSelection(pageNum: number) {
+    const selection = window.getSelection();
+    if (!selection || selection.isCollapsed || !selection.toString().trim() || !selection.rangeCount) {
+      setSelectionPopup(null);
+      return;
+    }
+
+    const container = textLayerRefs.current[pageNum - 1];
+    const range = selection.getRangeAt(0);
+    if (!container || !container.contains(range.commonAncestorContainer)) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const rects = Array.from(range.getClientRects())
+      .filter((r) => r.width > 0 && r.height > 0)
+      .map((r) => ({
+        x: (r.left - containerRect.left) / effectiveScale,
+        y: (r.top - containerRect.top) / effectiveScale,
+        width: r.width / effectiveScale,
+        height: r.height / effectiveScale,
+      }));
+    if (rects.length === 0) return;
+
+    const anchorRect = range.getBoundingClientRect();
+    setSelectionPopup({
+      pageNum,
+      text: selection.toString().trim(),
+      rects,
+      x: anchorRect.left + anchorRect.width / 2,
+      y: anchorRect.top,
+    });
+  }
+
+  async function saveHighlight() {
+    if (!selectionPopup) return;
+    const { pageNum, text, rects } = selectionPopup;
+    setSelectionPopup(null);
+    window.getSelection()?.removeAllRanges();
+
+    const res = await fetch("/api/highlights", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bookId: book.id, pageNumber: pageNum, text, rects }),
+    });
+    if (res.ok) {
+      const { highlight } = await res.json();
+      setHighlights((prev) =>
+        [...prev, { ...highlight, rects: JSON.parse(highlight.rects) }].sort((a, b) => a.pageNumber - b.pageNumber)
+      );
+    }
+  }
+
+  async function removeHighlight(id: string) {
+    await fetch("/api/highlights", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    setHighlights((prev) => prev.filter((h) => h.id !== id));
+  }
+
   // Best-effort deterrents against saving/printing/copying the page. None of
   // this can stop a screenshot, screen recording, or someone reading the
   // network response directly — that's a hard ceiling for any browser-based
@@ -395,22 +522,41 @@ export function BookReader({
 
   // The canvas itself is capped at 100% width (see className below), so on
   // screens narrower than the PDF's native render size it gets scaled down
-  // by the browser — match that here or the reserved placeholder height
-  // will be far taller than the page actually displays at.
-  const estimatedPageHeight = (() => {
+  // by the browser. effectiveScale is the *actual* displayed scale after
+  // that clamp — everything overlaid on the page (text layer, highlight
+  // marks) is positioned using it so it lines up with what's drawn, and the
+  // placeholder height below matches how tall the page actually renders.
+  const effectiveScale = (() => {
     const base = basePageSizeRef.current;
-    if (!base) return undefined;
-    const nativeWidth = base.width * zoom * 1.5;
-    const nativeHeight = base.height * zoom * 1.5;
-    if (!viewerContentWidth) return nativeHeight;
-    const displayWidth = Math.min(viewerContentWidth, nativeWidth);
-    return (displayWidth / nativeWidth) * nativeHeight;
+    const nativeScale = zoom * 1.5;
+    if (!base || !viewerContentWidth) return nativeScale;
+    return Math.min(nativeScale, viewerContentWidth / base.width);
   })();
+  const estimatedPageHeight = basePageSizeRef.current ? basePageSizeRef.current.height * effectiveScale : undefined;
+  const pageDisplayWidth = basePageSizeRef.current ? basePageSizeRef.current.width * effectiveScale : 0;
+  const pageDisplayHeight = basePageSizeRef.current ? basePageSizeRef.current.height * effectiveScale : 0;
 
   return (
     <div ref={containerRef} tabIndex={-1} className="bg-background" style={isPdf ? { userSelect: "none" } : undefined}>
+      {/* Floating "Highlight" button that appears above a text selection */}
+      {selectionPopup && (
+        <div
+          ref={selectionPopupRef}
+          className="fixed z-50 -translate-x-1/2 -translate-y-full pb-2 print:hidden"
+          style={{ left: selectionPopup.x, top: selectionPopup.y }}
+        >
+          <button
+            onClick={saveHighlight}
+            className="flex items-center gap-1.5 rounded-lg bg-navy px-3 py-1.5 text-xs font-medium text-white shadow-lg hover:bg-navy/90"
+          >
+            <Highlighter size={14} />
+            {t("reader.highlightSelection")}
+          </button>
+        </div>
+      )}
+
       {/* Top bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3 print:hidden">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-3 print:hidden">
         <div className="flex min-w-0 items-center gap-2">
           <Link href="/dashboard">
             <Button size="icon" variant="ghost" aria-label={t("reader.backToDashboard")}>
@@ -425,53 +571,80 @@ export function BookReader({
             </div>
           </div>
         </div>
-
-        <div className="flex items-center gap-1.5">
-          <Button size="icon" variant="ghost" onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))} aria-label={t("reader.zoomOut")}>
-            <ZoomOut size={16} />
-          </Button>
-          <span className="data-text w-12 text-center text-xs text-text-secondary">{Math.round(zoom * 100)}%</span>
-          <Button size="icon" variant="ghost" onClick={() => setZoom((z) => Math.min(2, z + 0.1))} aria-label={t("reader.zoomIn")}>
-            <ZoomIn size={16} />
-          </Button>
-          <Button size="icon" variant="ghost" onClick={toggleFullscreen} aria-label={t("reader.toggleFullscreen")}>
-            {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => toggleBookmark(page)}
-            aria-label={t(bookmarkedPages.has(page) ? "reader.removeBookmark" : "reader.addBookmark")}
-          >
-            <Bookmark size={16} fill={bookmarkedPages.has(page) ? "currentColor" : "none"} />
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => toggleFavorite(page)}
-            aria-label={t(favoritedPages.has(page) ? "reader.removeFavorite" : "reader.addFavorite")}
-            className={favoritedPages.has(page) ? "text-brandred" : undefined}
-          >
-            <Heart size={16} fill={favoritedPages.has(page) ? "currentColor" : "none"} />
-          </Button>
-          {isPdf && (
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => setThumbsOpen((s) => !s)}
-              aria-label={t("reader.togglePageNavigator")}
-              className={thumbsOpen ? "bg-background" : undefined}
-            >
-              <PanelRight size={16} />
-            </Button>
-          )}
-          <Button size="sm" variant="outline" onClick={() => setSidebarOpen((s) => !s)}>
-            {t("reader.bookmarks")} ({bookmarks.length})
-          </Button>
-        </div>
       </div>
 
       <div className="flex">
+        {/* Adobe-style vertical action rail, fixed to the right edge of the viewer */}
+        {isViewable && (
+          <div
+            className={`fixed top-1/2 z-30 flex -translate-y-1/2 flex-col items-center gap-1 rounded-2xl border border-border bg-background/95 p-2 shadow-lg backdrop-blur print:hidden ${
+              thumbsOpen && isPdf ? "right-44" : "right-4"
+            }`}
+          >
+            <Button size="icon" variant="ghost" onClick={() => setZoom((z) => Math.min(2, z + 0.1))} aria-label={t("reader.zoomIn")}>
+              <ZoomIn size={16} />
+            </Button>
+            <span className="data-text w-10 text-center text-[11px] text-text-secondary">{Math.round(zoom * 100)}%</span>
+            <Button size="icon" variant="ghost" onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))} aria-label={t("reader.zoomOut")}>
+              <ZoomOut size={16} />
+            </Button>
+
+            <div className="my-1 h-px w-6 bg-border" />
+
+            <Button size="icon" variant="ghost" onClick={toggleFullscreen} aria-label={t("reader.toggleFullscreen")}>
+              {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+            </Button>
+
+            <div className="my-1 h-px w-6 bg-border" />
+
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => toggleBookmark(page)}
+              aria-label={t(bookmarkedPages.has(page) ? "reader.removeBookmark" : "reader.addBookmark")}
+            >
+              <Bookmark size={16} fill={bookmarkedPages.has(page) ? "currentColor" : "none"} />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => toggleFavorite(page)}
+              aria-label={t(favoritedPages.has(page) ? "reader.removeFavorite" : "reader.addFavorite")}
+              className={favoritedPages.has(page) ? "text-brandred" : undefined}
+            >
+              <Heart size={16} fill={favoritedPages.has(page) ? "currentColor" : "none"} />
+            </Button>
+            {isPdf && (
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setThumbsOpen((s) => !s)}
+                aria-label={t("reader.togglePageNavigator")}
+                className={thumbsOpen ? "bg-background" : undefined}
+              >
+                <PanelRight size={16} />
+              </Button>
+            )}
+
+            <div className="my-1 h-px w-6 bg-border" />
+
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => setSidebarOpen((s) => !s)}
+              aria-label={`${t("reader.bookmarks")} (${bookmarks.length})`}
+              className="relative"
+            >
+              <BookMarked size={16} />
+              {bookmarks.length > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accentblue px-1 text-[10px] text-white">
+                  {bookmarks.length}
+                </span>
+              )}
+            </Button>
+          </div>
+        )}
+
         {/* Bookmarks sidebar: overlay drawer on mobile, inline column from md up */}
         {sidebarOpen && (
           <>
@@ -494,6 +667,27 @@ export function BookReader({
                       {t("reader.page")} {b.pageNumber}
                     </button>
                     <button onClick={() => removeBookmark(b.id)} aria-label={t("reader.removeBookmark")}>
+                      <X size={14} className="text-text-secondary" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <p className="mb-3 mt-6 text-sm font-medium text-navy">{t("reader.highlights")}</p>
+              {highlights.length === 0 && <p className="text-xs text-text-secondary">{t("reader.noHighlights")}</p>}
+              <div className="space-y-2">
+                {highlights.map((h) => (
+                  <div key={h.id} className="flex items-start justify-between gap-2 rounded-lg bg-background px-2 py-1.5">
+                    <button
+                      onClick={() => (isPdf ? scrollToPage(h.pageNumber) : setPage(h.pageNumber))}
+                      className="min-w-0 flex-1 text-left"
+                    >
+                      <p className="data-text text-xs text-accentblue">
+                        {t("reader.page")} {h.pageNumber}
+                      </p>
+                      <p className="mt-0.5 line-clamp-2 text-xs text-text-secondary">&ldquo;{h.text}&rdquo;</p>
+                    </button>
+                    <button onClick={() => removeHighlight(h.id)} aria-label={t("reader.removeHighlight")}>
                       <X size={14} className="text-text-secondary" />
                     </button>
                   </div>
@@ -553,6 +747,39 @@ export function BookReader({
                         }}
                         className="mx-auto block h-auto max-w-full rounded-lg border border-border"
                         onDragStart={(e) => e.preventDefault()}
+                      />
+                      {/* Saved highlight marks — purely visual, positioned to match
+                          the canvas exactly; managed from the Bookmarks panel. */}
+                      <div
+                        className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
+                        style={{ width: pageDisplayWidth, height: pageDisplayHeight }}
+                      >
+                        {highlights
+                          .filter((h) => h.pageNumber === pageNum)
+                          .flatMap((h) =>
+                            h.rects.map((r, i) => (
+                              <div
+                                key={`${h.id}-${i}`}
+                                className="absolute rounded-sm bg-yellow-300/40"
+                                style={{
+                                  left: r.x * effectiveScale,
+                                  top: r.y * effectiveScale,
+                                  width: r.width * effectiveScale,
+                                  height: r.height * effectiveScale,
+                                }}
+                              />
+                            ))
+                          )}
+                      </div>
+                      {/* Invisible text layer over the canvas — makes the rendered
+                          text selectable so it can be highlighted. */}
+                      <div
+                        ref={(el) => {
+                          textLayerRefs.current[pageNum - 1] = el;
+                        }}
+                        className="textLayer absolute left-1/2 top-0 -translate-x-1/2 select-text"
+                        style={{ ["--scale-factor" as string]: effectiveScale }}
+                        onMouseUp={() => handleTextSelection(pageNum)}
                       />
                     </div>
                   ))}

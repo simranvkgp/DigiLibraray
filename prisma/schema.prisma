@@ -51,6 +51,7 @@ model User {
 
   bookmarks               Bookmark[]
   favorites               Favorite[]
+  highlights              Highlight[]
   readingProgress         ReadingProgress[]
   notifications           NotificationRecipient[]
   approvals               Approval[]              @relation("ApprovalTarget")
@@ -191,6 +192,7 @@ model Book {
   bookAccess        BookAccess[]
   bookmarks         Bookmark[]
   favorites         Favorite[]
+  highlights        Highlight[]
   readingProgress   ReadingProgress[]
   bookAccessGrants  BookAccessGrant[]
   bookRequests      BookRequest[]
@@ -321,6 +323,24 @@ model Favorite {
   // Null means "whole book" (quick heart from the library grid); a page
   // number means a specific page was favorited from inside the reader.
   pageNumber Int?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([bookId])
+}
+
+model Highlight {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId     String
+  book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  pageNumber Int
+  text       String
+  // JSON array of {x,y,width,height}, in unscaled (scale=1) page coordinates,
+  // so the overlay can be repositioned at whatever zoom the page re-renders at.
+  rects      String
+  color      String   @default("yellow")
   createdAt  DateTime @default(now())
 
   @@index([userId])

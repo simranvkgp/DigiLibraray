@@ -77,6 +77,27 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
+  /* Minimal subset of pdf.js's text_layer CSS — sized/positioned via the
+     --scale-factor custom property set per-page in BookReader, so it tracks
+     the canvas exactly at any zoom level. Spans are transparent: the canvas
+     underneath already shows the glyphs, this only makes them selectable. */
+  .textLayer {
+    line-height: 1;
+    text-align: initial;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+    forced-color-adjust: none;
+    transform-origin: 0 0;
+    z-index: 0;
+  }
+  .textLayer span,
+  .textLayer br {
+    color: transparent;
+    position: absolute;
+    white-space: pre;
+    cursor: text;
+    transform-origin: 0% 0%;
+  }
   @keyframes marquee {
     from {
       transform: translateX(0);

@@ -138,6 +138,10 @@ export const user = {
     "reader.loading": "Loading book…",
     "reader.loadError": "Couldn't load this book. Please try again.",
     "reader.printDisabled": "Printing is disabled for this book.",
+    "reader.highlightSelection": "Highlight",
+    "reader.highlights": "Highlights",
+    "reader.noHighlights": "No highlights yet. Select any text on a page to highlight it.",
+    "reader.removeHighlight": "Remove highlight",
 
     // Bookmarks page (all bookmarks across every book)
     "bookmarks.title": "Bookmarks",
@@ -282,6 +286,10 @@ export const user = {
     "reader.loading": "पुस्तक लोड हो रही है…",
     "reader.loadError": "यह पुस्तक लोड नहीं हो सकी। कृपया पुनः प्रयास करें।",
     "reader.printDisabled": "इस पुस्तक के लिए प्रिंट करना अक्षम है।",
+    "reader.highlightSelection": "हाइलाइट करें",
+    "reader.highlights": "हाइलाइट्स",
+    "reader.noHighlights": "अभी तक कोई हाइलाइट नहीं है। किसी पृष्ठ पर टेक्स्ट चुनकर हाइलाइट करें।",
+    "reader.removeHighlight": "हाइलाइट हटाएं",
 
     // Bookmarks page (all bookmarks across every book)
     "bookmarks.title": "बुकमार्क",
