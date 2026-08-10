@@ -34,10 +34,21 @@ function findHeaderColumn(headerRow: unknown[], aliases: string[]): number {
   return -1;
 }
 
+function looksLikeYearOrSession(s: string): boolean {
+  return /^(19|20)\d{2}([-–]\d{2,4})?$/.test(s) || /session|annual\s*system/i.test(s);
+}
+
 // Each sheet opens with a merged banner row naming the course/university
-// (e.g. "B.A./B.Com.(HPU) 2025-26  ANNUAL SYSTEM"). Strip the session/year
-// noise so what's left reads as the institution name.
+// (e.g. "B.A./B.Com.(HPU) 2025-26  ANNUAL SYSTEM"). The course name before
+// the parentheses varies sheet to sheet for the *same* university (a B.Sc.
+// sheet and an M.A. sheet for HPU each have their own course prefix), so
+// prefer the parenthesized abbreviation — that's what actually identifies
+// the institution — over the full banner text whenever one is present.
 function cleanInstitutionName(raw: string): string {
+  const parenGroups = [...raw.matchAll(/\(([^)]+)\)/g)].map((m) => m[1].trim());
+  const abbrev = parenGroups.find((p) => p && /[a-zA-Z]/.test(p) && !looksLikeYearOrSession(p));
+  if (abbrev) return abbrev;
+
   let s = raw;
   s = s.replace(/\b(19|20)\d{2}\s*[-–]\s*\d{2,4}\b/g, " ");
   s = s.replace(/\b(19|20)\d{2}\b/g, " ");
