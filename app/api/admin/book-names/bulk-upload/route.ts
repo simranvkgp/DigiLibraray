@@ -18,7 +18,7 @@ const TITLE_ALIASES = ["titles", "title"];
 const CLASS_ALIASES = ["class"];
 const MEDIUM_ALIASES = ["medium"];
 const AUTHOR_ALIASES = ["author", "authors"];
-const UNIVERSITY_ALIASES = ["uni", "university"];
+const INSTITUTION_ALIASES = ["institution", "institution/board", "institute", "board", "uni", "university"];
 const HEADER_SEARCH_COLUMNS = 8;
 const HEADER_SCAN_ROWS = 6;
 
@@ -119,15 +119,27 @@ export async function POST(req: Request) {
     const classCol = findHeaderColumn(headerRow, CLASS_ALIASES);
     const mediumCol = findHeaderColumn(headerRow, MEDIUM_ALIASES);
     const authorCol = findHeaderColumn(headerRow, AUTHOR_ALIASES);
-    const uniCol = findHeaderColumn(headerRow, UNIVERSITY_ALIASES);
+    const institutionCol = findHeaderColumn(headerRow, INSTITUTION_ALIASES);
 
     if (titleCol === -1 || classCol === -1) {
       sheetsSkipped.push(sheetName);
       continue;
     }
 
-    const bannerCell = grid[0].find((c) => normalize(c) !== "");
-    const sheetInstitution = cleanInstitutionName(normalize(bannerCell)) || sheetFallbackName(sheetName);
+    // Only rows *above* the header can be a merged banner naming the
+    // course/university — if the header is row 0 there's no banner at all,
+    // and treating the header row itself as one would just pick up a column
+    // label (e.g. "Title") as the "institution name" for every row.
+    let sheetInstitution = "";
+    for (let i = 0; i < headerRowIdx; i++) {
+      const bannerCell = grid[i].find((c) => normalize(c) !== "");
+      const cleaned = cleanInstitutionName(normalize(bannerCell));
+      if (cleaned) {
+        sheetInstitution = cleaned;
+        break;
+      }
+    }
+    if (!sheetInstitution) sheetInstitution = sheetFallbackName(sheetName);
 
     for (let r = headerRowIdx + 1; r < grid.length; r++) {
       const row = grid[r];
@@ -135,7 +147,7 @@ export async function POST(req: Request) {
       const className = normalize(row[classCol]);
       const author = authorCol !== -1 ? normalize(row[authorCol]) : "";
       const medium = mediumCol !== -1 ? normalize(row[mediumCol]) : "";
-      const rowUniversity = uniCol !== -1 ? normalize(row[uniCol]) : "";
+      const rowInstitution = institutionCol !== -1 ? normalize(row[institutionCol]) : "";
 
       if (!title && !className && !author) continue; // blank filler / section-header row (e.g. "Ist Year")
 
@@ -149,7 +161,7 @@ export async function POST(req: Request) {
         className,
         medium,
         author,
-        institutionName: rowUniversity || sheetInstitution,
+        institutionName: rowInstitution || sheetInstitution,
       });
     }
   }
