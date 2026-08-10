@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { bookRequestSchema } from "@/lib/validations";
+import { sendPushToAdmins } from "@/lib/push";
 
 export async function GET() {
   const session = await auth();
@@ -56,6 +57,12 @@ export async function POST(req: Request) {
   const request = await prisma.bookRequest.create({
     data: { userId, bookId, note: note || null },
   });
+
+  sendPushToAdmins(
+    "New book access request",
+    `${user.name ?? "A user"} requested access to "${book.title}"`,
+    "/admin/requests"
+  ).catch(() => {});
 
   return NextResponse.json({ request }, { status: 201 });
 }
