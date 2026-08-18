@@ -360,7 +360,6 @@ export const admin = {
     "admin.suggestions.giveAccess": "एक्सेस दें",
     "admin.suggestions.addBookFirst": "कृपया पहले पुस्तक को लाइब्रेरी में जोड़ें, फिर एक्सेस देने के लिए यहां वापस आएं।",
     "admin.suggestions.noBooksFound": "लाइब्रेरी में कोई मेल खाती पुस्तक नहीं मिली। कृपया पहले इसे Books में जोड़ें।",
-    "admin.suggestions.bookNameMatches": "कैटलॉग मेल",
     "admin.suggestions.mailSent": "एक्सेस दे दिया गया — ईमेल भेज दिया गया है",
     "admin.suggestions.reject": "अस्वीकृत करें",
     "admin.suggestions.empty": "इस दृश्य में कोई नई पुस्तक अनुरोध नहीं है।",

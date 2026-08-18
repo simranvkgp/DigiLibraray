@@ -196,19 +196,17 @@ export function BookSuggestionsTable({ lang = "en" }: { lang?: Lang }) {
                     {s.medium ?? "—"}
                   </td>
                   <td className="hidden p-3 md:table-cell">
-                    <p className="text-xs font-medium">{s.user.institution || "—"}</p>
-                    <p className="text-xs text-text-secondary">
-                      {[s.user.category, s.user.board].filter(Boolean).join(" / ") || "—"}
-                    </p>
                     {(() => {
-                      const catalogMatch = bookNamesAdmin.find(
+                      const match = bookNamesAdmin.find(
                         (bn) => bn.name?.toLowerCase().trim() === s.title.toLowerCase().trim()
-                      )?.institutionName;
-                      return catalogMatch ? (
-                        <p className="mt-0.5 text-[11px] text-text-secondary/70">
-                          {t("admin.suggestions.bookNameMatches")}: {catalogMatch}
-                        </p>
-                      ) : null;
+                      );
+                      if (!match) return <span className="text-xs text-text-secondary">—</span>;
+                      return (
+                        <>
+                          <p className="text-xs font-medium">{match.institution?.name ?? "—"}</p>
+                          <p className="text-xs text-text-secondary">{match.className ?? "—"}</p>
+                        </>
+                      );
                     })()}
                   </td>
                   <td className="hidden p-3 max-w-xs md:table-cell">
