@@ -83,6 +83,13 @@ export function BookRequestsTable({
     setBusyId(null);
   }
 
+  async function revokeAccess(id: string) {
+    setBusyId(id);
+    await fetch(`/api/admin/book-requests/${id}/revoke`, { method: "POST" });
+    await load();
+    setBusyId(null);
+  }
+
   async function reject(id: string) {
     setBusyId(id);
     await fetch(`/api/admin/book-requests/${id}/reject`, {
@@ -195,9 +202,23 @@ export function BookRequestsTable({
                         </>
                       )}
                       {r.status === "APPROVED" && (
-                        <Button size="sm" variant="success" disabled={busyId === r.id} onClick={() => approve(r.id)}>
-                          {t("admin.requests.reaccess")}
-                        </Button>
+                        <>
+                          <Button size="sm" variant="success" disabled={busyId === r.id} onClick={() => approve(r.id)}>
+                            {t("admin.requests.reaccess")}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            disabled={busyId === r.id}
+                            onClick={() => {
+                              if (window.confirm(t("admin.requests.confirmRevoke"))) {
+                                revokeAccess(r.id);
+                              }
+                            }}
+                          >
+                            {t("admin.requests.revoke")}
+                          </Button>
+                        </>
                       )}
                       <Button
                         size="sm"

@@ -121,6 +121,8 @@ export const admin = {
     "admin.requests.rejectReason": "Reason (optional)",
     "admin.requests.rejectSubmit": "Confirm reject",
     "admin.requests.reaccess": "Reaccess",
+    "admin.requests.revoke": "Revoke access",
+    "admin.requests.confirmRevoke": "Revoke this user's access to the book? It will disappear from their dashboard.",
     "admin.requests.delete": "Delete",
     "admin.requests.confirmDelete": "Delete this request?",
     "admin.requests.empty": "No requests in this view.",
@@ -346,6 +348,8 @@ export const admin = {
     "admin.requests.reject": "अस्वीकृत करें",
     "admin.requests.rejectReason": "कारण (वैकल्पिक)",
     "admin.requests.rejectSubmit": "अस्वीकृति की पुष्टि करें",
+    "admin.requests.revoke": "एक्सेस रद्द करें",
+    "admin.requests.confirmRevoke": "इस उपयोगकर्ता की पुस्तक तक पहुँच रद्द करें? यह उनके डैशबोर्ड से हटा दी जाएगी।",
     "admin.requests.empty": "इस दृश्य में कोई अनुरोध नहीं है।",
 
     // New book suggestions (books not yet in the library)
